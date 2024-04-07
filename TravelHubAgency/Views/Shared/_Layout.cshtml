@@ -1,0 +1,191 @@
+﻿@{
+    //List<Continente> continentes = ViewData["continentes"] as List<Continente>;
+    List<Continente> continentes = cache.Get<List<Continente>>("continentes");
+    List<Pais> paises = cache.Get<List<Pais>>("paises");
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - TravelHubAgency</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/lib/owlcarousel/assets/owl.carousel.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/TravelHubAgency.styles.css" asp-append-version="true" />
+</head>
+<body>
+    <!-- Topbar Start -->
+    <div class="container-fluid bg-light pt-3 d-none d-lg-block" id="topbar">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-6 text-center text-lg-left mb-2 mb-lg-0">
+                    <div class="d-inline-flex align-items-center">
+                        <p><i class="fa fa-envelope mr-2"></i>info@example.com</p>
+                        <p class="text-body px-3">|</p>
+                        <p><i class="fa fa-phone-alt mr-2"></i>+012 345 6789</p>
+                    </div>
+                </div>
+                <div class="col-lg-6 text-center text-lg-right" id="social">
+                    <div class="d-inline-flex align-items-center">
+                        <a class="text-primary px-3" asp-controller="Home" asp-action="Index">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a class="text-primary px-3" asp-controller="Home" asp-action="Index">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a class="text-primary px-3" asp-controller="Home" asp-action="Index">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
+                        <a class="text-primary px-3" asp-controller="Home" asp-action="Index">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a class="text-primary px-3" asp-controller="Home" asp-action="Index">
+                            <i class="fab fa-youtube"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Topbar End -->
+    <!-- Navbar Start -->
+    <div class="container-fluid position-relative nav-bar p-0">
+        <div class="container-lg position-relative p-0 px-lg-3" style="z-index: 9;">
+            <nav class="navbar navbar-expand-lg bg-light navbar-light shadow-lg py-3 py-lg-0 pl-3 pl-lg-5" id="navbar">
+                <a asp-controller="Home" asp-action="Index" class="navbar-brand">
+                    <h1 class="m-0 text-primary"><span class="text-dark">TRAVEL</span>HUB</h1>
+                </a>
+                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse justify-content-between px-3" id="navbarCollapse">
+                    <ul class="navbar-nav ml-auto py-0">
+                        <li class="nav-item "><a class="nav-link active" asp-controller="Home" asp-action="Index">Home</a></li>
+                        <li class="nav-item "><a class="nav-link " asp-controller="Home" asp-action="Index">Reservas</a></li>
+                        <li class="nav-item "><a class="nav-link " asp-controller="Home" asp-action="Index">Ofertas</a></li>
+                        <li class="nav-item "><a class="nav-link " asp-controller="Home" asp-action="Index">Tour Packages</a></li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" id="navbarDropdown" href="#">Destinos</a>
+                            <ul class="dropdown-menu border-0 rounded-0 m-0" aria-labelledby="navbarDropdown">
+                                <li><a class="dropdown-item" asp-controller="Home" asp-action="Index">Islas</a></li>
+                                @if (continentes != null)
+                                {
+                                    @foreach (Continente cont in continentes)
+                                    {
+                                        <li class="dropdown-item">
+                                            <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" id="navbarSubmenuDropdown" asp-controller="Home" asp-action="Index" asp-route-idcontinente="@cont.IdContinente">@cont.Nombre</a>
+                                            <ul class="dropdown-menu" aria-labelledby="navbarSubmenuDropdown">
+                                                @{
+                                                    var ps = paises.Where(x => x.IdContinente == cont.IdContinente);
+
+                                                }
+                                                @foreach (Pais pais in ps)
+                                                {
+                                                    <li><a class="dropdown-item" asp-controller="Home" asp-action="Index" asp-route-idpais="@pais.IdPais">@pais.Nombre</a></li>
+                                                }
+                                            </ul>
+                                        </li>
+                                    }
+                                }
+                            </ul>
+                        </li>
+                        <li class="nav-item"><a class="nav-link" asp-controller="Home" asp-action="Index">Contact</a></li>
+                        <li class="nav-item"><a class="nav-link" asp-controller="Managed" asp-action="Auth"> perfil</a> </li>
+                    </ul>
+                </div>
+            </nav>
+        </div>
+    </div>
+    @* Navbar End *@
+    <main role="main">
+        @RenderBody()
+    </main>
+    @*  Back to Top *@
+    <a href="#" id="btn-backtop" class="btn btn-lg btn-primary btn-lg-square back-to-top"><i class="fa fa-angle-double-up"></i></a>
+
+    <!-- Footer Start -->
+    <div class="container-fluid bg-dark text-white-50 py-5 px-sm-3 px-lg-5" style="margin-top: 90px;">
+        <div class="row pt-5" style="margin:0;">
+            <div class="col-lg-3 col-md-6 mb-5">
+                <a asp-controller="Home" asp-action="Index" class="navbar-brand">
+                    <h1 class="text-primary"><span class="text-white">TRAVEL</span>HUB</h1>
+                </a>
+                <p>Sed ipsum clita tempor ipsum ipsum amet sit ipsum lorem amet labore rebum lorem ipsum dolor. No sed vero lorem dolor dolor</p>
+                <h6 class="text-white text-uppercase mt-4 mb-3" style="letter-spacing: 5px;">Follow Us</h6>
+                <div class="d-flex justify-content-start">
+                    <a class="btn btn-outline-primary btn-square mr-2" asp-controller="Home" asp-action="Index"><i class="fab fa-twitter"></i></a>
+                    <a class="btn btn-outline-primary btn-square mr-2" asp-controller="Home" asp-action="Index"><i class="fab fa-facebook-f"></i></a>
+                    <a class="btn btn-outline-primary btn-square mr-2" asp-controller="Home" asp-action="Index"><i class="fab fa-linkedin-in"></i></a>
+                    <a class="btn btn-outline-primary btn-square" asp-controller="Home" asp-action="Index"><i class="fab fa-instagram"></i></a>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-5">
+                <h5 class="text-white text-uppercase mb-4" style="letter-spacing: 5px;">Our Services</h5>
+                <div class="d-flex flex-column justify-content-start">
+                    <a class="text-white-50 mb-2" asp-controller="Home" asp-action="Index"><i class="fa fa-angle-right mr-2"></i>About</a>
+                    <a class="text-white-50 mb-2" asp-controller="Home" asp-action="Index"><i class="fa fa-angle-right mr-2"></i>Destination</a>
+                    <a class="text-white-50 mb-2" asp-controller="Home" asp-action="Index"><i class="fa fa-angle-right mr-2"></i>Services</a>
+                    <a class="text-white-50 mb-2" asp-controller="Home" asp-action="Index"><i class="fa fa-angle-right mr-2"></i>Packages</a>
+                    <a class="text-white-50 mb-2" asp-controller="Home" asp-action="Index"><i class="fa fa-angle-right mr-2"></i>Guides</a>
+                    <a class="text-white-50 mb-2" asp-controller="Home" asp-action="Index"><i class="fa fa-angle-right mr-2"></i>Testimonial</a>
+                    <a class="text-white-50" asp-controller="Home" asp-action="Index"><i class="fa fa-angle-right mr-2"></i>Blog</a>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-5">
+                <h5 class="text-white text-uppercase mb-4" style="letter-spacing: 5px;">Usefull Links</h5>
+                <div class="d-flex flex-column justify-content-start">
+                    <a class="text-white-50 mb-2" asp-controller="Home" asp-action="Index"><i class="fa fa-angle-right mr-2"></i>About</a>
+                    <a class="text-white-50 mb-2" asp-controller="Home" asp-action="Index"><i class="fa fa-angle-right mr-2"></i>Destination</a>
+                    <a class="text-white-50 mb-2" asp-controller="Home" asp-action="Index"><i class="fa fa-angle-right mr-2"></i>Services</a>
+                    <a class="text-white-50 mb-2" asp-controller="Home" asp-action="Index"><i class="fa fa-angle-right mr-2"></i>Packages</a>
+                    <a class="text-white-50 mb-2" asp-controller="Home" asp-action="Index"><i class="fa fa-angle-right mr-2"></i>Guides</a>
+                    <a class="text-white-50 mb-2" asp-controller="Home" asp-action="Index"><i class="fa fa-angle-right mr-2"></i>Testimonial</a>
+                    <a class="text-white-50" asp-controller="Home" asp-action="Index"><i class="fa fa-angle-right mr-2"></i>Blog</a>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-5">
+                <h5 class="text-white text-uppercase mb-4" style="letter-spacing: 5px;">Contactanos</h5>
+                <p><i class="fa fa-map-marker-alt mr-2"></i>123 Calle, Murcia, España</p>
+                <p><i class="fa fa-phone-alt mr-2"></i>+012 345 67890</p>
+                <p><i class="fa fa-envelope mr-2"></i>infotravelhub@gmail.com</p>
+                <h6 class="text-white text-uppercase mt-4 mb-3" style="letter-spacing: 5px;">Newsletter</h6>
+                <div class="w-100">
+                    <div class="input-group">
+                        <input type="text" class="form-control border-light" style="padding: 25px;" placeholder="Your Email">
+                        <div class="input-group-append">
+                            <button class="btn btn-primary px-3">inscribete ya!</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container-fluid bg-dark text-white border-top py-4 px-sm-3 px-md-5" style="border-color: rgba(256, 256, 256, .1) !important;">
+        <div class="row">
+            <div class="col-lg-6 text-center text-md-left mb-3 mb-md-0">
+                <p class="m-0 text-white-50">
+                    2024 &copy; <a asp-controller="Home" asp-action="Index">Travelhub</a>. All rights reserved.</a>
+                </p>
+            </div>
+            <div class="col-lg-6 text-center text-md-right">
+                <p class="m-0 text-white-50">
+                    made by <a href="https://github.com/werkuLopez">werku</a>
+                </p>
+            </div>
+        </div>
+    </div>
+    <!-- Footer End -->
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="~/js/easing.js"></script>
+    <script src="~/lib/owlcarousel/owl.carousel.min.js"></script>
+    <script src="~/js/fontaweson.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+    @await RenderSectionAsync("Styles", required: false)
+</body>
+</html>

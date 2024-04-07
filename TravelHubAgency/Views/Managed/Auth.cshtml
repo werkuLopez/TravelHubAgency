@@ -1,0 +1,516 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    string usuario = ViewData["usuario"] as string;
+}
+
+<section>
+    <div class="form-auth-container" id="form-auth-container">
+        <div class="form-container sign-up-container">
+            <form action="">
+                <h2>Registrarse</h2>
+                <span class="with">- registrarse con -</span>
+                <div class="social-container">
+                    <a href="#" class="social">
+                        <i class="fa-brands fa-facebook-f"></i>
+                    </a>
+                    <a href="#" class="social">
+                        <i class="fa-brands fa-instagram"></i>
+                    </a>
+                    <a href="#" class="social">
+                        <i class="fa-brands fa-linkedin"></i>
+                    </a>
+                    <a href="#" class="social">
+                        <i class="fa-brands fa-twitter"></i>
+                    </a>
+                </div>
+                <span class="with">o registrarse con cuenta nueva</span>
+                <input type="text" name="username" placeholder="username" />
+                <input type="email" name="email" placeholder="email" />
+                <input type="password" name="password" placeholder="password" />
+                <button id="submitSignUpbtn">registrarme</button>
+                <a href="#" id="signinbtn"> ya tengo cuenta? Sign in</a>
+            </form>
+        </div>
+        <div class="form-container sign-in-container">
+            <form action="">
+                <h2>Iniciar sesión</h2>
+                <span class="with" style="display: inline-flex;">- iniciar sesión con -</span>
+                <div class="social-container">
+                    <a href="#" class="social">
+                        <i class="fa-brands fa-facebook-f"></i>
+                    </a>
+                    <a href="#" class="social">
+                        <i class="fa-brands fa-instagram"></i>
+                    </a>
+                    <a href="#" class="social">
+                        <i class="fa-brands fa-linkedin"></i>
+                    </a>
+                    <a href="#" class="social">
+                        <i class="fa-brands fa-twitter"></i>
+                    </a>
+                </div>
+                <span class="with">o use su cuenta</span>
+                <input type="email" name="email" placeholder="email" />
+                <input type="password" name="password" placeholder="password" />
+                <button id="submitSignInbtn">iniciar sesión</button>
+                <a href="#" id="signupbtn"> no tengo cuenta? Sig up</a>
+            </form>
+        </div>
+        <div class="overlay-container">
+            <div class="overlay">
+                <div class="overlay-panel overlay-left">
+                    <h1>Bienvenido de nuevo!</h1>
+                    <p>
+                        Para mantenerte conectado con nosotros, por favor inicie sesion con su cuenta
+                    </p>
+                    <button class="ghost" id="signInBtn">iniciar sesion</button>
+                </div>
+                <div class="overlay-panel overlay-right">
+                    <h1>Hola !, amigo</h1>
+                    <p>Introduce tus datos y empieza a disfrutar con nosotros</p>
+                    <button class="ghost" id="signUpBtn">Registrarse</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    @if (usuario != null)
+    {
+        <span class="pt-5">
+            @usuario
+        </span>
+    }
+</section>
+
+
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+
+            $("#submitSignUpbtn").on("click", function (e) {
+
+                e.preventDefault();
+
+                console.log($(this).prev())
+
+                var passwordInput = $(this).prev();
+                var emailInput = $(passwordInput).prev();
+                var username = $(emailInput).prev().val();
+                var email = $(passwordInput).prev().val();
+                var password = $(this).prev().val();
+
+                sigUp(username, email, password);
+
+                passwordInput.val('');
+                $(passwordInput).prev().val('');
+                emailInput.val('');
+                $(emailInput).prev().val('');
+
+            });
+
+            $("#submitSignInbtn").on("click", function (e) {
+                e.preventDefault();
+
+                console.log($(this).prev())
+
+                var passwordInput = $(this).prev();
+                var email = $(passwordInput).prev().val();
+                var password = $(this).prev().val();
+
+                sigIn(email, password);
+
+                passwordInput.val('');
+                $(passwordInput).prev().val('');
+            });
+
+        });
+
+        function sigIn(email, password) {
+            var url = "/Managed/SignIn";
+            var request = "?email=" + email + "&password=" + password;
+
+            $.ajax({
+                url: url + request,
+                method: "POST",
+                success: function (response) {
+                    console.log(response);
+                }
+            });
+        }
+
+        function sigUp(username, email, password) {
+            var url = "/Managed/SignUp";
+            var request = "?username=" + username + "&email=" + email + "&password=" + password;
+
+            $.ajax({
+                url: url + request,
+                method: "POST",
+                success: function (response) {
+                    console.log(response);
+                }
+            });
+        }
+    </script>
+    <script>
+        const signUpButton = document.getElementById("signUpBtn");
+        const signInButton = document.getElementById("signInBtn");
+
+        const signUplink = document.getElementById("signupbtn");
+        const signInlink = document.getElementById("signinbtn");
+
+        const container = document.getElementById("form-auth-container");
+
+        signUpButton.addEventListener("click", () => {
+            container.classList.add("right-panel-active");
+        });
+
+        signInButton.addEventListener("click", () => {
+            container.classList.remove("right-panel-active");
+        });
+
+        signUplink.addEventListener("click", (e) => {
+            e.preventDefault();
+            // if (window.innerWidth < 700) {
+            //     container.classList.remove("right-panel-active");
+            // }
+            container.classList.add("right-panel-active");
+        });
+
+        signInlink.addEventListener("click", (e) => {
+            e.preventDefault();
+            // if (window.innerWidth > 700) {
+            //     container.classList.add("right-panel-active");
+            // }
+            container.classList.remove("right-panel-active");
+            // container.children[0].style.Transform = "translateX(100%)";
+        });
+    </script>
+}
+
+@section Styles {
+    <style>
+        @@import url("https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap");
+
+        * {
+            padding: 0;
+            margin: 0;
+            text-decoration: none;
+            font-family: "Roboto", sans-serif;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #f6f5f7;
+            height: 100vh;
+        }
+
+        section {
+            padding: 100px 0 10px 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        h1, h2, p {
+            color: #fff !important;
+        }
+
+        #form-auth-container h1 {
+            font-weight: 800 !important;
+            margin: 0;
+        }
+
+        #form-auth-container h2 {
+            text-align: center;
+            margin-bottom: 24px;
+            font-weight: 600 !important;
+        }
+
+        #form-auth-container p {
+            font-size: 14px;
+            font-weight: 400 !important;
+            line-height: 20px;
+            margin: 20px 0 30px;
+        }
+
+        #form-auth-container a {
+            color: #333;
+            font-size: 14px;
+            margin: 15px 0;
+        }
+
+        #form-auth-container button {
+            border-radius: 20px;
+            color: #fff;
+            font-size: 12px;
+            font-weight: 500;
+            padding: 12px 45px;
+            letter-spacing: 1px;
+            background-image: linear-gradient( 56deg, rgba(232, 96, 76, 0.9) 0%, rgba(232, 96, 76, 0.9) 100% ), linear-gradient(336deg, rgb(232, 96, 76), rgb(232, 96, 76));
+            /* background-image: linear-gradient(56deg, rgba(43,46,224,0.15) 0%, rgba(26,218,182,0.15) 100%), linear-gradient(336deg, rgb(50, 52, 221), rgb(60, 239, 241)); */
+            text-transform: uppercase;
+            transition: 80ms ease-in;
+            border: none;
+            cursor: pointer;
+        }
+
+            #form-auth-container button:active {
+                transform: scale(0.95);
+            }
+
+            #form-auth-container button:focus {
+                outline: none;
+            }
+
+            #form-auth-container button.ghost {
+                background-color: transparent;
+                border: 1px solid #fff;
+            }
+
+        #form-auth-container form {
+            background: #f6f5f7;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            padding: 0 50px;
+            height: 100%;
+            text-align: center;
+        }
+
+        #form-auth-container input {
+            background: #eee;
+            border: none;
+            padding: 12px 15px;
+            margin: 8px 0;
+            width: 100%;
+            border-radius: 5px;
+        }
+
+        .form-auth-container {
+            background-color: #f6f5f7;
+            box-shadow: 0 7px 14px rgba(0, 0, 0, 0.2), 0 10px 10px rgba(0, 0, 0, 0.2);
+            position: relative;
+            width: 90%;
+            height: 100%;
+            margin: 0 auto;
+            overflow-x: hidden;
+            max-width: 100%;
+            min-height: 480px;
+        }
+
+        .form-container {
+            position: absolute;
+            top: 0;
+            height: 100%;
+            transition: 0.6s ease-in-out;
+        }
+
+        .sign-in-container {
+            width: 50%;
+        }
+
+        .sign-up-container {
+            left: 0;
+            width: 50%;
+            z-index: 2;
+        }
+
+        .form-auth-container.right-panel-active .sign-in-container {
+            transform: translateX(0);
+        }
+
+        .sign-up-container {
+            left: 0;
+            width: 50%;
+            opacity: 1;
+            z-index: 1;
+            transform: translateX(100%);
+        }
+
+        .form-auth-container.right-panel-active .sign-up-container {
+            transform: translateX(100%);
+            opacity: 1;
+            z-index: 5;
+            animation: show 0.6s;
+        }
+
+        @@keyframes show {
+            0%,
+            49.99% {
+                opacity: 1;
+                z-index: 5;
+            }
+
+            50%,
+            100% {
+                opacity: 1;
+                z-index: 1;
+            }
+        }
+
+        .overlay-container {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            width: 50%;
+            height: 100%;
+            overflow: hidden;
+            transition: 0.6s ease-in-out;
+            z-index: 100;
+        }
+
+        .form-auth-container.right-panel-active .overlay-container {
+            transform: translateX(-100%);
+        }
+
+        .overlay {
+            /* background-image: linear-gradient(56deg, rgba(43,46,224,0.15) 0%, rgba(26,218,182,0.15) 100%), linear-gradient(336deg, rgb(50, 52, 221), rgb(60, 239, 241)); */
+            background-image: linear-gradient( 56deg, rgba(232, 96, 76, 0.9) 0%, rgba(232, 96, 76, 0.9) 100% ), linear-gradient(336deg, rgb(232, 96, 76), rgb(232, 96, 76));
+            color: #fff;
+            position: relative;
+            left: -100%;
+            height: 100%;
+            width: 200%;
+            transform: translateX(0);
+            transition: 0.6s ease-in-out;
+        }
+
+        .form-auth-container.right-panel-active .overlay {
+            transform: translateX(50%);
+        }
+
+        .overlay-panel {
+            position: absolute;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            text-align: center;
+            top: 0;
+            height: 100%;
+            width: 50%;
+            transform: translateX(0);
+            transition: 0.6s ease-in-out;
+        }
+
+        .overlay-left {
+            transform: translateX(-20%);
+        }
+
+        .form-auth-container.right-panel-active .overlay-left {
+            transform: translateX(0);
+        }
+
+        .overlay-right {
+            transform: translateX(0);
+            right: 0;
+        }
+
+        .form-auth-container.right-panel-active .overlay-right {
+            transform: translateX(20%);
+        }
+
+        .social-container {
+            margin: 20px 0;
+        }
+
+            .social-container a.social {
+                border: 2px solid #ddd;
+                border-radius: 50%;
+                display: inline-flex;
+                justify-content: center;
+                align-items: center;
+                margin: 0 5px;
+                height: 40px;
+                width: 40px;
+                transition: all 0.3s ease-in-out;
+            }
+
+        .social i {
+            color: #e8604c;
+        }
+
+        .sign-in-container .social-container a.social:hover,
+        .sign-up-container .social-container a.social:hover {
+            cursor: pointer;
+            background-color: #e8604c;
+            text-decoration: none;
+        }
+
+            .sign-in-container .social-container a.social:hover i,
+            .sign-up-container .social-container a.social:hover i {
+                color: #fff;
+            }
+
+        #signinbtn {
+            display: none;
+            text-decoration: underline;
+            color: #0077ff !important;
+        }
+
+        #signupbtn {
+            display: none;
+            text-decoration: underline;
+            color: #0077ff !important;
+        }
+
+        @@media (max-width: 700px) {
+            #signinbtn,
+            #signupbtn {
+                display: inline-block;
+            }
+
+            #form-auth-container form {
+                padding: 0 1em;
+            }
+
+            .sign-in-container {
+                width: 70%;
+                /* transform: translateX(100%); */
+            }
+
+            .sign-up-container {
+                width: 70%;
+                /* left: 80%; */
+            }
+
+            .overlay-container {
+                left: 70%;
+            }
+
+            .overlay-left {
+                left: 100%;
+            }
+
+            .overlay-right {
+                right: -100%;
+            }
+
+            .form-auth-container.right-panel-active .sign-up-container {
+                transform: translateX(0);
+            }
+
+            .form-auth-container.right-panel-active .sign-in-container {
+                transform: translateX(100%);
+            }
+
+            .form-auth-container.right-panel-active .overlay-container {
+                transform: translateX(0);
+            }
+
+            .social-container {
+                display: inline-flex;
+                justify-content: space-around;
+                align-items: center;
+                text-align: center;
+            }
+        }
+
+        .with {
+            color: rgba(0, 0, 0, 0.37);
+            font-size: 14px;
+            font-weight: 800;
+            margin: .5em 0;
+        }
+    </style>
+}
