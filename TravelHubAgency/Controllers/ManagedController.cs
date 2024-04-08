@@ -14,11 +14,11 @@ namespace TravelHubAgency.Controllers
         }
         public IActionResult Auth()
         {
-            if (cache.Get<string>("usuario") != null)
-            {
-                ViewData["usuario"] = cache.Get<string>("usuario");
-                return View();
-            }
+            //if (cache.Get<string>("usuario") != null)
+            //{
+            //    ViewData["usuario"] = cache.Get<string>("usuario");
+            //    return View();
+            //}
             return View();
         }
 
@@ -28,7 +28,7 @@ namespace TravelHubAgency.Controllers
             string usuario = email + "y su contraseña es " + password;
             this.cache.Set("usuario", usuario);
 
-            return RedirectToAction("Auth", "Managed");
+            return Redirect("Auth");
         }
 
         [HttpPost]
@@ -39,7 +39,7 @@ namespace TravelHubAgency.Controllers
             this.cache.Set("usuario", usuario);
 
 
-            return RedirectToAction("Auth", "Managed");
+            return Redirect("Auth");
         }
     }
 }
