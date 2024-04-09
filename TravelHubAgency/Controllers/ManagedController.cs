@@ -18,11 +18,11 @@ namespace TravelHubAgency.Controllers
         }
         public IActionResult Auth()
         {
-            if (cache.Get<string>("usuario") != null)
-            {
-                ViewData["usuario"] = cache.Get<string>("usuario");
-                return View();
-            }
+            //if (cache.Get<string>("usuario") != null)
+            //{
+            //    ViewData["usuario"] = cache.Get<string>("usuario");
+            //    return View();
+            //}
             return View();
         }
 
