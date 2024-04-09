@@ -1,6 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
+using System.Security.Claims;
 using TravelHubAgency.Models;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace TravelHubAgency.Controllers
 {
@@ -25,21 +29,60 @@ namespace TravelHubAgency.Controllers
         [HttpPost]
         public async Task<IActionResult> SignIn(string email, string password)
         {
-            string usuario = email + "y su contraseña es " + password;
-            this.cache.Set("usuario", usuario);
+            Usuario usuario = await this.repo.LogIn(email, password);
+            if (usuario == null)
+            {
+                ViewData["MENSAJE"] = "Error al registrarse";
+                return View();
+            }
+            else
+            {
+                ClaimsIdentity identity =
+                    new ClaimsIdentity(
+                        CookieAuthenticationDefaults.AuthenticationScheme,
+                        ClaimTypes.Name, ClaimTypes.Role);
 
-            return RedirectToAction("Auth", "Managed");
+                Claim name = new Claim(ClaimTypes.Name, usuario.Email);
+                identity.AddClaim(name);
+                Claim id = new Claim(ClaimTypes.NameIdentifier, usuario.IdUsuario.ToString());
+                identity.AddClaim(id);
+
+                ClaimsPrincipal principal = new ClaimsPrincipal(identity);
+
+                await HttpContext.SignInAsync(
+                    CookieAuthenticationDefaults.AuthenticationScheme,
+                    principal);
+
+                // recuperamos la ruta a la navegacion que el 
+                // usuario había seleccionado
+
+                string controller = TempData["controller"].ToString();
+                string action = TempData["action"].ToString();
+
+                return RedirectToAction(action, controller);
+            }
         }
 
         [HttpPost]
         public async Task<IActionResult> SignUp(string username, string email, string password)
         {
-            string usuario =
-                username + ", su correo es " + email + "y su contraseña es " + password;
-            this.cache.Set("usuario", usuario);
+            Usuario usuario = await this.repo.SignIn(nombre, apellido, email, password);
+            if (usuario == null)
+            {
+                ViewData["MENSAJE"] = "Error al registrarse";
+                return View();
+            }
+            else
+            {
+                return View(usuario);
+            }
+        }
 
-
-            return RedirectToAction("Auth", "Managed");
+        public async Task<IActionResult> LogOut()
+        {
+            await HttpContext.SignOutAsync(
+                CookieAuthenticationDefaults.AuthenticationScheme);
+            return RedirectToAction("Index", "Home");
         }
     }
 }
