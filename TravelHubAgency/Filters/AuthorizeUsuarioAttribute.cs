@@ -30,7 +30,7 @@ namespace TravelHubAgency.Filters
 
             if (usuario.Identity.IsAuthenticated == false)
             {
-                context.Result = this.GetRoute("Managed", "Auth");
+                context.Result = this.GetRoute("Managed", "LogIn");
             }
         }
 

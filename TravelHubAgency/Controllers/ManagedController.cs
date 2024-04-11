@@ -5,31 +5,31 @@ using Microsoft.Extensions.Caching.Memory;
 using System.Security.Claims;
 using TravelHubAgency.Models;
 using static System.Runtime.InteropServices.JavaScript.JSType;
+using TravelHubAgency.Repositories;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace TravelHubAgency.Controllers
 {
     public class ManagedController : Controller
     {
         private IMemoryCache cache;
+        private ITravelhubRepository repo;
 
-        public ManagedController(IMemoryCache cache)
+        public ManagedController(ITravelhubRepository repo, IMemoryCache cache)
         {
+            this.repo = repo;
             this.cache = cache;
+
         }
-        public IActionResult Auth()
+        public IActionResult LogIn()
         {
-            //if (cache.Get<string>("usuario") != null)
-            //{
-            //    ViewData["usuario"] = cache.Get<string>("usuario");
-            //    return View();
-            //}
             return View();
         }
 
         [HttpPost]
         public async Task<IActionResult> SignIn(string email, string password)
         {
-            Usuario usuario = await this.repo.LogIn(email, password);
+            Usuario usuario = await this.repo.SigIn(email, password);
             if (usuario == null)
             {
                 ViewData["MENSAJE"] = "Error al registrarse";
@@ -64,9 +64,9 @@ namespace TravelHubAgency.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> SignUp(string username, string email, string password)
+        public async Task<IActionResult> SignUp(string nombre, string apellido, string email, string password)
         {
-            Usuario usuario = await this.repo.SignIn(nombre, apellido, email, password);
+            Usuario usuario = await this.repo.SigUp(nombre, apellido, email, password);
             if (usuario == null)
             {
                 ViewData["MENSAJE"] = "Error al registrarse";
@@ -83,6 +83,12 @@ namespace TravelHubAgency.Controllers
             await HttpContext.SignOutAsync(
                 CookieAuthenticationDefaults.AuthenticationScheme);
             return RedirectToAction("Index", "Home");
+        }
+
+
+        public IActionResult ErrorAcceso()
+        {
+            return View();
         }
     }
 }

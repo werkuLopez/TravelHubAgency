@@ -5,15 +5,9 @@ using TravelHubAgency.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-builder.Services.AddControllersWithViews(options =>
-    options.EnableEndpointRouting = false)
-    .AddSessionStateTempDataProvider();
-
 
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession();
-
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
@@ -27,10 +21,20 @@ builder.Services.AddAuthentication(options =>
     }
     );
 
+// Add services to the container.
+builder.Services.AddControllersWithViews(options =>
+    options.EnableEndpointRouting = false)
+    .AddSessionStateTempDataProvider();
+
+
 builder.Services.AddTransient<ITravelhubRepository, TravelhubRepository>();
 string connection = builder.Configuration.GetConnectionString("SQLTravelhubagency");
 builder.Services.AddDbContext<TravelhubContext>(options => options.UseSqlServer(connection));
 
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
+});
 
 
 var app = builder.Build();
@@ -51,8 +55,11 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.UseSession();
 
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+app.UseMvc(routes =>
+{
+    routes.MapRoute(
+        name: "default",
+        template: "{controller=Home}/{action=Index}/{id?}");
+});
 
 app.Run();

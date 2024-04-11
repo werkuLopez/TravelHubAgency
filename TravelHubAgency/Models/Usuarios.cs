@@ -16,7 +16,7 @@ namespace TravelHubAgency.Models
         [Column("Email")]
         public string Email { get; set; }
         [Column("Password")]
-        public string Password { get; set; }
+        public byte[] Password { get; set; }
         [Column("Tipousuario")]
         public int TipoUsuario { get; set; }
         [Column("Salt")]

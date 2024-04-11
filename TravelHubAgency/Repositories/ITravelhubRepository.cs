@@ -24,6 +24,10 @@ namespace TravelHubAgency.Repositories
         #endregion
 
         #region USUARIOS
+        Task<Usuario> SigIn(string username, string password);
+        Task<Usuario> SigUp(string nombre, string apellido, string email, string password);
         #endregion
+
+        
     }
 }
