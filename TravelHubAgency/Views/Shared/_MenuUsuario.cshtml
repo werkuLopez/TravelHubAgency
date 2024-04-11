@@ -1,0 +1,18 @@
+﻿@if (Context.User.Identity.IsAuthenticated)
+{
+    <div class="nav-item dropdown">
+        <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Perfil</a>
+        <div class="dropdown-menu">
+            <a href="#reservas" class="dropdown-item">Reservas</a>
+            <a href="#mis-post" class="dropdown-item">Mis posts</a>
+            <a href="#mis-post" class="dropdown-item">Mis posts</a>
+            <a href="#mis-post" class="dropdown-item">Mis posts</a>
+        </div>
+    </div>
+}
+else
+{
+    <a asp-controller="Usuarios" asp-action="Perfil"
+       class="nav-item nav-link">Perfil</a>
+@*     class="btn btn-primary rounded-pill py-2 px-4" *@
+}

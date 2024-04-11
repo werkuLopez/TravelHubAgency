@@ -1,0 +1,14 @@
+﻿﻿@using System.Security.Claims
+
+<h2 class="text-primary">
+    Bienvenido @Context.User.Identity.Name !!
+</h2>
+
+<ul class="list-group">
+    @foreach(Claim claim in Context.User.Claims)
+    {
+        <li class="list-group-item">
+            @claim.Type: @claim.Value
+        </li>
+    }
+</ul>

@@ -78,8 +78,7 @@ namespace TravelHubAgency.Repositories
 
         public async Task<Usuario> SigIn(string username, string pass)
         {
-            Usuario user = await
-                 this.context.Usuarios.FirstOrDefaultAsync(x => x.Email == username);
+            Usuario user = await this.context.Usuarios.FirstOrDefaultAsync(x => x.Email == username);
 
             if (user == null)
             {
@@ -106,12 +105,13 @@ namespace TravelHubAgency.Repositories
             }
         }
 
-        public async Task<Usuario> SigUp(string nombre, string apellido, string email, string password)
+        public async Task<Usuario> SigUp(string nombre, string apellido, string email, string password, string pais)
         {
             Usuario user = new Usuario();
             user.IdUsuario = await this.GetMaxIdUsuarioAsync();
             user.Nombre = nombre;
             user.Email = email;
+            user.Pais= pais;
             user.Imagen = "usuario.png";
             user.TipoUsuario = 2;
 
@@ -122,7 +122,6 @@ namespace TravelHubAgency.Repositories
             user.Password =
                 HelperCryptography.EncryptPassword(password, user.Salt);
 
-            user.Activo = false;
             user.Token = HelperTools.GenerateTokenMail();
 
             Usuario existe = await this.context.Usuarios.FirstOrDefaultAsync(x => x.Email == user.Email);

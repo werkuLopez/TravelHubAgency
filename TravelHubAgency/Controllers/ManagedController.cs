@@ -64,9 +64,9 @@ namespace TravelHubAgency.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> SignUp(string nombre, string apellido, string email, string password)
+        public async Task<IActionResult> SignUp(string nombre, string apellido, string email, string password,string pais)
         {
-            Usuario usuario = await this.repo.SigUp(nombre, apellido, email, password);
+            Usuario usuario = await this.repo.SigUp(nombre, apellido, email, password, pais);
             if (usuario == null)
             {
                 ViewData["MENSAJE"] = "Error al registrarse";

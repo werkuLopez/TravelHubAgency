@@ -1,12 +1,12 @@
 ﻿@{
     Layout = "~/Views/Shared/_Layout.cshtml";
-    string usuario = cache.Get<string>("usuario");
 }
 
 <section style="height:100vh;">
     <div class="form-auth-container" id="form-auth-container">
         <div class="form-container sign-up-container">
-            <form action="">
+            <form method="post">
+                @Html.AntiForgeryToken()
                 <h2>Registrarse</h2>
                 <span class="with">- registrarse con -</span>
                 <div class="social-container">
@@ -24,15 +24,18 @@
                     </a>
                 </div>
                 <span class="with">o registrarse con cuenta nueva</span>
-                <input type="text" name="username" placeholder="username" />
-                <input type="email" name="email" placeholder="email" />
-                <input type="password" name="password" placeholder="password" />
+                <input type="text" id="nombre" placeholder="nombre" />
+                <input type="text" id="apellido" placeholder="apellido" />
+                <input type="text" id="pais" placeholder="pais" />
+                <input type="email" id="email" placeholder="email" />
+                <input type="password" id="password" placeholder="password" />
                 <button id="submitSignUpbtn">registrarme</button>
                 <a href="#" id="signinbtn"> ya tengo cuenta? Sign in</a>
             </form>
         </div>
         <div class="form-container sign-in-container">
-            <form action="">
+            <form method="post">
+                @Html.AntiForgeryToken()
                 <h2>Iniciar sesión</h2>
                 <span class="with" style="display: inline-flex;">- iniciar sesión con -</span>
                 <div class="social-container">
@@ -73,12 +76,10 @@
             </div>
         </div>
     </div>
-    @if (usuario != null)
-    {
-        <span class="pt-5">
-            @usuario
-        </span>
-    }
+    <span class="pt-5">
+        @ViewData["MENSAJE"]
+    </span>
+
 </section>
 
 
@@ -91,33 +92,35 @@
 
                 e.preventDefault();
 
-                console.log($(this).prev())
 
-                var passwordInput = $(this).prev();
-                var emailInput = $(passwordInput).prev();
-                var username = $(emailInput).prev().val();
-                var email = $(passwordInput).prev().val();
-                var password = $(this).prev().val();
+                // var passwordInput = $(this).prev();
+                // var emailInput = $(passwordInput).prev();
+                // var apellidoInput = $(emailInput).prev();
 
-                sigUp(username, email, password);
+                var nombre = $("#nombre").val();
+                var apellido = $("#apellido").val();
+                var pais = $("#pais").val();
+                var email = $("#email").val();
+                var password = $("#password").val();
 
-                passwordInput.val('');
-                $(passwordInput).prev().val('');
-                emailInput.val('');
-                $(emailInput).prev().val('');
+                SignUp(nombre, apellido, email, password);
+
+                $("#nombre").val('');
+                $("#apellido").val('');
+                $("#pais").val('');
+                $("#email").val('');
+                $("#password").val('');
 
             });
 
             $("#submitSignInbtn").on("click", function (e) {
                 e.preventDefault();
 
-                console.log($(this).prev())
-
                 var passwordInput = $(this).prev();
                 var email = $(passwordInput).prev().val();
                 var password = $(this).prev().val();
 
-                sigIn(email, password);
+                SignIn(email, password);
 
                 passwordInput.val('');
                 $(passwordInput).prev().val('');
@@ -125,7 +128,8 @@
 
         });
 
-        function sigIn(email, password) {
+        function SignIn(email, password) {
+
             var url = "/Managed/SignIn";
             var request = "?email=" + email + "&password=" + password;
 
@@ -138,9 +142,9 @@
             });
         }
 
-        function sigUp(username, email, password) {
+        function SignUp(nombre, apellido, email, password) {
             var url = "/Managed/SignUp";
-            var request = "?username=" + username + "&email=" + email + "&password=" + password;
+            var request = "?nombre=" + nombre + "&apellido=" + apellido + "&email=" + email + "&password=" + password;
 
             $.ajax({
                 url: url + request,
