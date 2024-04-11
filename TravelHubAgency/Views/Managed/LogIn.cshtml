@@ -2,8 +2,8 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<section style="height:100vh;">
-    <div class="form-auth-container" id="form-auth-container">
+<section style="height:100%;">
+    <div class="form-auth-container" id="form-auth-container" style="height:100vh;">
         <div class="form-container sign-up-container">
             <form method="post">
                 @Html.AntiForgeryToken()
@@ -256,6 +256,7 @@
             text-transform: uppercase;
             transition: 80ms ease-in;
             border: none;
+            margin-top: 1em;
             cursor: pointer;
         }
 
@@ -364,7 +365,7 @@
             height: 100%;
             overflow: hidden;
             transition: 0.6s ease-in-out;
-            z-index: 100;
+            z-index: 99;
         }
 
         .form-auth-container.right-panel-active .overlay-container {
@@ -502,6 +503,10 @@
 
             .form-auth-container.right-panel-active .overlay-container {
                 transform: translateX(0);
+            }
+
+            #form-auth-container form {
+                align-items: inherit;
             }
 
             .social-container {

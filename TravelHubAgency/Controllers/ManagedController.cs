@@ -13,11 +13,11 @@ namespace TravelHubAgency.Controllers
     public class ManagedController : Controller
     {
         private IMemoryCache cache;
-        private ITravelhubRepository repo;
+        private TravelhubServices service;
 
-        public ManagedController(ITravelhubRepository repo, IMemoryCache cache)
+        public ManagedController(TravelhubServices service, IMemoryCache cache)
         {
-            this.repo = repo;
+            this.service= service;
             this.cache = cache;
 
         }
@@ -29,7 +29,7 @@ namespace TravelHubAgency.Controllers
         [HttpPost]
         public async Task<IActionResult> SignIn(string email, string password)
         {
-            Usuario usuario = await this.repo.SigIn(email, password);
+            Usuario usuario = await this.service.SigIn(email, password);
             if (usuario == null)
             {
                 ViewData["MENSAJE"] = "Error al registrarse";
@@ -66,7 +66,7 @@ namespace TravelHubAgency.Controllers
         [HttpPost]
         public async Task<IActionResult> SignUp(string nombre, string apellido, string email, string password,string pais)
         {
-            Usuario usuario = await this.repo.SigUp(nombre, apellido, email, password, pais);
+            Usuario usuario = await this.service.SigUp(nombre, apellido, email, password, pais);
             if (usuario == null)
             {
                 ViewData["MENSAJE"] = "Error al registrarse";

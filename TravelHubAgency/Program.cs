@@ -27,9 +27,9 @@ builder.Services.AddControllersWithViews(options =>
     .AddSessionStateTempDataProvider();
 
 
-builder.Services.AddTransient<ITravelhubRepository, TravelhubRepository>();
-string connection = builder.Configuration.GetConnectionString("SQLTravelhubagency");
-builder.Services.AddDbContext<TravelhubContext>(options => options.UseSqlServer(connection));
+builder.Services.AddTransient<TravelhubServices>();
+//string connection = builder.Configuration.GetConnectionString("SQLTravelhubagency");
+//builder.Services.AddDbContext<TravelhubContext>(options => options.UseSqlServer(connection));
 
 builder.Services.AddSession(options =>
 {

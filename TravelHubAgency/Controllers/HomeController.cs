@@ -8,12 +8,12 @@ namespace TravelHubAgency.Controllers
 {
     public class HomeController : Controller
     {
-        private ITravelhubRepository repo;
+        private TravelhubServices service;
         private IMemoryCache cache;
-        public HomeController(ITravelhubRepository repo,
+        public HomeController(TravelhubServices service,
             IMemoryCache cache)
         {
-            this.repo = repo;
+            this.service = service;
             this.cache = cache;
         }
 
@@ -26,7 +26,7 @@ namespace TravelHubAgency.Controllers
             }
             else
             {
-                continentes = await this.repo.GetAllContinentesAsync();
+                continentes = await this.service.GetAllContinentesAsync();
                 this.cache.Set("continentes", continentes);
             }
 
@@ -37,7 +37,7 @@ namespace TravelHubAgency.Controllers
             }
             else
             {
-                paises = await this.repo.GetAllPaisesAsync();
+                paises = await this.service.GetAllPaisesAsync();
                 this.cache.Set("paises", paises);
             }
 

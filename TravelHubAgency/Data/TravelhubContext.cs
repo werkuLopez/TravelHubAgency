@@ -8,6 +8,7 @@ namespace TravelHubAgency.Data
         public TravelhubContext(DbContextOptions<TravelhubContext>options):base(options) { }
         public DbSet<Continente> Continentes { get; set; }
         public DbSet<Pais> Paises { get; set; }
+        public DbSet<Destino> Destinos { get; set; }
         public DbSet<Usuario> Usuarios { get; set; }
     }
 }

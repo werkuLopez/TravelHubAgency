@@ -25,8 +25,6 @@ namespace TravelHubAgency.Models
         public string Token { get; set; }
         [Column("Imagen")]
         public string Imagen { get; set; }
-        //[Column("Activo")]
-        //public bool Activo { get; set; }
         [Column("Pais")]
         public string Pais { get; set; }
 
