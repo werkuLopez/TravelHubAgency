@@ -26,6 +26,7 @@ builder.Services.AddControllersWithViews(options =>
     options.EnableEndpointRouting = false)
     .AddSessionStateTempDataProvider();
 
+builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddTransient<TravelhubServices>();
 //string connection = builder.Configuration.GetConnectionString("SQLTravelhubagency");

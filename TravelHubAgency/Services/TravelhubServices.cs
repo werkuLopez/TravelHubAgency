@@ -1,7 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
 using System.Net.Http.Headers;
 using System.Numerics;
+using System.Text;
 using TravelHubAgency.Data;
 using TravelHubAgency.Helpers;
 using TravelHubAgency.Models;
@@ -12,11 +15,13 @@ namespace TravelHubAgency.Repositories
     {
         private string ApiUrl;
         private MediaTypeWithQualityHeaderValue header;
+        private IHttpContextAccessor context;
 
-        public TravelhubServices(IConfiguration config)
+        public TravelhubServices(IConfiguration config, IHttpContextAccessor context)
         {
             this.header = new MediaTypeWithQualityHeaderValue("application/json");
             this.ApiUrl = config.GetValue<string>("ApiUrls:ApiTravelHub");
+            this.context = context;
         }
 
         // CALLAPISASYNC
@@ -28,6 +33,12 @@ namespace TravelHubAgency.Repositories
                 client.DefaultRequestHeaders.Clear();
                 client.DefaultRequestHeaders.Accept.Add(this.header);
                 HttpResponseMessage response = await client.GetAsync(request);
+
+                //string token = this.context.HttpContext.User.FindFirst(x => x.Type == "Token").Value;
+                //if(token != null)
+                //{
+                     
+                //}
                 if (response.IsSuccessStatusCode)
                 {
                     T data = await response.Content.ReadAsAsync<T>();
@@ -39,6 +50,46 @@ namespace TravelHubAgency.Repositories
                 }
             }
         }
+
+        #region GETUSUARIOTOKEN
+        public async Task<string> GetTokenAsync(string username, string password)
+        {
+            using (HttpClient client = new HttpClient())
+            {
+                string request = "api/auth/login";
+                client.BaseAddress = new Uri(this.ApiUrl);
+                client.DefaultRequestHeaders.Clear();
+                client.DefaultRequestHeaders.Accept.Add(this.header);
+
+                LoginModel model = new LoginModel
+                {
+                    Email = username,
+                    Password = password
+                };
+
+                string jsonData =
+                    JsonConvert.SerializeObject(model);
+                StringContent content =
+                    new StringContent(jsonData, Encoding.UTF8, "application/json");
+
+                HttpResponseMessage response =
+                   await client.PostAsync(request, content);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    string data =
+                        await response.Content.ReadAsStringAsync();
+                    JObject keys = JObject.Parse(data);
+                    string token = keys.GetValue("response").ToString();
+                    return token;
+                }
+                else
+                {
+                    return null;
+                }
+            };
+        }
+        #endregion
         #region CONTINENTES
 
         public async Task<List<Continente>> GetAllContinentesAsync()
