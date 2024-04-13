@@ -19,5 +19,9 @@ namespace TravelHubAgency.Models
         public string Descripcion { get; set; }
         [Column("Imagen")]
         public string Imagen { get; set; }
+        [Column("Latitud")]
+        public string Latitud { get; set; }
+        [Column("Longitud")]
+        public string Longitud { get; set; }
     }
 }

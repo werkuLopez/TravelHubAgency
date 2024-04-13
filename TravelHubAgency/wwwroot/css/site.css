@@ -433,3 +433,15 @@
 .btn-square:hover.fab {
     color: #fff !important;
 }
+
+/* autocomplete form css*/
+.pac-container {
+    border: none;
+    padding-top: 1em;
+    margin: 1em 0;
+}
+
+.pac-item:hover {
+    background: #df574d;
+    color: #fff;
+}

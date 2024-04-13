@@ -51,7 +51,7 @@
                 <span class="fa fa-bars"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarCollapse">
-                <div class="navbar-nav ms-auto py-0">
+                <div class="navbar-nav ms-auto m-md-auto py-0">
                     <a asp-controller="Home" asp-action="Index" class="nav-item nav-link active">Home</a>
                     <a href="https://localhost:7199/#aboutus" class="nav-item nav-link">Nosotros</a>
                     <a href="https://localhost:7199/#services" class="nav-item nav-link">Servicios</a>
@@ -69,18 +69,6 @@
                                        asp-route-idcontinente="@cont.IdContinente"
                                        style="color:rgba(0, 0, 0, 0.9) !important">@cont.Nombre</a>
 
-                                    @*                                     var ps = paises.Where(x => x.IdContinente == cont.IdContinente);
-
-                            <div class="dropdown-menu">
-                            @foreach (Pais pais in ps)
-                            {
-                            <a class="dropdown-item"
-                            asp-controller="Home"
-                            asp-action="Index"
-                            asp-route-idpais="@pais.IdPais"
-                            style="color:rgba(0, 0, 0, 0.9)!important">@pais.Nombre</a>
-                            }
-                            </div> *@
                                 }
                             }
                         </div>
@@ -181,8 +169,14 @@
         </div>
     </div>
     <!-- Footer End -->
-
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    @if (IsSectionDefined("googleMapsScripts"))
+    {
+        @await RenderSectionAsync("googleMapsScripts", required: false)
+
+    }
+
+
     <script src="~/lib/bootstrap/dist/js/bootstrap.min.js"></script>
     <script src="~/js/easing.js"></script>
     <script src="~/lib/wow/wow.min.js"></script>

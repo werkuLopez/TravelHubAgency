@@ -17,20 +17,24 @@ namespace TravelHubAgency.Controllers
 
         public ManagedController(TravelhubServices service, IMemoryCache cache)
         {
-            this.service= service;
+            this.service = service;
             this.cache = cache;
 
         }
         public IActionResult LogIn()
         {
-            return View();
+            string controller = TempData["controller"].ToString();
+            string action = TempData["action"].ToString();
+
+            return RedirectToAction(action, controller);
         }
 
         [HttpPost]
-        public async Task<IActionResult> SignIn(string email, string password)
+        public async Task<IActionResult> SignIn(LoginModel model)
         {
-            Usuario usuario = await this.service.SigIn(email, password);
-            if (usuario == null)
+            //Usuario usuario = await this.service.SigIn(model.Email, model.Password);
+            string token = await this.service.GetTokenAsync(model.Email, model.Password);
+            if (token == null)
             {
                 ViewData["MENSAJE"] = "Error al registrarse";
                 return View();
@@ -42,10 +46,13 @@ namespace TravelHubAgency.Controllers
                         CookieAuthenticationDefaults.AuthenticationScheme,
                         ClaimTypes.Name, ClaimTypes.Role);
 
-                Claim name = new Claim(ClaimTypes.Name, usuario.Email);
+                Claim name = new Claim(ClaimTypes.Name, model.Email);
                 identity.AddClaim(name);
-                Claim id = new Claim(ClaimTypes.NameIdentifier, usuario.IdUsuario.ToString());
-                identity.AddClaim(id);
+                //Claim claimId = new Claim(ClaimTypes.NameIdentifier, usuario.IdUsuario.ToString());
+                //identity.AddClaim(claimId);
+
+                // añadimos el token al clams
+                identity.AddClaim(new Claim("Token", token));
 
                 ClaimsPrincipal principal = new ClaimsPrincipal(identity);
 
@@ -64,18 +71,15 @@ namespace TravelHubAgency.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> SignUp(string nombre, string apellido, string email, string password,string pais)
+        public async Task<IActionResult> SignUp(RegisterModel model)
         {
-            Usuario usuario = await this.service.SigUp(nombre, apellido, email, password, pais);
-            if (usuario == null)
+            RegisterModel exist = await this.service.SigUp(model.Nombre, model.Apellido, model.Email, model.Password, model.Pais);
+            if (exist == null)
             {
                 ViewData["MENSAJE"] = "Error al registrarse";
-                return View();
             }
-            else
-            {
-                return View(usuario);
-            }
+            return View();
+
         }
 
         public async Task<IActionResult> LogOut()

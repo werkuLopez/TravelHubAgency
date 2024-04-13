@@ -1,6 +1,6 @@
-async function initAutocomplete() {
+function initAutocomplete() {
     var input = $("#inputDestinoAutocomplete")[0];
-    var autocomplete = await new google.maps.places.Autocomplete(input);
+    var autocomplete = new google.maps.places.Autocomplete(input);
 
     const btnSearch = $("#btnSearch");
     btnSearch.on("click", function () {
@@ -9,6 +9,6 @@ async function initAutocomplete() {
     });
 }
 
-async function getGoogleMapsIframes(destino) {
-    console.log(destino);
+function getGoogleMapsIframes(destino) {
+    console.log(destino.name);
 }

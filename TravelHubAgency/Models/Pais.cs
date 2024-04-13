@@ -11,10 +11,6 @@ namespace TravelHubAgency.Models
         public int IdPais { get; set; }
         [Column("Nombre")]
         public string Nombre { get; set; }
-        [Column("Latitud")]
-        public string Latitud { get; set; }
-        [Column("Longitud")]
-        public string Longitud { get; set; }
         [Column("Continente")]
         public int IdContinente { get; set; }
     }

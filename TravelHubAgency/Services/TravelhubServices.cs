@@ -24,7 +24,7 @@ namespace TravelHubAgency.Repositories
             this.context = context;
         }
 
-        // CALLAPISASYNC
+        #region CALLAPISASYNC
         private async Task<T> CallApiAsync<T>(string request)
         {
             using (HttpClient client = new HttpClient())
@@ -37,7 +37,7 @@ namespace TravelHubAgency.Repositories
                 //string token = this.context.HttpContext.User.FindFirst(x => x.Type == "Token").Value;
                 //if(token != null)
                 //{
-                     
+
                 //}
                 if (response.IsSuccessStatusCode)
                 {
@@ -50,6 +50,7 @@ namespace TravelHubAgency.Repositories
                 }
             }
         }
+        #endregion
 
         #region GETUSUARIOTOKEN
         public async Task<string> GetTokenAsync(string username, string password)
@@ -89,7 +90,9 @@ namespace TravelHubAgency.Repositories
                 }
             };
         }
+
         #endregion
+
         #region CONTINENTES
 
         public async Task<List<Continente>> GetAllContinentesAsync()
@@ -118,72 +121,82 @@ namespace TravelHubAgency.Repositories
 
         #endregion
 
-        #region USUARIOS
-
-        public async Task<Usuario> SigIn(string username, string pass)
+        #region DESTINOS 
+        public async Task<List<Destino>> GetAllDestinosAsync()
         {
-            //Usuario user = await this.context.Usuarios.FirstOrDefaultAsync(x => x.Email == username);
-
-            //if (user == null)
-            //{
-            //    return null;
-            //}
-            //else
-            //{
-            //    string salt = user.Salt;
-            //    byte[] temp =
-            //        HelperCryptography.EncryptPassword(pass, salt);
-            //    byte[] passUser = user.Password;
-
-            //    bool response =
-            //        HelperTools.CompareArrays(temp, passUser);
-
-            //    if (response == true)
-            //    {
-            //        return user;
-            //    }
-            //    else
-            //    {
-            //        return null;
-            //    }
-            //}
-
-            throw new Exception();
+            string request = "api/travelhub/destinos";
+            List<Destino> destinos = await this.CallApiAsync<List<Destino>>(request);
+            return destinos;
         }
 
-        public async Task<Usuario> SigUp(string nombre, string apellido, string email, string password, string pais)
+        public async Task<Destino> GetDestinoByNameAsync(string destino)
         {
-            //Usuario user = new Usuario();
-            //user.IdUsuario = await this.GetMaxIdUsuarioAsync();
-            //user.Nombre = nombre;
-            //user.Email = email;
-            //user.Pais= pais;
-            //user.Imagen = "usuario.png";
-            //user.TipoUsuario = 2;
+            string request = "api/travelhub/destinos?destino=" + destino;
+            Destino destinos = await this.CallApiAsync<Destino>(request);
+            return destinos;
+        }
 
-            ////CADA USUARIO TENDRA UN SALT DISTINTO 
-            //user.Salt = HelperTools.GenerateSalt();
+        public async Task<Destino> GetDestinoByIdAsync(int iddestino)
+        {
+            string request = "api/travelhub/destinos/" + iddestino;
+            Destino destinos = await this.CallApiAsync<Destino>(request);
+            return destinos;
+        }
+        #endregion
 
-            ////GUARDAMOS EL PASSWORD EN BYTE[] 
-            //user.Password =
-            //    HelperCryptography.EncryptPassword(password, user.Salt);
+        #region USUARIOS
 
-            //user.Token = HelperTools.GenerateTokenMail();
+        public async Task<List<Usuario>> GetAllUsuariosAsync()
+        {
+            string request = "api/travelhub/usuarios";
+            List<Usuario> usuarios =
+                await this.CallApiAsync<List<Usuario>>(request);
 
-            //Usuario existe = await this.context.Usuarios.FirstOrDefaultAsync(x => x.Email == user.Email);
+            return usuarios;
+        }
+        #endregion
 
-            //if (existe != null)
-            //{
-            //    return null;
-            //}
-            //else
-            //{
-            //    this.context.Usuarios.Add(user);
-            //    await this.context.SaveChangesAsync();
+        #region AUTH
 
-            //    return user;
-            //}
-            throw new Exception();
+        public async Task<RegisterModel> SigUp(string nombre, string apellido, string email, string password, string pais)
+        {
+            using (HttpClient client = new HttpClient())
+            {
+                string request = "api/auth/signup";
+                client.BaseAddress = new Uri(this.ApiUrl);
+                client.DefaultRequestHeaders.Clear();
+                client.DefaultRequestHeaders.Accept.Add(this.header);
+
+                RegisterModel model = new RegisterModel
+                {
+                    Nombre = nombre,
+                    Apellido = apellido,
+                    Email = email,
+                    Password = password,
+                    Pais = pais
+                };
+
+                string jsonData =
+                    JsonConvert.SerializeObject(model);
+                StringContent content =
+                    new StringContent(jsonData, Encoding.UTF8, "application/json");
+
+                HttpResponseMessage response =
+                   await client.PostAsync(request, content);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    RegisterModel data =
+                        await response.Content.ReadAsAsync<RegisterModel>();
+
+                    return data;
+                }
+                else
+                {
+                    return null;
+                }
+
+            }
         }
         #endregion
     }

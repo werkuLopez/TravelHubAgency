@@ -8,5 +8,10 @@ namespace TravelHubAgency.Controllers
         {
             return View();
         }
+
+        public async Task<IActionResult> SinglePack()
+        {
+            return View();
+        }
     }
 }
