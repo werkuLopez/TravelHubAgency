@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 using TravelHubAgency.Models;
 using TravelHubAgency.Repositories;
 
@@ -7,19 +8,59 @@ namespace TravelHubAgency.Controllers
     public class DestinosController : Controller
     {
         private TravelhubServices service;
+        private IMemoryCache cache;
 
-        public DestinosController(TravelhubServices service)
+        public DestinosController(TravelhubServices service, IMemoryCache cache)
         {
             this.service = service;
+            this.cache = cache;
         }
-        public async Task<IActionResult> Destinos()
+        public async Task<IActionResult> Destinos(int? idcontinente)
         {
-            List<Destino> destinos = await this.service.GetAllDestinosAsync();
+
+            List<Destino> destinos;
+            if (idcontinente == null)
+            {
+                destinos = await this.service.GetAllDestinosAsync();
+            }
+            else
+            {
+                destinos = await this.service.GetAllDestinosContinenteAsync(idcontinente.Value);
+            }
             return View(destinos);
         }
 
         public async Task<IActionResult> SingleDestino(int id)
         {
+            Destino destino = await this.service.GetDestinoByIdAsync(id);
+            return View(destino);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> CrearDestino()
+        {
+            List<Pais> paises;
+
+            if (this.cache.Get("paises") != null)
+            {
+                paises = this.cache.Get<List<Pais>>("paises");
+            }
+            else
+            {
+                paises = await this.service.GetAllPaisesAsync();
+                this.cache.Set("paises", paises);
+            }
+
+            ViewData["paises"] = paises;
+
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CrearDestino(Destino destino, IFormFile? file)
+        {
+            destino.Imagen = file.FileName;
+            Destino detino = await this.service.InsertarDestinoAsync(destino);
             return View();
         }
     }

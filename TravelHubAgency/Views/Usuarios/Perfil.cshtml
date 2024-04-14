@@ -1,14 +1,119 @@
 ﻿﻿@using System.Security.Claims
+@model Usuario
 
-<h2 class="text-primary">
-    Bienvenido @Context.User.Identity.Name !!
-</h2>
+<div class="container-xxl py-5 fadeInUp" data-wow-delay="0.1s">
+    <div class="container">
+        <form method="post" asp-action="Perfil" enctype="multipart/form-data">
+            <div class="row">
+                <div class="col-md-3 border-right" style="border:1px solid #e8604c !important;">
 
-<ul class="list-group">
-    @foreach(Claim claim in Context.User.Claims)
-    {
-        <li class="list-group-item">
-            @claim.Type: @claim.Value
-        </li>
-    }
-</ul>
+                    @Html.AntiForgeryToken()
+                    <div class="d-flex flex-column align-items-center text-center p-3 py-5">
+                        <div class="position-relative d-flex flex-column align-items-center text-center mb-5 overflow-hidden">
+                            <input type="file" name="file" class="position-absolute top-50" style="opacity:0 !important; width:100%;" id="fileInput" />
+                            <img class="rounded-circle mt-5" width="150px" src="~/img/@Model.Imagen">
+                            <label for="fileInput" class="position-absolute" style="top:80% !important; color: #e8604c;">
+                                <i class="fas fa-camera" style="font-size:xx-large;"></i>
+                            </label>
+                        </div>
+                        <span class="font-weight-bold mb-3">@Model.Nombre</span>
+                        <span class="text-black-50">@Model.Email</span>
+                    </div>
+                </div>
+                <div class="col-md-9 border-right">
+                    <div class="p-3 py-5">
+                        <div class="text-center wow">
+                            <h4 class="section-title bg-white text-center text-primary px-3 mb-5">Perfil</h4>
+                        </div>
+                        <div class="row mt-2">
+                            <div class="col-md-6">
+                                <label class="labels">Nombre</label>
+                                <input type="text" name="nombre" class="form-control" placeholder="nombre" value="@Model.Nombre">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="labels">Apellido</label>
+                                <input type="text" name="apellido" class="form-control" placeholder="apellido" value="@Model.Apellido">
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-md-12">
+                                <label class="labels">Telefono</label>
+                                <input type="text" name="telefono" class="form-control" placeholder="telefono" value="@Model.Telefono">
+                            </div>
+                            <div class="col-md-12">
+                                <label class="labels">Correo</label>
+                                <input type="text" name="email" class="form-control" placeholder="email" value="@Model.Email">
+                            </div>
+                            <div class="col-md-12">
+                                <label class="labels">Contraseña</label>
+                                <input type="text" name="password" class="form-control" placeholder="**********" value="">
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-md-12">
+                                <label class="labels">Pais</label>
+                                <input type="text" name="pais" class="form-control" placeholder="pais" value="@Model.Pais">
+                            </div>
+                        </div>
+                        <div class="mt-5 text-center">
+                            <button class="btn btn-primary profile-button">guardar cambios</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.getElementById('fileInput').addEventListener('change', function () {
+            document.getElementById('profileForm').submit();
+        });
+    </script>
+}
+
+@section Styles {
+    <style>
+        .form-control:focus {
+            box-shadow: none;
+            border-color: #e8604c
+        }
+
+        .profile-button {
+            background: #e8604c;
+            box-shadow: none;
+            border: none
+        }
+
+            .profile-button:hover {
+                background: #e8604c
+            }
+
+            .profile-button:focus {
+                background: #e8604c;
+                box-shadow: none
+            }
+
+            .profile-button:active {
+                background: #e8604c;
+                box-shadow: none
+            }
+
+        .back:hover {
+            color: #e8604c;
+            cursor: pointer
+        }
+
+        .labels {
+            font-size: 11px
+        }
+
+        .add-experience:hover {
+            background: #BA68C8;
+            color: #fff;
+            cursor: pointer;
+            border: solid 1px #BA68C8
+        }
+    </style>
+}

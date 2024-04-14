@@ -24,13 +24,17 @@
                     </a>
                 </div>
                 <span class="with">o registrarse con cuenta nueva</span>
-                <input type="text" name="nombre" id="nombre" placeholder="nombre" />
-                <input type="text" name="apellido" id="apellido" placeholder="apellido" />
-                <input type="text" name="pais" id="pais" placeholder="pais" />
-                <input type="email" name="email" id="email" placeholder="email" />
-                <input type="password" name="password" id="password" placeholder="password" />
+                <input type="text" name="nombre" id="nombre" placeholder="nombre" required />
+                <input type="text" name="apellido" id="apellido" placeholder="apellido" required />
+                <input type="text" name="pais" id="pais" placeholder="pais" required />
+                <input type="text" name="telefono" id="telefono" placeholder="telefono" required />
+                <input type="email" name="email" id="email" placeholder="email" required />
+                <input type="password" name="password" id="password" placeholder="password" required />
                 <button id="submitSignUpbtn">registrarme</button>
                 <a href="#" id="signinbtn"> ya tengo cuenta? Sign in</a>
+                <span id="messageSignUp">
+
+                </span>
             </form>
         </div>
         <div class="form-container sign-in-container">
@@ -53,10 +57,13 @@
                     </a>
                 </div>
                 <span class="with">o use su cuenta</span>
-                <input type="email" name="email" placeholder="email" />
-                <input type="password" name="password" placeholder="password" />
+                <input type="email" name="email" placeholder="email" required />
+                <input type="password" name="password" placeholder="password" required />
                 <button id="submitSignInbtn">iniciar sesión</button>
-                <a href="#" id="signupbtn"> no tengo cuenta? Sig up</a>
+                <a href="#" id="signupbtn" class="mb-3"> no tengo cuenta? Sig up</a>
+                <span id="messageSignIn">
+
+                </span>
             </form>
         </div>
         <div class="overlay-container">
@@ -76,10 +83,6 @@
             </div>
         </div>
     </div>
-    <span class="pt-5">
-        @ViewData["MENSAJE"]
-    </span>
-
 </section>
 
 
@@ -92,24 +95,14 @@
 
                 e.preventDefault();
 
-
-                // var passwordInput = $(this).prev();
-                // var emailInput = $(passwordInput).prev();
-                // var apellidoInput = $(emailInput).prev();
-
                 var nombre = $("#nombre").val();
                 var apellido = $("#apellido").val();
                 var pais = $("#pais").val();
                 var email = $("#email").val();
                 var password = $("#password").val();
+                var telefono = $("#telefono").val();
 
-                SignUp(nombre, apellido, email, password, pais);
-
-                $("#nombre").val('');
-                $("#apellido").val('');
-                $("#pais").val('');
-                $("#email").val('');
-                $("#password").val('');
+                SignUp(nombre, apellido, email, password, telefono, pais);
 
             });
 
@@ -137,20 +130,63 @@
                 url: url + request,
                 method: "POST",
                 success: function (response) {
-                    console.log(response);
+                    $("#nombre").val('');
+                    $("#apellido").val('');
+                    $("#email").val('');
+                    $("#password").val('');
+                    $("#telefono").val('');
+                    $("#pais").val('');
+
+                    $("#messageSignIn").empty();
+
+                    var messageHtml = $("<span></span>");
+                    messageHtml.addClass("text-success my-3");
+                    messageHtml.text("inicio sesion exitosamente");
+
+                    $("#messageSignIn").append(messageHtml);
+
+                    setTimeout(function () {
+                        messageHtml.remove();
+                    }, 3000);
+                },
+                error: function (error) {
+                    $("#messageSignIn").empty();
+
+                    var messageHtml = $("<span></span>");
+                    messageHtml.addClass("text-danger my-3");
+                    messageHtml.text("Error al iniciar sesión");
+
+                    $("#messageSignIn").append(messageHtml);
+
+                    setTimeout(function () {
+                        messageHtml.remove();
+                    }, 3000);
                 }
             });
         }
 
-        function SignUp(nombre, apellido, email, password, pais) {
+        function SignUp(nombre, apellido, email, password, telefono, pais) {
             var url = "/Managed/SignUp";
-            var request = "?nombre=" + nombre + "&apellido=" + apellido + "&email=" + email + "&password=" + password + "&pais=" + pais;
+            var request = "?nombre=" + nombre + "&apellido=" + apellido + "&email=" + email + "&password=" + password + "&telefono=" + telefono + "&pais=" + pais;
 
             $.ajax({
                 url: url + request,
                 method: "POST",
                 success: function (response) {
-                    console.log(response);
+                    $("#messageSignUp").empty();
+
+                    var messageHtml = $("<span></span>");
+                    messageHtml.addClass("text-success my-3");
+                    messageHtml.text("Registrado exitosamente");
+
+                    $("#messageSignUp").append(messageHtml);
+
+                    setTimeout(function () {
+                        messageHtml.remove();
+                    }, 3000);
+                },
+                error: function (error) {
+                    console.log(error);
                 }
             });
         }
@@ -523,5 +559,6 @@
             font-weight: 800;
             margin: .5em 0;
         }
+
     </style>
 }

@@ -1,0 +1,129 @@
+﻿@model Destino
+@{
+    List<Pais> paises = ViewData["paises"] as List<Pais>;
+}
+
+
+
+<!-- Booking Start -->
+<div class="container-xxl py-3 wow fadeInUp" data-wow-delay="0.1s">
+    <div style="margin:0 1em;">
+        <div class="p-3">
+            <form method="post" enctype="multipart/form-data">
+                <div class="row g-5 align-items-center">
+                    <div class="col-md-6">
+                        <h1 class="text-black mb-4">Crear destino</h1>
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="text" name="nombre" class="form-control " id="nombre" placeholder="Nombre" required>
+                                    <label for="nombre">Nombre</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="text" name="region" class="form-control" id="destino" placeholder="Region" required>
+                                    <label for="destino"> Region</label>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="form-floating">
+                                    <select name="idpais" class="form-select " id="idpais" required>
+                                        @foreach (Pais pais in paises)
+                                        {
+                                            <option value="@pais.IdPais">@pais.Nombre</option>
+                                        }
+                                    </select>
+                                    <label for="idpais">Pais</label>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-floating">
+                                    <input type="text" name="precio" class="form-control " id="precio" placeholder="precio">
+                                    <label for="precio">Precio</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="text" name="latitud" class="form-control " id="latitud" placeholder="latitud" readonly>
+                                    <label for="latitud">Latitud</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="text" name="longitud" class="form-control " id="longitud" placeholder="longitud" readonly>
+                                    <label for="longitud">Longitud</label>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="form-floating">
+                                    <textarea class="form-control" name="descripcion" placeholder="descripcion " id="message" style="height: 100px; resize:none;"></textarea>
+                                    <label for="message"> Descripción</label>
+                                </div>
+                                <div class="col-12">
+                                    <button class="btn btn-outline-dark w-100 py-3"> Guardar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 text-white">
+                        <div class="col-12">
+                            <img src="~/img/booking.jpg" class="img-fluid" />
+                        </div>
+                        <div class="col-12">
+                            <div class="form-floating mt-3">
+                                <input type="file" class="form-control w-100" name="file" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div id="mapadestino" hidden>
+        </div>
+    </div>
+</div>
+
+
+
+
+@section Scripts {
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB_sNNhR1rCinzXXrVxI6VhQlYUTbQbAyo&callback=initMap" async defer></script>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    @*     <script src="~/js/SearchDestinoMapa.js"></script> *@
+
+    <script>
+        var map;
+        var marcador;
+
+        $(document).ready(function () {
+            $("#destino").on("change", function () {
+                movePin();
+            });
+        });
+
+        function movePin() {
+
+            var geocoder = new google.maps.Geocoder();
+            var searched_destino = $("#destino").val();
+
+            geocoder.geocode({
+                "address": searched_destino
+            }, function (results, status) {
+                if (status == google.maps.GeocoderStatus.OK) {
+
+                    console.log("Latitud: ", results[0].geometry.location.lat());
+                    console.log("Longitud: ", results[0].geometry.location.lng());
+
+                    $("#destino").val(results[0].address_components[0].long_name);
+                    $("#latitud").val(results[0].geometry.location.lat());
+                    $("#longitud").val(results[0].geometry.location.lng());
+
+                } else {
+                    console.error("Geocode was not successful for the following reason: " + status);
+                }
+            });
+        }
+    </script>
+}

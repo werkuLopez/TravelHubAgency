@@ -23,10 +23,8 @@ namespace TravelHubAgency.Controllers
         }
         public IActionResult LogIn()
         {
-            string controller = TempData["controller"].ToString();
-            string action = TempData["action"].ToString();
 
-            return RedirectToAction(action, controller);
+            return View();
         }
 
         [HttpPost]
@@ -52,13 +50,18 @@ namespace TravelHubAgency.Controllers
                 //identity.AddClaim(claimId);
 
                 // añadimos el token al clams
-                identity.AddClaim(new Claim("Token", token));
+                //identity.AddClaim(new Claim("Token", token));
+                Claim tokenClaim = new Claim("TOKEN", token);
+                identity.AddClaim(tokenClaim);
 
                 ClaimsPrincipal principal = new ClaimsPrincipal(identity);
 
                 await HttpContext.SignInAsync(
                     CookieAuthenticationDefaults.AuthenticationScheme,
-                    principal);
+                    principal, new AuthenticationProperties
+                    {
+                        ExpiresUtc = DateTime.UtcNow.AddMinutes(30),
+                    });
 
                 // recuperamos la ruta a la navegacion que el 
                 // usuario había seleccionado
@@ -73,7 +76,7 @@ namespace TravelHubAgency.Controllers
         [HttpPost]
         public async Task<IActionResult> SignUp(RegisterModel model)
         {
-            RegisterModel exist = await this.service.SigUp(model.Nombre, model.Apellido, model.Email, model.Password, model.Pais);
+            RegisterModel exist = await this.service.SigUp(model.Nombre, model.Apellido, model.Email, model.Password, model.Telefono, model.Pais);
             if (exist == null)
             {
                 ViewData["MENSAJE"] = "Error al registrarse";

@@ -61,6 +61,9 @@
                         <div class="dropdown-menu">
                             @if (continentes != null)
                             {
+                                <a asp-controller="Destinos" asp-action="Destinos" class="dropdown-item">
+                                    All Destinos
+                                </a>
                                 @foreach (Continente cont in continentes)
                                 {
                                     <a class="dropdown-item"
@@ -73,10 +76,19 @@
                             }
                         </div>
                     </div>
-
-
+                    <div class="nav-item dropdown">
+                        <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Acciones</a>
+                        <div class="dropdown-menu">
+                            <a asp-controller="Destinos" asp-action="CrearDestino" class="dropdown-item">Crear destino</a>
+                            <a asp-controller="Packages" asp-action="nuevo" class="dropdown-item">Crear pack</a>
+                            <a asp-controller="Hoteles" asp-action="nuevo" class="dropdown-item">Crear hotel</a>
+                            <a asp-controller="Vuelos" asp-action="nuevo" class="dropdown-item">Crear vuelo</a>
+                        </div>
+                    </div>
                     <partial name="_MenuUsuario" />
+
                 </div>
+            </div>
         </nav>
 
         <div class="container-fluid bg-primary py-5 mb-5 hero-header">

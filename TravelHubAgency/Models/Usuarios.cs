@@ -27,6 +27,8 @@ namespace TravelHubAgency.Models
         public string Imagen { get; set; }
         [Column("Pais")]
         public string Pais { get; set; }
+        [Column("Telefono")]
+        public string Telefono {  get; set; }
 
     }
 }

@@ -23,5 +23,7 @@ namespace TravelHubAgency.Models
         public string Latitud { get; set; }
         [Column("Longitud")]
         public string Longitud { get; set; }
+        [Column("Precio")]
+        public decimal Precio { get; set; }
     }
 }

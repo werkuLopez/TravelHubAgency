@@ -17,7 +17,7 @@ async function initMap() {
 function movePin() {
 
     var geocoder = new google.maps.Geocoder();
-    var searched_destino = $("#destino").text();
+    var searched_destino = $("#destino").val();
 
     geocoder.geocode({
         "address": searched_destino
@@ -32,6 +32,10 @@ function movePin() {
             console.log("Latitud: ", results[0].geometry.location.lat());
             console.log("Longitud: ", results[0].geometry.location.lng());
             console.log("data: ", results);
+
+            $("#latitud").val(results[0].geometry.location.lat());
+            $("#longitud").val(results[0].geometry.location.lng());
+
         } else {
             console.error("Geocode was not successful for the following reason: " + status);
         }
