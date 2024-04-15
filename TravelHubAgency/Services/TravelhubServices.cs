@@ -198,7 +198,9 @@ namespace TravelHubAgency.Repositories
             return destinos;
         }
 
-        public async Task<Destino> InsertarDestinoAsync(Destino destino)
+        public async Task<Destino> InsertarDestinoAsync(string nombre,
+            int idpais, string region, string descripcion,
+            string imagen, string latitud, string longitud, decimal precio)
         {
             string token =
                 this.context.HttpContext.User.FindFirst(x => x.Type == "TOKEN").Value;
@@ -213,14 +215,14 @@ namespace TravelHubAgency.Repositories
 
                 Destino model = new Destino
                 {
-                    Nombre = destino.Nombre,
-                    Region = destino.Region,
-                    IdPais = destino.IdPais,
-                    Descripcion = destino.Descripcion,
-                    Longitud = destino.Longitud,
-                    Latitud = destino.Latitud,
-                    Imagen = destino.Imagen,
-                    Precio = destino.Precio
+                    Nombre = nombre,
+                    Region = region,
+                    IdPais = idpais,
+                    Descripcion = descripcion,
+                    Longitud = longitud,
+                    Latitud = latitud,
+                    Imagen = imagen,
+                    Precio = precio
                 };
 
                 string jsonData =
@@ -229,7 +231,7 @@ namespace TravelHubAgency.Repositories
                     new StringContent(jsonData, Encoding.UTF8, "application/json");
 
                 HttpResponseMessage response =
-                   await client.PutAsync(request, content);
+                   await client.PostAsync(request, content);
 
                 if (response.IsSuccessStatusCode)
                 {

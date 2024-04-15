@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
+using TravelHubAgency.Filters;
 using TravelHubAgency.Models;
 using TravelHubAgency.Repositories;
 
@@ -56,11 +57,14 @@ namespace TravelHubAgency.Controllers
             return View();
         }
 
+        [AuthorizeUsuario]
         [HttpPost]
-        public async Task<IActionResult> CrearDestino(Destino destino, IFormFile? file)
+        public async Task<IActionResult> CrearDestino(Destino destino, IFormFile file)
         {
-            destino.Imagen = file.FileName;
-            Destino detino = await this.service.InsertarDestinoAsync(destino);
+            
+            Destino detino = await this.service.InsertarDestinoAsync(destino.Nombre, destino.IdPais, destino.Region, destino.Descripcion, file.FileName, destino.Latitud, destino.Longitud, destino.Precio);
+
+            ViewData["paises"] = this.cache.Get<List<Pais>>("paises");
             return View();
         }
     }
