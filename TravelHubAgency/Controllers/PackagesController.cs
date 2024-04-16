@@ -12,7 +12,7 @@ namespace TravelHubAgency.Controllers
         {
             this.service = service;
         }
-        public async Task<IActionResult> Packs(string? destino)
+        public async Task<IActionResult> Index(string? destino)
         {
             List<Package> packages;
 
@@ -34,6 +34,7 @@ namespace TravelHubAgency.Controllers
         {
             Package package =
                 await this.service.GetPackageByIdAsync(id);
+            ViewData["destinos"] = await this.service.GetAllDestinosAsync();
             return View(package);
         }
     }

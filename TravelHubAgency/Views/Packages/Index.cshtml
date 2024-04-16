@@ -1,0 +1,65 @@
+﻿@model List<Package>
+
+@if (Model != null)
+{
+    <!-- Packages Start -->
+    <div class="container-xxl py-5">
+        <div class="container">
+            <div class="text-center wow fadeInUp" data-wow-delay="0.1s">
+                <h6 class="section-title bg-white text-center text-primary px-3">Pack turísticos</h6>
+                <h1 class="mb-5">Las mejores ofertas</h1>
+            </div>
+            <div class="row g-4 justify-content-center">
+                @foreach (Package package in Model)
+                {
+                    <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.1s">
+                        <div class="package-item">
+                            <div class="overflow-hidden">
+                                <img class="img-fluid" src="~/img/package-1.jpg" alt="">
+                            </div>
+                            <div class="d-flex border-bottom">
+                                <small class="flex-fill text-center border-end py-2"><i class="fa fa-map-marker-alt text-primary me-2"></i>@package.Nombre</small>
+                                <small class="flex-fill text-center border-end py-2"><i class="fa fa-calendar-alt text-primary me-2"></i>@package.Duracion días</small>
+                                <small class="flex-fill text-center py-2"><i class="fa fa-user text-primary me-2"></i>@package.Personas Personas</small>
+                            </div>
+                            <div class="text-center p-4">
+                                <h3 class="mb-0">@package.Precio</h3>
+                                <div class="mb-3">
+                                    <small class="fa fa-star text-primary"></small>
+                                    <small class="fa fa-star text-primary"></small>
+                                    <small class="fa fa-star text-primary"></small>
+                                    <small class="fa fa-star text-primary"></small>
+                                    <small class="fa fa-star text-primary"></small>
+                                </div>
+                                <p>@package.Descripcion</p>
+                                <div class="d-flex justify-content-center mb-2">
+                                    <a asp-controller="Packages" asp-action="SinglePack" asp-route-id="@package.idPack" class="btn btn-sm btn-primary px-3 border-end" style="border-radius: 30px 0 0 30px;">ver más</a>
+                                    <a href="#" class="btn btn-sm btn-primary px-3" style="border-radius: 0 30px 30px 0;">reservar ya</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <div class="container-xxl py-5 destination">
+        <div class="container">
+            <div class="text-center wow fadeInUp" data-wow-delay="0.1s">
+                <h1 class="mb-5">No se han encontrado paquetes</h1>
+                <a asp-controller="Destinos" asp-action="Index" class="btn btn-sm btn-primary px-3 border-end" style="border-radius: 30px 0 0 30px;">
+                    volver
+                </a>
+            </div>
+        </div>
+    </div>
+}
+<!-- Packages End -->
+@section Scripts {
+    <script>
+
+    </script>
+}

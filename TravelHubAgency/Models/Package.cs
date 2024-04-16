@@ -8,7 +8,7 @@ namespace TravelHubAgency.Models
     {
         [Key]
         [Column("ID_Paquete")]
-        public int IdPaquete { get; set; }
+        public int idPack { get; set; }
         [Column("Nombre")]
         public string Nombre { get; set; }
         [Column("ID_Destino")]
@@ -24,7 +24,7 @@ namespace TravelHubAgency.Models
         [Column("Num_Personas")]
         public int Personas { get; set; }
         [Column("Descripcion")]
-        public int Descripcion { get; set; }
+        public string Descripcion { get; set; }
         [Column("Imagen")]
         public string Imagen { get; set; }
     }

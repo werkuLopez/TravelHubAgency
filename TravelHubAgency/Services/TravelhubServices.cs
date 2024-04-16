@@ -172,7 +172,7 @@ namespace TravelHubAgency.Repositories
 
         public async Task<List<Destino>> GetAllDestinosAsync()
         {
-            string request = "api/destinos/destinos";
+            string request = "api/destinos/alldestinos";
             List<Destino> destinos = await this.CallApiAsync<List<Destino>>(request);
             return destinos;
         }
@@ -193,7 +193,7 @@ namespace TravelHubAgency.Repositories
 
         public async Task<Destino> GetDestinoByIdAsync(int iddestino)
         {
-            string request = "api/destinos/destinos/" + iddestino;
+            string request = "api/destinos/finddestino/" + iddestino;
             Destino destinos = await this.CallApiAsync<Destino>(request);
             return destinos;
         }
@@ -267,7 +267,7 @@ namespace TravelHubAgency.Repositories
 
         public async Task<Package> GetPackageByIdAsync(int id)
         {
-            string request = "api/packages/" + id;
+            string request = "api/packages/findpackage/" + id;
             Package package =
                 await this.CallApiAsync<Package>(request);
 

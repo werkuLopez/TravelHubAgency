@@ -52,10 +52,9 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarCollapse">
                 <div class="navbar-nav ms-auto m-md-auto py-0">
-                    <a asp-controller="Home" asp-action="Index" class="nav-item nav-link active">Home</a>
-                    <a href="https://localhost:7199/#aboutus" class="nav-item nav-link">Nosotros</a>
-                    <a href="https://localhost:7199/#services" class="nav-item nav-link">Servicios</a>
-                    <a asp-controller="Packages" asp-action="Packs" class="nav-item nav-link">Paquetes</a>
+                    <a asp-controller="Home" asp-action="Index" class="nav-item nav-link active">Inicio</a>
+                    <a asp-controller="Packages" asp-action="Index" class="nav-item nav-link">Paquetes</a>
+                    <a asp-controller="Vuelos" asp-action="Index" class="nav-item nav-link">Vuelos</a>
                     <div class="nav-item dropdown">
                         <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Destinos</a>
                         <div class="dropdown-menu">
@@ -67,8 +66,8 @@
                                 @foreach (Continente cont in continentes)
                                 {
                                     <a class="dropdown-item"
-                                       asp-controller="Home"
-                                       asp-action="Index"
+                                       asp-controller="Destinos"
+                                       asp-action="Destinos"
                                        asp-route-idcontinente="@cont.IdContinente"
                                        style="color:rgba(0, 0, 0, 0.9) !important">@cont.Nombre</a>
 
@@ -76,16 +75,10 @@
                             }
                         </div>
                     </div>
-                    <div class="nav-item dropdown">
-                        <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Acciones</a>
-                        <div class="dropdown-menu">
-                            <a asp-controller="Destinos" asp-action="CrearDestino" class="dropdown-item">Crear destino</a>
-                            <a asp-controller="Packages" asp-action="nuevo" class="dropdown-item">Crear pack</a>
-                            <a asp-controller="Hoteles" asp-action="nuevo" class="dropdown-item">Crear hotel</a>
-                            <a asp-controller="Vuelos" asp-action="nuevo" class="dropdown-item">Crear vuelo</a>
-                        </div>
-                    </div>
+
                     <partial name="_MenuUsuario" />
+                    <a href="https://localhost:7199/#aboutus" class="nav-item nav-link">Nosotros</a>
+                    <a href="https://localhost:7199/#services" class="nav-item nav-link">Servicios</a>
 
                 </div>
             </div>

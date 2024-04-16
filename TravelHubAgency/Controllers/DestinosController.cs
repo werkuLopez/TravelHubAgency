@@ -63,9 +63,7 @@ namespace TravelHubAgency.Controllers
         {
             
             Destino detino = await this.service.InsertarDestinoAsync(destino.Nombre, destino.IdPais, destino.Region, destino.Descripcion, file.FileName, destino.Latitud, destino.Longitud, destino.Precio);
-
-            ViewData["paises"] = this.cache.Get<List<Pais>>("paises");
-            return View();
+            return RedirectToAction("Destinos");
         }
     }
 }

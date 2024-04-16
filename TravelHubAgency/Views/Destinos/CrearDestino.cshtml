@@ -17,13 +17,13 @@
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <div class="form-floating">
-                                    <input type="text" name="nombre" class="form-control " id="nombre" placeholder="Nombre" required>
+                                    <input type="text" name="nombre" class="form-control " id="destino" placeholder="Ejemp: Paseo de la Castellana" required>
                                     <label for="nombre">Nombre</label>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-floating">
-                                    <input type="text" name="region" class="form-control" id="destino" placeholder="Region" required>
+                                    <input type="text" name="region" class="form-control" id="region" placeholder="Ejemp: Madrid" required>
                                     <label for="destino"> Region</label>
                                 </div>
                             </div>
@@ -115,6 +115,8 @@
 
                     console.log("Latitud: ", results[0].geometry.location.lat());
                     console.log("Longitud: ", results[0].geometry.location.lng());
+
+                    console.log(results[0].address_components);
 
                     $("#destino").val(results[0].address_components[0].long_name);
                     $("#latitud").val(results[0].geometry.location.lat());
