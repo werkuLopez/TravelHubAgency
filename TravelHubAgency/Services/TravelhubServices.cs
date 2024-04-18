@@ -1,10 +1,12 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.Extensions.Hosting;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Net.Http.Headers;
 using System.Text;
 using TravelHubAgency.Data;
 using TravelHubAgency.Helpers;
 using TravelHubAgency.Models;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace TravelHubAgency.Repositories
 {
@@ -53,26 +55,6 @@ namespace TravelHubAgency.Repositories
         // con token
         public async Task<T> CallApiAsync<T>(string request, string token)
         {
-            /* using (HttpClient client = new HttpClient())
-             {
-                 client.BaseAddress = new Uri(this.ApiUrl);
-                 client.DefaultRequestHeaders.Clear();
-                 client.DefaultRequestHeaders.Accept.Add(this.header);
-                 client.DefaultRequestHeaders.Add("Authorization", "Bearer " + token);
-
-                 HttpResponseMessage response =
-                     await client.GetAsync(resquest);
-                 if (response.IsSuccessStatusCode)
-                 {
-                     T data = await response.Content.ReadAsAsync<T>();
-                     return data;
-                 }
-                 else
-                 {
-                     return default(T);
-                 }
-             }*/
-
             try
             {
                 using (HttpClient client = new HttpClient())
@@ -351,7 +333,13 @@ namespace TravelHubAgency.Repositories
                     return null;
                 }
             };
+        }
 
+        public async Task<Usuario> GetUsuarioByUsername(string username)
+        {
+            List<Usuario> usuarios = await this.GetAllUsuariosAsync();
+
+            return usuarios.FirstOrDefault(x => x.Email == username);
         }
 
         public async Task<Usuario> UpdateFotoPerfilUsuarioAsync(string imagen)
@@ -386,6 +374,176 @@ namespace TravelHubAgency.Repositories
         }
 
         #endregion
+
+        #region POSTSCOMENTARIOSMODEL
+
+        public async Task<PostComentariosModel> GetPostComentariosModelAsync(int idpost)
+        {
+            PostComentariosModel model = new PostComentariosModel();
+            model.Post = await this.GetPostByIdAsync(idpost);
+            model.Comentarios = await this.GetComentariosPostAsync(idpost);
+
+            return model;
+        }
+
+        #endregion
+
+        #region PUBLICACIONES
+
+        public async Task<List<Post>> GetAllPublicacionesAsync()
+        {
+            string request = "api/publicaciones/allposts";
+            List<Post> posts = await this.CallApiAsync<List<Post>>(request);
+            return posts;
+        }
+
+        public async Task<List<Post>> GetPostsByUsuarioAsync()
+        {
+            string token =
+                this.context.HttpContext.User.FindFirst(x => x.Type == "TOKEN").Value;
+
+            string request = "api/publicaciones/postsusuario";
+            List<Post> postsUsuario = await this.CallApiAsync<List<Post>>(request, token);
+
+            return postsUsuario;
+        }
+
+        public async Task<Post> GetPostByIdAsync(int id)
+        {
+            string request = "api/publicaciones/post/" + id;
+            Post post =
+                await this.CallApiAsync<Post>(request);
+
+            return post;
+        }
+
+        public async Task<Post> PublicarPostAsync(Post post, string imagen)
+        {
+            string token =
+            this.context.HttpContext.User.FindFirst(x => x.Type == "TOKEN").Value;
+
+            using (HttpClient client = new HttpClient())
+            {
+                string request = "api/publicaciones/crearpost";
+                client.BaseAddress = new Uri(this.ApiUrl);
+                client.DefaultRequestHeaders.Clear();
+                client.DefaultRequestHeaders.Accept.Add(this.header);
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+                Post newPost = new Post
+                {
+                    IdPublicacion = 0,
+                    Contenido = post.Contenido,
+                    FechaPublicacion = post.FechaPublicacion,
+                    Imagen = imagen,
+                    Titulo = post.Titulo,
+
+                    IdUsuario = 0, // le paso 0 porque en la
+                                   // api me encargo de recuperar el id el
+                                   // usuario por el token
+                };
+
+                string jsonData =
+                    JsonConvert.SerializeObject(newPost);
+                StringContent content =
+                    new StringContent(jsonData, Encoding.UTF8, "application/json");
+
+                HttpResponseMessage response =
+                   await client.PostAsync(request, content);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    Post postUloaded =
+                        await response.Content.ReadAsAsync<Post>();
+                    return postUloaded;
+                }
+                else
+                {
+                    return null;
+                }
+
+            }
+
+        }
+
+        public async Task EliminarPostAsync(int id)
+        {
+            string request = "api/publicaciones/EliminarPost/" + id;
+            int reult = await this.CallApiAsync<int>(request);
+        }
+
+        #endregion
+
+        #region COMENTARIOS
+
+        public async Task<List<Comentario>> GetAllComentariosAsync()
+        {
+            string request = "api/comentarios/allcomentarios";
+            List<Comentario> comentarios =
+                await this.CallApiAsync<List<Comentario>>(request);
+
+            return comentarios;
+        }
+
+        public async Task<List<Comentario>> GetComentariosPostAsync(int idpost)
+        {
+            string request = "api/comentarios/comentariospost/" + idpost;
+            List<Comentario> comentarios =
+                await this.CallApiAsync<List<Comentario>>(request);
+
+            return comentarios;
+        }
+
+        public async Task<Comentario> PublicarComentarioAsync(int idpost, string contenido)
+        {
+            string token =
+            this.context.HttpContext.User.FindFirst(x => x.Type == "TOKEN").Value;
+
+            using (HttpClient client = new HttpClient())
+            {
+                string request = "api/comentarios/publicarcomentario";
+                client.BaseAddress = new Uri(this.ApiUrl);
+                client.DefaultRequestHeaders.Clear();
+                client.DefaultRequestHeaders.Accept.Add(this.header);
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+                Comentario newComent = new Comentario
+                {
+                    IdComentario = 0,
+                    Contenido = contenido,
+                    Fecha = DateTime.Now,
+                    IdPost = idpost,
+                    IdUsuario = 0, // le paso 0 porque en la
+                                   // api me encargo de recuperar el id el
+                                   // usuario por el token
+                };
+
+                string jsonData =
+                    JsonConvert.SerializeObject(newComent);
+                StringContent content =
+                    new StringContent(jsonData, Encoding.UTF8, "application/json");
+
+                HttpResponseMessage response =
+                   await client.PostAsync(request, content);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    Comentario comentUloaded =
+                        await response.Content.ReadAsAsync<Comentario>();
+                    return comentUloaded;
+                }
+                else
+                {
+                    return null;
+                }
+
+            }
+        }
+
+        #endregion
+
+
+
 
         #region AUTH
 

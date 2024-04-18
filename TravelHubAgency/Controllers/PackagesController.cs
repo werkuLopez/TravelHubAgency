@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using TravelHubAgency.Filters;
 using TravelHubAgency.Models;
 using TravelHubAgency.Repositories;
 
@@ -36,6 +37,12 @@ namespace TravelHubAgency.Controllers
                 await this.service.GetPackageByIdAsync(id);
             ViewData["destinos"] = await this.service.GetAllDestinosAsync();
             return View(package);
+        }
+
+        [AuthorizeUsuario(Policy = "Administrador")]
+        public async Task<IActionResult> CrearPack(Package package, IFormFile file)
+        {
+            return RedirectToAction("Index");
         }
     }
 }

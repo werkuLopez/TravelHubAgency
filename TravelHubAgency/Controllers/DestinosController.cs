@@ -37,6 +37,7 @@ namespace TravelHubAgency.Controllers
             return View(destino);
         }
 
+        [AuthorizeUsuario(Policy = "Administrador")]
         [HttpGet]
         public async Task<IActionResult> CrearDestino()
         {
@@ -56,8 +57,7 @@ namespace TravelHubAgency.Controllers
 
             return View();
         }
-
-        [AuthorizeUsuario]
+        
         [HttpPost]
         public async Task<IActionResult> CrearDestino(Destino destino, IFormFile file)
         {

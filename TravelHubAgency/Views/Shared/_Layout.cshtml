@@ -53,8 +53,6 @@
             <div class="collapse navbar-collapse" id="navbarCollapse">
                 <div class="navbar-nav ms-auto m-md-auto py-0">
                     <a asp-controller="Home" asp-action="Index" class="nav-item nav-link active">Inicio</a>
-                    <a asp-controller="Packages" asp-action="Index" class="nav-item nav-link">Paquetes</a>
-                    <a asp-controller="Vuelos" asp-action="Index" class="nav-item nav-link">Vuelos</a>
                     <div class="nav-item dropdown">
                         <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Destinos</a>
                         <div class="dropdown-menu">
@@ -75,11 +73,10 @@
                             }
                         </div>
                     </div>
-
+                    <a asp-controller="Packages" asp-action="Index" class="nav-item nav-link">Paquetes</a>
+                    <a asp-controller="Vuelos" asp-action="Index" class="nav-item nav-link">Vuelos</a>
+                    <a asp-controller="Blogs" asp-action="Index" class="nav-item nav-link">Blog</a>
                     <partial name="_MenuUsuario" />
-                    <a href="https://localhost:7199/#aboutus" class="nav-item nav-link">Nosotros</a>
-                    <a href="https://localhost:7199/#services" class="nav-item nav-link">Servicios</a>
-
                 </div>
             </div>
         </nav>

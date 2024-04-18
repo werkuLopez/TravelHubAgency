@@ -7,6 +7,7 @@ using TravelHubAgency.Models;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using TravelHubAgency.Repositories;
 using static System.Net.Mime.MediaTypeNames;
+using System.Numerics;
 
 namespace TravelHubAgency.Controllers
 {
@@ -39,6 +40,8 @@ namespace TravelHubAgency.Controllers
             }
             else
             {
+                Usuario usuario = await this.service.GetUsuarioByUsername(model.Email);
+
                 ClaimsIdentity identity =
                     new ClaimsIdentity(
                         CookieAuthenticationDefaults.AuthenticationScheme,
@@ -53,6 +56,12 @@ namespace TravelHubAgency.Controllers
                 //identity.AddClaim(new Claim("Token", token));
                 Claim tokenClaim = new Claim("TOKEN", token);
                 identity.AddClaim(tokenClaim);
+
+                if (usuario.TipoUsuario == 1)
+                {
+                    //creamos su propio claimId
+                    identity.AddClaim(new Claim("Administrador", usuario.TipoUsuario.ToString()));
+                }
 
                 ClaimsPrincipal principal = new ClaimsPrincipal(identity);
 

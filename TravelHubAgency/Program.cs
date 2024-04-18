@@ -9,14 +9,6 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddAuthentication(options =>
 {
-    //options.DefaultSignInScheme = 
-    //CookieAuthenticationDefaults.AuthenticationScheme;
-
-    //options.DefaultAuthenticateScheme = 
-    //CookieAuthenticationDefaults.AuthenticationScheme;
-
-    //options.DefaultChallengeScheme = 
-    //CookieAuthenticationDefaults.AuthenticationScheme;
 
     options.DefaultAuthenticateScheme =
 CookieAuthenticationDefaults.AuthenticationScheme;
@@ -34,6 +26,14 @@ CookieAuthenticationDefaults.AuthenticationScheme;
 
 
 builder.Services.AddHttpContextAccessor();
+
+// incluimos las politica para el acceso a determinados roles
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("Administrador",
+        policy => policy.RequireClaim("Administrador"));
+
+});
 
 // Add services to the container.
 builder.Services.AddControllersWithViews(options =>

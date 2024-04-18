@@ -1,0 +1,288 @@
+﻿@model PostComentariosModel
+
+@if (Model.Post != null)
+{
+    <div class="container-xxl py-5 wow fadeInUp" data-wow-delay="0.1s">
+        <div class="container py-5">
+            <div class="row">
+                <div class="col-lg-12">
+                    <!-- Blog Detail Start -->
+                    <div class="pb-3">
+                        <div class="blog-item">
+                            <div class="position-relative">
+                                <img class="img-fluid w-100" src="~/img/@Model.Post.Imagen" alt="@Model.Post.Titulo">
+                                <div class="blog-date">
+                                    <h6 class="font-weight-bold mb-n1">@Model.Post.FechaPublicacion.Date.Day</h6>
+                                    <small class="text-white text-uppercase">@Model.Post.FechaPublicacion.ToString("MMMM")</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-white mb-3" style="padding: 30px;">
+                            <div class="d-flex mb-3">
+                                <a class="text-primary text-uppercase text-decoration-none" href="#">Usuario: @Model.Post.IdUsuario</a>
+                                <span class="text-primary px-2">|</span>
+                                <a class="text-primary text-uppercase text-decoration-none" href="#">@Model.Post.Titulo</a>
+                            </div>
+                            <h2 class="mb-3">@Model.Post.Titulo</h2>
+                            <p>
+                                @Model.Post.Contenido
+                            </p>
+                        </div>
+                    </div>
+                    <!-- Blog  -->
+                    <!-- comentarios -->
+                    @if (Model.Comentarios.Count != 0)
+                    {
+                        <div class="bg-white" style="padding: 30px; margin-bottom: 30px;">
+                            <h4 class="text-uppercase mb-4" style="letter-spacing: 5px;"> @Model.Comentarios.Count Comentarios</h4>
+                            <!-- comentario -->
+                            @foreach (Comentario comentario in Model.Comentarios)
+                            {
+                                <div class="media mb-4">
+                                    <img src="~/img/testimonial-@(comentario.IdUsuario).jpg"
+                                         alt="Image"
+                                         class="img-fluid mr-3 mt-1"
+                                         style="width: 45px" />
+                                    <div class="media-body">
+                                        <h6 class="d-flex justify-content-between align-items-center mb-3">
+                                            <a href="">Usuario: @comentario.IdUsuario</a>
+                                            <small style="margin-right: 30px;"><i>@comentario.Fecha.ToShortDateString()</i></small>
+                                        </h6>
+                                        <p>
+                                            @comentario.Contenido
+                                        </p>
+                                        <div class="aib-button-toggle toggle-button expand-all-button">
+                                            <span class="replays-btn" data-id="@comentario.IdComentario">
+                                                <i class="fas fa-chevron-down"></i>
+                                            </span>
+                                            respuestas
+                                        </div>
+                                        <div class="replays replay-blog-@(comentario.IdComentario) mt-4">
+                                            <img src="~/img/testimonial-@(comentario.IdUsuario).jpg"
+                                                 alt="Image"
+                                                 class="img-fluid mr-3 mt-1"
+                                                 style="width: 45px" />
+                                            <div class="media-body">
+                                                <h6>
+                                                    <a href="">John Doe</a>
+                                                    <small><i>@comentario.Fecha.ToShortDateString()</i></small>
+                                                </h6>
+                                                <p>
+                                                    @comentario.Contenido
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                    <!-- Comments -->
+                    <!-- Comment form -->
+                    <div class="bg-white mb-3 text-center" style="padding: 30px;">
+                        <h1 class="mb-5">dejar comentario</h1>
+                        <form method="post">
+                            @Html.AntiForgeryToken()
+                            <input hidden value="@Model.Post.IdPublicacion" name="idpost" id="idpost" />
+                            <div class="row g-3 align-items-center">
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        <input type="text" class="form-control" id="name" required>
+                                        <label for="name">Name *</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        <input type="email" class="form-control" id="email" required>
+                                        <label for="email">Email *</label>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="form-floating">
+                                        <textarea class="form-control" name="contenido" placeholder="comentario " id="contenido" style="height: 100px; resize:none;" required>
+                                            </textarea>
+                                        <label for="contenido">Comentario *</label>
+                                    </div>
+                                </div>
+                                <div class="text-center">
+                                    <button class="btn btn-outline-dark" id="sendcomment">
+                                        enviar comentario
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <!-- Comment form-->
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+
+
+@section Styles {
+    <style>
+        .expand-all-button {
+            display: inline-flex;
+            align-items: center;
+        }
+
+            .expand-all-button label {
+                font-size: 14px;
+                margin-right: 8px;
+            }
+
+            .expand-all-button input[type="checkbox"]:checked {
+                background-color: #e8604c;
+            }
+
+            .expand-all-button input[type="checkbox"] {
+                -webkit-appearance: none;
+                -moz-appearance: none;
+                appearance: none;
+                width: 54px;
+                height: 24px;
+                border-radius: 12px;
+                background-color: rgba(4, 15, 26, 0.15);
+                position: relative;
+                display: inline-block;
+                vertical-align: middle;
+                transition: all 0.3s ease;
+                cursor: pointer;
+            }
+
+        [type="checkbox"],
+        [type="radio"] {
+            box-sizing: border-box;
+            padding: 0;
+        }
+
+        .expand-all-button input[type="checkbox"]:checked::before {
+            left: 31px;
+        }
+
+        .expand-all-button input[type="checkbox"]::before {
+            content: "";
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background-color: #fff;
+            position: absolute;
+            left: 1px;
+            top: 1px;
+            bottom: 1px;
+            transition: all 0.3s ease;
+            z-index: 1;
+        }
+
+        .expand-all-button input[type="checkbox"]:checked::after {
+            content: "ON";
+            color: #fff;
+            left: 8px;
+        }
+
+        .expand-all-button input[type="checkbox"]::after {
+            content: "OFF";
+            color: rgba(0, 0, 0, 0.32);
+            position: absolute;
+            top: 50%;
+            left: 27px;
+            transform: translateY(-50%);
+            font-size: 10px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .replays {
+            overflow: hidden;
+            transition: all 0.5s ease-in-out;
+            height: 0;
+            will-change: max-height;
+        }
+
+            .replays.show {
+                height: 125px;
+            }
+
+        .replays-btn {
+            margin: 0 1em;
+            color: rgba(0, 0, 0, 0.32);
+            cursor: pointer;
+            transition: 0.5s ease-in-out;
+        }
+
+            .replays-btn i {
+                font-size: 18px;
+            }
+
+        .active-replays {
+            transform: rotate(180deg);
+        }
+    </style>
+}
+
+
+@section Scripts {
+
+    <script>
+
+        $(document).ready(function () {
+
+            $("#sendcomment").on("click", function () {
+                var idpost = parseInt($("#idpost").val());
+                var contenido = $("#contenido").val();
+
+                sendComment(idpost, contenido);
+            })
+        });
+
+        function sendComment(idpost, contenido) {
+
+            var request = "/Blogs/SingleBlog?idpost=" + idpost + "&contenido=" + contenido;
+
+            $.ajax({
+                url: request,
+                type: "POST",
+                success: function (data) {
+                    console.log(data);
+                }
+            })
+        }
+    </script>
+    <script>
+        // expand btn
+        var replaysBtn = document.querySelectorAll(".replays-btn");
+        var comments = document.querySelectorAll(".replays");
+
+        replaysBtn.forEach((btn) => {
+            btn.addEventListener("click", function (e) {
+                var idreplayBlog = e.target.parentElement.dataset.id;
+
+                comments.forEach((coment) => {
+                    var replaysblog = document.querySelectorAll(
+                        ".replay-blog-" + idreplayBlog
+                    );
+                    var idcometblog = coment.classList[1].split("-")[2];
+                    if (idcometblog != idreplayBlog) {
+                        coment.classList.remove("show");
+                    }
+                });
+
+                var replaysblog = document.querySelectorAll(
+                    ".replay-blog-" + idreplayBlog
+                );
+
+                replaysblog.forEach((comment) => {
+                    if (comment.classList.contains("show")) {
+                        comment.classList.remove("show");
+                        e.currentTarget.classList.remove("active-replays");
+                    } else {
+                        comment.classList.add("show");
+                        e.currentTarget.classList.add("active-replays");
+                    }
+                });
+            });
+        });
+    </script>
+}

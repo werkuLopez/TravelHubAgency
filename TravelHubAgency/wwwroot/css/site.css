@@ -363,6 +363,57 @@
         border-color: var(--primary);
     }
 
+/*** blog ***/
+
+.blog-item {
+    transition: 0.5s;
+}
+
+    .blog-item:hover {
+        box-shadow: 0 0 30px #cccccc;
+    }
+
+.blog-date {
+    position: absolute;
+    width: 20%;
+    height: 45px;
+    top: 30px;
+    left: -15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    background: #e8604c;
+}
+
+    .blog-date::after {
+        position: absolute;
+        content: "";
+        width: 0;
+        height: 0;
+        top: -15px;
+        left: 0;
+        border: 8px solid;
+        border-color: transparent #e8604c #e8604c transparent;
+        z-index: -1;
+    }
+
+.replays {
+    display: flex;
+    align-items: flex-start;
+    gap:25px;
+}
+
+.media {
+    display: flex;
+    align-items: flex-start;
+    gap:20px;
+    border-bottom: 1px solid #8c8c8c;
+}
+
+.media-body {
+    flex: 1;
+}
 
 /*** Footer ***/
 .footer .btn.btn-social {
