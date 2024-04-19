@@ -3,17 +3,19 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace TravelHubAgency.Models
 {
-    //[Table("REPLAYSCOMENTARIO")]
+    [Table("REPLAYSCOMENTARIO")]
     public class ReplayComentario
     {
-       // [Key]
-       // [Column("ID_Replay")]
-        public int Id { get; set; }
-        //[Column("Usuario")]
+        [Key]
+        [Column("ID_Replay")]
+        public int IdReplay { get; set; }
+        [Column("Usuario")]
         public int IdUsuario { get; set; }
-       // [Column("Contenido")]
-        public string Replay { get; set;}
-        //[Column("Comentario")]
+        [Column("Contenido")]
+        public string Replay { get; set; }
+        [Column("Comentario")]
         public int IdComentario { get; set; }
+        [Column("Fecha")]
+        public DateTime Fecha { get; set; }
     }
 }

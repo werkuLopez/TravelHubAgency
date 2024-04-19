@@ -15,10 +15,19 @@ namespace TravelHubAgency.Controllers
             this.service = service;
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int? page)
         {
+            if (page == null || page == 0)
+            {
+                page = 1;
+            }
+
             List<Post> publicaciones =
-                await this.service.GetAllPublicacionesAsync();
+                await this.service.GetAllPublicacionesAsync(page.Value);
+
+            int numRegistros= publicaciones.Count;
+
+            ViewData["numRegistros"] = numRegistros;
 
             return View(publicaciones);
         }

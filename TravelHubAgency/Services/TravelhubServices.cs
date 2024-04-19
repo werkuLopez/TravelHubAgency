@@ -382,6 +382,21 @@ namespace TravelHubAgency.Repositories
             PostComentariosModel model = new PostComentariosModel();
             model.Post = await this.GetPostByIdAsync(idpost);
             model.Comentarios = await this.GetComentariosPostAsync(idpost);
+            model.Replays = new List<ReplayComentario>();
+
+            foreach (Comentario item in model.Comentarios)
+            {
+                List<ReplayComentario> replays = await GetReplaysByComentarioAsync(item.IdComentario);
+
+                if (replays != null && replays.Any())
+                {
+                    foreach (ReplayComentario rp in replays)
+                    {
+                        model.Replays.Add(rp);
+                    }
+                }
+            }
+
 
             return model;
         }
@@ -390,9 +405,9 @@ namespace TravelHubAgency.Repositories
 
         #region PUBLICACIONES
 
-        public async Task<List<Post>> GetAllPublicacionesAsync()
+        public async Task<List<Post>> GetAllPublicacionesAsync(int page)
         {
-            string request = "api/publicaciones/allposts";
+            string request = "api/publicaciones/allposts?page="+page;
             List<Post> posts = await this.CallApiAsync<List<Post>>(request);
             return posts;
         }
@@ -542,7 +557,71 @@ namespace TravelHubAgency.Repositories
 
         #endregion
 
+        #region REPLAYSCOMENTARIOS 
+        public async Task<List<ReplayComentario>> GetAllReplasy()
+        {
+            string request = "api/replayscomentario/allreplays";
+            List<ReplayComentario> replays =
+                await this.CallApiAsync<List<ReplayComentario>>(request);
+            return replays;
+        }
 
+        public async Task<List<ReplayComentario>> GetReplaysByComentarioAsync(int idcomentario)
+        {
+            string request = "api/replayscomentario/replayscomentario/" + idcomentario;
+            List<ReplayComentario> replays =
+                await this.CallApiAsync<List<ReplayComentario>>(request);
+
+            return replays;
+        }
+
+        public async Task<ReplayComentario> PublicarReplaysByComentarioAsync(ReplaysModel model)
+        {
+            string token =
+this.context.HttpContext.User.FindFirst(x => x.Type == "TOKEN").Value;
+
+            using (HttpClient client = new HttpClient())
+            {
+                string request = "api/replayscomentario/publicarreplay";
+                client.BaseAddress = new Uri(this.ApiUrl);
+                client.DefaultRequestHeaders.Clear();
+                client.DefaultRequestHeaders.Accept.Add(this.header);
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+                ReplayComentario newComent = new ReplayComentario
+                {
+                    IdReplay = 0,
+                    Replay = model.Contenido,
+                    Fecha = DateTime.Now,
+                    IdComentario = model.IdComentario,
+                    IdUsuario = 0, // le paso 0 porque en la
+                                   // api me encargo de recuperar el id el
+                                   // usuario por el token
+                };
+
+                string jsonData =
+                    JsonConvert.SerializeObject(newComent);
+                StringContent content =
+                    new StringContent(jsonData, Encoding.UTF8, "application/json");
+
+                HttpResponseMessage response =
+                   await client.PostAsync(request, content);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    ReplayComentario comentUloaded =
+                        await response.Content.ReadAsAsync<ReplayComentario>();
+                    return comentUloaded;
+                }
+                else
+                {
+                    return null;
+                }
+
+            }
+        }
+
+        #endregion
 
 
         #region AUTH

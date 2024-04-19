@@ -57,26 +57,31 @@
                                             </span>
                                             respuestas
                                         </div>
-                                        <div class="replays replay-blog-@(comentario.IdComentario) mt-4">
-                                            <img src="~/img/testimonial-@(comentario.IdUsuario).jpg"
-                                                 alt="Image"
-                                                 class="img-fluid mr-3 mt-1"
-                                                 style="width: 45px" />
-                                            <div class="media-body">
-                                                <h6>
-                                                    <a href="">John Doe</a>
-                                                    <small><i>@comentario.Fecha.ToShortDateString()</i></small>
-                                                </h6>
-                                                <p>
-                                                    @comentario.Contenido
-                                                </p>
+                                        @foreach (ReplayComentario replay in Model.Replays)
+                                        {
+                                            <div class="replays replay-blog-@(replay.IdComentario) mt-4" data-id="@replay.IdReplay">
+                                                <img src="~/img/testimonial-@(replay.IdUsuario).jpg"
+                                                     alt="Image"
+                                                     class="img-fluid mr-3 mt-1"
+                                                     style="width: 45px" />
+                                                <div class="media-body">
+                                                    <h6>
+                                                        <a href="">Usuario: @replay.IdUsuario</a>
+                                                        <small><i>@replay.Fecha.ToShortDateString()</i></small>
+                                                    </h6>
+                                                    <p>
+                                                        @replay.Replay
+                                                    </p>
+                                                </div>
                                             </div>
-                                        </div>
+                                        }
                                     </div>
                                 </div>
                             }
+
                         </div>
                     }
+
                     <!-- Comments -->
                     <!-- Comment form -->
                     <div class="bg-white mb-3 text-center" style="padding: 30px;">
@@ -100,7 +105,7 @@
                                 <div class="col-12">
                                     <div class="form-floating">
                                         <textarea class="form-control" name="contenido" placeholder="comentario " id="contenido" style="height: 100px; resize:none;" required>
-                                            </textarea>
+                                                                                                </textarea>
                                         <label for="contenido">Comentario *</label>
                                     </div>
                                 </div>
@@ -251,36 +256,46 @@
         }
     </script>
     <script>
-        // expand btn
-        var replaysBtn = document.querySelectorAll(".replays-btn");
-        var comments = document.querySelectorAll(".replays");
+        document.querySelectorAll(".replays-btn").forEach((btn) => {
 
-        replaysBtn.forEach((btn) => {
-            btn.addEventListener("click", function (e) {
-                var idreplayBlog = e.target.parentElement.dataset.id;
+            // expand btn
+            var replaysBtn = document.querySelectorAll(".replays-btn");
+            var comments = document.querySelectorAll(".replays");
 
-                comments.forEach((coment) => {
+            replaysBtn.forEach((btn) => {
+                btn.addEventListener("click", function (e) {
+                    var idreplayBlog = e.target.parentElement.dataset.id;
+
+
+                    comments.forEach((coment) => {
+                        // var replaysblog = document.querySelectorAll(
+                        //     ".replay-blog-" + idreplayBlog
+                        // );
+                        var idcometblog = coment.classList[1].split("-")[2];
+                        if (idcometblog != idreplayBlog) {
+                            coment.classList.remove("show");
+                        }
+                    });
+
                     var replaysblog = document.querySelectorAll(
                         ".replay-blog-" + idreplayBlog
                     );
-                    var idcometblog = coment.classList[1].split("-")[2];
-                    if (idcometblog != idreplayBlog) {
-                        coment.classList.remove("show");
-                    }
-                });
 
-                var replaysblog = document.querySelectorAll(
-                    ".replay-blog-" + idreplayBlog
-                );
+                    replaysblog.forEach((comment) => {
+                        var idsreplay = comment;
+                        console.log(replaysblog[idsreplay]);
+                        // if (coment.target){
 
-                replaysblog.forEach((comment) => {
-                    if (comment.classList.contains("show")) {
-                        comment.classList.remove("show");
-                        e.currentTarget.classList.remove("active-replays");
-                    } else {
-                        comment.classList.add("show");
-                        e.currentTarget.classList.add("active-replays");
-                    }
+                        // }
+
+                        if (comment.classList.contains("show")) {
+                            comment.classList.remove("show");
+                            e.currentTarget.classList.remove("active-replays");
+                        } else {
+                            comment.classList.add("show");
+                            e.currentTarget.classList.add("active-replays");
+                        }
+                    });
                 });
             });
         });

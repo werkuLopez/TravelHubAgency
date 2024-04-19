@@ -16,8 +16,13 @@ namespace TravelHubAgency.Controllers
             this.service = service;
             this.cache = cache;
         }
-        public async Task<IActionResult> Destinos(int? idcontinente)
+        public async Task<IActionResult> Destinos(int? idcontinente, int? page)
         {
+            if (page == null || page == 0)
+            {
+                page = 1;
+            }
+
 
             List<Destino> destinos;
             if (idcontinente == null)
@@ -28,6 +33,11 @@ namespace TravelHubAgency.Controllers
             {
                 destinos = await this.service.GetAllDestinosContinenteAsync(idcontinente.Value);
             }
+
+            int numRegistros = destinos.Count;
+
+            ViewData["numRegistros"] = numRegistros;
+
             return View(destinos);
         }
 
@@ -57,11 +67,11 @@ namespace TravelHubAgency.Controllers
 
             return View();
         }
-        
+
         [HttpPost]
         public async Task<IActionResult> CrearDestino(Destino destino, IFormFile file)
         {
-            
+
             Destino detino = await this.service.InsertarDestinoAsync(destino.Nombre, destino.IdPais, destino.Region, destino.Descripcion, file.FileName, destino.Latitud, destino.Longitud, destino.Precio);
             return RedirectToAction("Destinos");
         }
