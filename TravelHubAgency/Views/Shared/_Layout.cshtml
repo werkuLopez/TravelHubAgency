@@ -1,5 +1,4 @@
 ﻿@{
-    //List<Continente> continentes = ViewData["continentes"] as List<Continente>;
     List<Continente> continentes = cache.Get<List<Continente>>("continentes");
     List<Pais> paises = cache.Get<List<Pais>>("paises");
 }
@@ -177,7 +176,6 @@
         @await RenderSectionAsync("googleMapsScripts", required: false)
 
     }
-
 
     <script src="~/lib/bootstrap/dist/js/bootstrap.min.js"></script>
     <script src="~/js/easing.js"></script>

@@ -7,6 +7,7 @@ using TravelHubAgency.Data;
 using TravelHubAgency.Helpers;
 using TravelHubAgency.Models;
 using static System.Net.Mime.MediaTypeNames;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace TravelHubAgency.Repositories
 {
@@ -154,7 +155,7 @@ namespace TravelHubAgency.Repositories
 
         public async Task<List<Destino>> GetDestinosPaginadosAsync(int page)
         {
-            string request = "api/destinos/alldestinos?page="+page;
+            string request = "api/destinos/alldestinos?page=" + page;
             List<Destino> destinos = await this.CallApiAsync<List<Destino>>(request);
             return destinos;
         }
@@ -201,6 +202,11 @@ namespace TravelHubAgency.Repositories
                 client.DefaultRequestHeaders.Accept.Add(this.header);
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
+                if (imagen == null || imagen == "")
+                {
+                    imagen = "default.jpg";
+                }
+
                 Destino model = new Destino
                 {
                     Nombre = nombre,
@@ -235,6 +241,72 @@ namespace TravelHubAgency.Repositories
             }
         }
 
+        public async Task<Destino> UpdateDestinoAsync(int iddestino, string nombre,
+                int idpais, string region, string descripcion,
+                string imagen, string latitud, string longitud, decimal precio)
+        {
+            string token =
+                this.context.HttpContext.User.FindFirst(x => x.Type == "TOKEN").Value;
+            using (HttpClient client = new HttpClient())
+            {
+                string request = "api/destinos/insertardestino";
+
+                client.BaseAddress = new Uri(this.ApiUrl);
+                client.DefaultRequestHeaders.Clear();
+                client.DefaultRequestHeaders.Accept.Add(this.header);
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+                Destino destino = await GetDestinoByIdAsync(iddestino);
+
+                if (imagen == null || imagen == "")
+                {
+                    imagen = destino.Imagen;
+                }
+
+                destino.IdDestino = iddestino;
+                destino.Nombre = nombre;
+                destino.Region = region;
+                destino.IdPais = idpais;
+                destino.Descripcion = descripcion;
+                destino.Longitud = longitud;
+                destino.Latitud = latitud;
+                destino.Imagen = imagen;
+                destino.Precio = precio;
+
+                string jsonData =
+                    JsonConvert.SerializeObject(destino);
+                StringContent content =
+                    new StringContent(jsonData, Encoding.UTF8, "application/json");
+
+                HttpResponseMessage response =
+                   await client.PutAsync(request, content);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    Destino data =
+                        await response.Content.ReadAsAsync<Destino>();
+
+                    return data;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+        }
+
+        public async Task EliminarDestino(int iddestion)
+        {
+            string token =
+                this.context.HttpContext.User.FindFirst(x => x.Type == "TOKEN").Value;
+
+            using (HttpClient client = new HttpClient())
+            {
+                string request = "api/destinos/deletedestino/" + iddestion;
+                int result = await this.CallApiAsync<int>(request, token);
+            }
+        }
+
         #endregion
 
         #region PACKAGES 
@@ -262,6 +334,121 @@ namespace TravelHubAgency.Repositories
             return package;
         }
 
+        public async Task<Package> InsertarPackageAsync(Package package)
+        {
+            string token =
+                this.context.HttpContext.User.FindFirst(x => x.Type == "TOKEN").Value;
+            using (HttpClient client = new HttpClient())
+            {
+                string request = "api/packages/insertar";
+
+                client.BaseAddress = new Uri(this.ApiUrl);
+                client.DefaultRequestHeaders.Clear();
+                client.DefaultRequestHeaders.Accept.Add(this.header);
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+                Package model = new Package
+                {
+                    idPack = 0,
+                    Nombre = package.Nombre,
+                    FechaInicio = package.FechaInicio,
+                    FechaFin = package.FechaFin,
+                    Descripcion = package.Descripcion,
+                    Personas = package.Personas,
+                    Duracion = package.Duracion,
+                    Imagen = package.Imagen,
+                    Precio = package.Precio,
+                    IdDestino = package.IdDestino,
+                    IdVuelo = package.IdVuelo,
+                    IdHotel = package.IdHotel
+                };
+
+                string jsonData =
+                    JsonConvert.SerializeObject(model);
+                StringContent content =
+                    new StringContent(jsonData, Encoding.UTF8, "application/json");
+
+                HttpResponseMessage response =
+                   await client.PostAsync(request, content);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    Package data =
+                        await response.Content.ReadAsAsync<Package>();
+
+                    return data;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+        }
+
+        public async Task<Package> UpdatePackageAsync(Package package)
+        {
+            string token =
+                this.context.HttpContext.User.FindFirst(x => x.Type == "TOKEN").Value;
+            using (HttpClient client = new HttpClient())
+            {
+                string request = "api/packages/update";
+
+                client.BaseAddress = new Uri(this.ApiUrl);
+                client.DefaultRequestHeaders.Clear();
+                client.DefaultRequestHeaders.Accept.Add(this.header);
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+                Package model = new Package
+                {
+                    idPack = package.idPack,
+                    Nombre = package.Nombre,
+                    FechaInicio = package.FechaInicio,
+                    FechaFin = package.FechaFin,
+                    Descripcion = package.Descripcion,
+                    Personas = package.Personas,
+                    Duracion = package.Duracion,
+                    Imagen = package.Imagen,
+                    Precio = package.Precio,
+                    IdDestino = package.IdDestino,
+                    IdVuelo = package.IdVuelo,
+                    IdHotel = package.IdHotel
+                };
+
+                string jsonData =
+                    JsonConvert.SerializeObject(model);
+                StringContent content =
+                    new StringContent(jsonData, Encoding.UTF8, "application/json");
+
+                HttpResponseMessage response =
+                   await client.PutAsync(request, content);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    Package data =
+                        await response.Content.ReadAsAsync<Package>();
+
+                    return data;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+        }
+
+        public async Task EliminarPackage(int idPack)
+        {
+            string token =
+                 this.context.HttpContext.User.FindFirst(x => x.Type == "TOKEN").Value;
+
+            using (HttpClient client = new HttpClient())
+            {
+                string request = "api/packages/eliminar/" + idPack;
+                int result = await this.CallApiAsync<int>(request, token);
+            }
+
+        }
+
         #endregion
 
         #region USUARIOS
@@ -280,7 +467,7 @@ namespace TravelHubAgency.Repositories
             string token =
               this.context.HttpContext.User.FindFirst(x => x.Type == "TOKEN").Value;
 
-            string request = "api/usuarios/perfilusuario";
+            string request = "api/usuarios/perfil";
 
             Usuario usuario =
                 await this.CallApiAsync<Usuario>(request, token);
@@ -295,7 +482,7 @@ namespace TravelHubAgency.Repositories
 
             using (HttpClient client = new HttpClient())
             {
-                string request = "api/usuarios/updateperfilusuario";
+                string request = "api/usuarios/updateperfil";
                 client.BaseAddress = new Uri(this.ApiUrl);
                 client.DefaultRequestHeaders.Clear();
                 client.DefaultRequestHeaders.Accept.Add(this.header);
@@ -353,7 +540,7 @@ namespace TravelHubAgency.Repositories
             string token =
     this.context.HttpContext.User.FindFirst(x => x.Type == "TOKEN").Value;
 
-            string request = "api/usuarios/updatefotoperfilusuario?imagen=" + imagen;
+            string request = "api/usuarios/updatefotoperfil?imagen=" + imagen;
 
             using (HttpClient client = new HttpClient())
             {
@@ -449,7 +636,7 @@ namespace TravelHubAgency.Repositories
 
             using (HttpClient client = new HttpClient())
             {
-                string request = "api/vuelos/crearvuelo";
+                string request = "api/vuelos/Insertar";
                 client.BaseAddress = new Uri(this.ApiUrl);
                 client.DefaultRequestHeaders.Clear();
                 client.DefaultRequestHeaders.Accept.Add(this.header);
@@ -500,7 +687,7 @@ namespace TravelHubAgency.Repositories
 
             using (HttpClient client = new HttpClient())
             {
-                string request = "api/vuelos/updatevuelo";
+                string request = "api/vuelos/update";
                 client.BaseAddress = new Uri(this.ApiUrl);
                 client.DefaultRequestHeaders.Clear();
                 client.DefaultRequestHeaders.Accept.Add(this.header);
@@ -534,7 +721,37 @@ namespace TravelHubAgency.Repositories
                 {
                     return null;
                 }
+            }
+        }
 
+        public async Task<ReservaVuelo> ComprarVueloAsync(int idvuelo)
+        {
+            string token =
+                this.context.HttpContext.User.FindFirst(x => x.Type == "TOKEN").Value;
+            using (HttpClient client = new HttpClient())
+            {
+                string request = "api/vuelos/comprarvuelo";
+
+                Vuelo vuelo = await GetVueloByIdAsync(idvuelo);
+
+                string jsonData =
+    JsonConvert.SerializeObject(vuelo);
+                StringContent content =
+                    new StringContent(jsonData, Encoding.UTF8, "application/json");
+
+                HttpResponseMessage response =
+                   await client.PutAsync(request, content);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    ReservaVuelo uploaded =
+                        await response.Content.ReadAsAsync<ReservaVuelo>();
+                    return uploaded;
+                }
+                else
+                {
+                    return null;
+                }
             }
         }
 

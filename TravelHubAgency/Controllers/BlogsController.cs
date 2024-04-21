@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Hosting;
 using TravelHubAgency.Filters;
+using TravelHubAgency.Helpers;
 using TravelHubAgency.Models;
 using TravelHubAgency.Repositories;
 
@@ -9,14 +10,18 @@ namespace TravelHubAgency.Controllers
     public class BlogsController : Controller
     {
         private TravelhubServices service;
+        private HelperUploadFiles uploadFiles;
 
         //ejemplo
         List<string> estiquetas;
 
-        public BlogsController(TravelhubServices service)
+        public BlogsController(TravelhubServices service,
+            HelperUploadFiles uploadFiles)
         {
             this.service = service;
+            this.uploadFiles = uploadFiles;
 
+            // ejemplo
             this.estiquetas = new List<string>();
             this.estiquetas.Add("Madrid");
             this.estiquetas.Add("Valencia");
@@ -49,7 +54,7 @@ namespace TravelHubAgency.Controllers
             ViewData["numRegistros"] = numRegistros;
             ViewData["ETIQUETAS"] = this.estiquetas;
             ViewData["actualPage"] = page.Value;
-            return PartialView("_Publicaciones",publicaciones);
+            return PartialView("_Publicaciones", publicaciones);
         }
 
         public async Task<IActionResult> _SingleBlog(int idpost)
@@ -62,7 +67,7 @@ namespace TravelHubAgency.Controllers
 
         [AuthorizeUsuario]
         [HttpPost]
-        public async Task<IActionResult> SingleBlog(string contenido, int idpost)
+        public async Task<IActionResult> _SingleBlog(string contenido, int idpost)
         {
             Comentario comment =
                 await this.service.PublicarComentarioAsync(idpost, contenido);
@@ -70,7 +75,38 @@ namespace TravelHubAgency.Controllers
             //return RedirectToAction("SingleBlog", new { idpost = comment.IdPost });
             PostComentariosModel model =
                 await this.service.GetPostComentariosModelAsync(idpost);
-            return View(model);
+            return PartialView("_SingleBlog", model);
+        }
+
+        [AuthorizeUsuario]
+        public async Task<IActionResult> _PublicrPost()
+        {
+            return PartialView("_PublicrPost");
+        }
+
+        [AuthorizeUsuario]
+        [HttpPost]
+        public async Task<IActionResult> _PublicarPost(Post post, IFormFile file)
+        {
+            if (file != null)
+            {
+                await this.uploadFiles.UploadFileAsync(file, Foldders.Images);
+                await this.service.PublicarPostAsync(post, file.FileName);
+
+                return RedirectToAction("Index");
+            }
+            else
+            {
+                ViewData["mensaje"] = "Debe asignar alguna imagen para su post";
+                return PartialView();
+            }
+        }
+
+        [AuthorizeUsuario]
+        public async Task<IActionResult> EliminarPost(int idpost)
+        {
+            await this.service.EliminarPostAsync(idpost);
+            return RedirectToAction("Index");
         }
     }
 }

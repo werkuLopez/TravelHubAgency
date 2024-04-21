@@ -4,11 +4,9 @@
         <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Perfil</a>
         <div class="dropdown-menu">
             <a href="#reservas" class="dropdown-item">Reservas</a>
-            <a href="#mis-post" class="dropdown-item">Mis posts</a>
-            <a href="#mis-post" class="dropdown-item">Mis posts</a>
-            <a href="#mis-post" class="dropdown-item">Mis posts</a>
-            <a asp-controller="Usuarios" asp-action="Perfil" class="dropdown-item">Mis datos</a>
-            <a asp-controller="Managed" asp-action="LogOut" class="dropdown-item">Cerrar sesión</a>
+            <a href="#mis-post" class="dropdown-item">Mis publicaciones</a>
+            <a asp-controller="Usuarios" asp-action="Perfil" class="dropdown-item">Perfil</a>
+            <a asp-controller="Managed" asp-action="LogOut" class="dropdown-item text-primary">Cerrar sesión</a>
         </div>
     </div>
 
@@ -29,5 +27,4 @@ else
 {
     <a asp-controller="Usuarios" asp-action="Perfil"
        class="nav-item nav-link">Perfil</a>
-    @*     class="btn btn-primary rounded-pill py-2 px-4" *@
 }

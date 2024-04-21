@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using TravelHubAgency.Filters;
+using TravelHubAgency.Helpers;
 using TravelHubAgency.Models;
 using TravelHubAgency.Repositories;
 
@@ -10,11 +11,17 @@ namespace TravelHubAgency.Controllers
     {
         private TravelhubServices service;
         private IMemoryCache cache;
+        private HelperUploadFiles uploadFiles;
 
-        public DestinosController(TravelhubServices service, IMemoryCache cache)
+
+        public DestinosController(
+            TravelhubServices service,
+            IMemoryCache cache,
+            HelperUploadFiles uploadFiles)
         {
             this.service = service;
             this.cache = cache;
+            this.uploadFiles = uploadFiles;
         }
 
         public async Task<IActionResult> Index(int? idcontinente)
@@ -89,8 +96,50 @@ namespace TravelHubAgency.Controllers
         [HttpPost]
         public async Task<IActionResult> CrearDestino(Destino destino, IFormFile file)
         {
+            if (file != null)
+            {
+                this.uploadFiles.UploadFileAsync(file, Foldders.Images);
 
-            Destino detino = await this.service.InsertarDestinoAsync(destino.Nombre, destino.IdPais, destino.Region, destino.Descripcion, file.FileName, destino.Latitud, destino.Longitud, destino.Precio);
+                Destino detino =
+                    await this.service.InsertarDestinoAsync(
+                        destino.Nombre, destino.IdPais,
+                    destino.Region, destino.Descripcion, file.FileName, destino.Latitud,
+                    destino.Longitud, destino.Precio);
+
+                return RedirectToAction("Destinos");
+            }
+            else
+            {
+                ViewData["mensaje"] = "Debe asignar una imagen";
+                return View();
+            }
+        }
+
+        [HttpPut]
+        public async Task<IActionResult> UpdateDestino(Destino destino, IFormFile file)
+        {
+            if (file != null)
+            {
+                this.uploadFiles.UploadFileAsync(file, Foldders.Images);
+
+                await this.service.UpdateDestinoAsync(destino.IdDestino, destino.Nombre, destino.IdPais,
+                    destino.Region, destino.Descripcion, file.FileName, destino.Latitud,
+                    destino.Longitud, destino.Precio);
+
+                return RedirectToAction("Destinos");
+            }
+            else
+            {
+                await this.service.UpdateDestinoAsync(destino.IdDestino, destino.Nombre, destino.IdPais,
+                    destino.Region, destino.Descripcion, file.FileName, destino.Latitud,
+                    destino.Longitud, destino.Precio);
+                return RedirectToAction("Destinos");
+            }
+        }
+
+        public async Task<IActionResult> EliminarDestino(int iddestino)
+        {
+            await this.service.EliminarDestino(iddestino);
             return RedirectToAction("Destinos");
         }
     }
