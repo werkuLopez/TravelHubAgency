@@ -1,0 +1,155 @@
+﻿@model Vuelo
+@{
+    List<Destino> destinos = ViewData["DESTINOS"] as List<Destino>;
+    string codVuelo = "";
+}
+<div class="container-xxl py-3">
+    <div style="margin:0 1em;">
+        <div class="p-3">
+            <form method="post" asp-action="_UpdateVuelo">
+                @Html.AntiForgeryToken()
+                <div class="row g-5 align-items-center">
+                    <div class="col-12">
+                        @if (Model.IdVuelo < 10)
+                        {
+                            codVuelo = "00" + Model.IdVuelo;
+                        }
+                        else if (Model.IdVuelo > 10)
+                        {
+                            codVuelo = "0" + Model.IdVuelo;
+                        }
+                        else if (Model.IdVuelo < 100)
+                        {
+                            codVuelo = "" + Model.IdVuelo;
+                        }
+
+                        <h1 class="text-black mb-4">Modificar vuelo @codVuelo</h1>
+
+                        <div class="row gy-2">
+                            <div class="col-md-12">
+                                <div class="form-floating">
+                                    <input type="text" name="origen" class="form-control " id="origen" value="@Model.Origen" placeholder="Aeropuerto de Barajas" required>
+                                    <label for="origen">Punto de salida</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="text" name="aerolinea" class="form-control" id="aerolinea" value="@Model.Aerolinea" placeholder="Air Europa" required>
+                                    <label for="aerolinea">Aerolinea</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="date" name="fechasalida" class="form-control " id="fechasalida" value="@Model.FechaSalida.ToString("yyyy-MM-dd")" required>
+                                    <label for="fechasalida">Fecha</label>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="form-floating">
+                                    <select name="iddestino" class="form-select " id="iddestino" required>
+
+
+                                        @foreach (Destino dt in destinos)
+                                        {
+                                            if (dt.IdDestino == Model.IdDestino)
+                                            {
+                                                <option value="@Model.IdDestino" selected>@dt.Nombre</option>
+                                            }
+                                            <option value="@dt.IdDestino">@dt.Nombre</option>
+                                        }
+                                    </select>
+                                    <label for="iddestino">Destino</label>
+                                </div>
+                            </div>
+                            <input name="idvuelo" id="idvuelo" value="@Model.IdVuelo" readonly class="form-control" />
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="text" name="latitud" class="form-control " id="latitudOrigen" placeholder="latitud" readonly>
+                                    <label for="latitudOrigen">Latitud</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="text" name="longitud" class="form-control" id="longitudOrigen" placeholder="longitud" readonly>
+                                    <label for="longitudOrigen">Longitud</label>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-floating">
+                                    <input type="text" name="precio" class="form-control " id="precio" value="@Model.Precio" placeholder="precio">
+                                    <label for="precio">Precio</label>
+                                </div>
+                            </div>
+                            <div class="col-12 text-center">
+                                <button class="btn btn-outline-dark py-3 w-75" id="guardarcambios" data-id="@Model.IdVuelo"> Guardar cambios</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            <div class="mt-4">
+                <span id="mensaje">
+
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="mapadestino" hidden>
+</div>
+@* @section Scripts {
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB_sNNhR1rCinzXXrVxI6VhQlYUTbQbAyo&callback=initMap" async defer></script>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+
+                     // geocoder
+    <script>
+        var map;
+        var marcador;
+
+        $(function () {
+            $(document).on("change", "#origen", async function () {
+                await initMap();
+            });
+
+            async function initMap() {
+                map = new google.maps.Map(document.getElementById("mapadestino"), {
+                    zoom: 14,
+                    mapTypeId: google.maps.MapTypeId.ROADMAP
+                });
+
+                marcador = new google.maps.Marker({
+                    draggable: true
+                });
+
+                await movePin();
+            }
+
+            async function movePin() {
+
+                var geocoder = new google.maps.Geocoder();
+                var searched_destino = $("#origen").val();
+
+                geocoder.geocode({
+                    "address": searched_destino
+                }, function (results, status) {
+                    if (status == google.maps.GeocoderStatus.OK) {
+
+                        console.log("Latitud: ", results[0].geometry.location.lat());
+                        console.log("Longitud: ", results[0].geometry.location.lng());
+
+                        console.log(results[0].address_components);
+
+                        $("#origen").val(results[0].address_components[0].long_name);
+                        $("#latitudOrigen").val(results[0].geometry.location.lat());
+                        $("#longitudOrigen").val(results[0].geometry.location.lng());
+
+                    } else {
+                        console.error("Geocode was not successful for the following reason: " + status);
+                    }
+                });
+            }
+        });
+    </script>
+}
+ *@

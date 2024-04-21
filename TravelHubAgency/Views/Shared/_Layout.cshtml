@@ -58,14 +58,14 @@
                         <div class="dropdown-menu">
                             @if (continentes != null)
                             {
-                                <a asp-controller="Destinos" asp-action="Destinos" class="dropdown-item">
+                                <a asp-controller="Destinos" asp-action="Index" class="dropdown-item">
                                     All Destinos
                                 </a>
                                 @foreach (Continente cont in continentes)
                                 {
                                     <a class="dropdown-item"
                                        asp-controller="Destinos"
-                                       asp-action="Destinos"
+                                       asp-action="Index"
                                        asp-route-idcontinente="@cont.IdContinente"
                                        style="color:rgba(0, 0, 0, 0.9) !important">@cont.Nombre</a>
 

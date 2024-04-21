@@ -152,6 +152,12 @@ namespace TravelHubAgency.Repositories
 
         #region DESTINOS 
 
+        public async Task<List<Destino>> GetDestinosPaginadosAsync(int page)
+        {
+            string request = "api/destinos/alldestinos?page="+page;
+            List<Destino> destinos = await this.CallApiAsync<List<Destino>>(request);
+            return destinos;
+        }
         public async Task<List<Destino>> GetAllDestinosAsync()
         {
             string request = "api/destinos/alldestinos";
@@ -375,6 +381,178 @@ namespace TravelHubAgency.Repositories
 
         #endregion
 
+        #region VUELOS
+
+        #region calcular distancia/ duración del vuelo/ fecha de llegada
+        private static double CalcularDistancia(double lat1, double lon1, double lat2, double lon2)
+        {
+
+            double radioTierra = 6371; // radio de la tierra;
+
+            // Convertir las coordenadas de grados a radianes
+            double dLat = ConvertToRadians(lat2 - lat1);
+            double dLon = ConvertToRadians(lon2 - lon1);
+
+            double a = Math.Sin(dLat / 2) * Math.Sin(dLat / 2) +
+                       Math.Cos(ConvertToRadians(lat1)) * Math.Cos(ConvertToRadians(lat2)) *
+                       Math.Sin(dLon / 2) * Math.Sin(dLon / 2);
+
+            double c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
+
+            double distancia = radioTierra * c; // Distancia en kilómetros
+
+            return distancia;
+        }
+
+        private static double ConvertToRadians(double grados)
+        {
+            return grados * Math.PI / 180;
+        }
+
+        private static DateTime CalcularFechaLlegada(DateTime fechaSalida, double distancia, double velocidad)
+        {
+            double horas = distancia / velocidad;
+            DateTime fechaLlegada = fechaSalida.AddHours(horas);
+
+            return fechaLlegada;
+        }
+        #endregion
+
+        public async Task<List<Vuelo>> GetAllVuelosAsync()
+        {
+            string request = "api/vuelos/allvuelos";
+            List<Vuelo> vuelos =
+                await this.CallApiAsync<List<Vuelo>>(request);
+
+            return vuelos;
+        }
+
+        public async Task<Vuelo> GetVueloByIdAsync(int idvuelo)
+        {
+            string request = "api/vuelos/vuelo/" + idvuelo;
+            Vuelo vuelo =
+                await this.CallApiAsync<Vuelo>(request);
+
+            return vuelo;
+        }
+
+        public async Task<Vuelo> CrearVueloAsync(Vuelo vuelo, string lat2, string lon2)
+        {
+            string token =
+            this.context.HttpContext.User.FindFirst(x => x.Type == "TOKEN").Value;
+
+            Destino destino = await GetDestinoByIdAsync(vuelo.IdDestino);
+
+            // calculamos la distancia
+            double distancia = CalcularDistancia(double.Parse(destino.Latitud),
+                double.Parse(destino.Longitud), double.Parse(lat2), double.Parse(lon2));
+
+            using (HttpClient client = new HttpClient())
+            {
+                string request = "api/vuelos/crearvuelo";
+                client.BaseAddress = new Uri(this.ApiUrl);
+                client.DefaultRequestHeaders.Clear();
+                client.DefaultRequestHeaders.Accept.Add(this.header);
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+                Vuelo newVuelo = new Vuelo();
+                newVuelo.IdVuelo = 0;
+                newVuelo.Aerolinea = vuelo.Aerolinea;
+                newVuelo.IdDestino = vuelo.IdDestino;
+                newVuelo.Precio = vuelo.Precio;
+                newVuelo.FechaSalida = vuelo.FechaSalida;
+                newVuelo.FechaLlegada = CalcularFechaLlegada(vuelo.FechaSalida, distancia, 1200);
+                newVuelo.Duracion = "00:00";
+                newVuelo.Origen = vuelo.Origen;
+
+                string jsonData =
+                    JsonConvert.SerializeObject(newVuelo);
+                StringContent content =
+                    new StringContent(jsonData, Encoding.UTF8, "application/json");
+
+                HttpResponseMessage response =
+                   await client.PostAsync(request, content);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    Vuelo comentUloaded =
+                        await response.Content.ReadAsAsync<Vuelo>();
+                    return comentUloaded;
+                }
+                else
+                {
+                    return null;
+                }
+
+            }
+        }
+
+        public async Task<Vuelo> UpdateVueloAsync(Vuelo vuelo, string lat2, string lon2)
+        {
+            string token =
+            this.context.HttpContext.User.FindFirst(x => x.Type == "TOKEN").Value;
+
+            Destino destino = await GetDestinoByIdAsync(vuelo.IdDestino);
+
+            // calculamos la distancia
+            double distancia = CalcularDistancia(double.Parse(destino.Latitud),
+                double.Parse(destino.Longitud), double.Parse(lat2), double.Parse(lon2));
+
+            using (HttpClient client = new HttpClient())
+            {
+                string request = "api/vuelos/updatevuelo";
+                client.BaseAddress = new Uri(this.ApiUrl);
+                client.DefaultRequestHeaders.Clear();
+                client.DefaultRequestHeaders.Accept.Add(this.header);
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+                Vuelo newVuelo = new Vuelo();
+                newVuelo.IdVuelo = vuelo.IdVuelo;
+                newVuelo.Aerolinea = vuelo.Aerolinea;
+                newVuelo.IdDestino = vuelo.IdDestino;
+                newVuelo.Precio = vuelo.Precio;
+                newVuelo.FechaSalida = vuelo.FechaSalida;
+                newVuelo.FechaLlegada = CalcularFechaLlegada(vuelo.FechaSalida, distancia, 1200);
+                newVuelo.Duracion = "00:00:00";
+                newVuelo.Origen = vuelo.Origen;
+
+                string jsonData =
+                    JsonConvert.SerializeObject(newVuelo);
+                StringContent content =
+                    new StringContent(jsonData, Encoding.UTF8, "application/json");
+
+                HttpResponseMessage response =
+                   await client.PutAsync(request, content);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    Vuelo comentUloaded =
+                        await response.Content.ReadAsAsync<Vuelo>();
+                    return comentUloaded;
+                }
+                else
+                {
+                    return null;
+                }
+
+            }
+        }
+
+        public async Task EliminarVueloAsync(int idvuelo)
+        {
+            string token =
+                this.context.HttpContext.User.FindFirst(x => x.Type == "TOKEN").Value;
+
+            using (HttpClient client = new HttpClient())
+            {
+                string request = "api/vuelos/eliminarvuelo/" + idvuelo;
+                int result = await this.CallApiAsync<int>(request, token);
+            }
+        }
+
+
+        #endregion
+
         #region POSTSCOMENTARIOSMODEL
 
         public async Task<PostComentariosModel> GetPostComentariosModelAsync(int idpost)
@@ -407,7 +585,7 @@ namespace TravelHubAgency.Repositories
 
         public async Task<List<Post>> GetAllPublicacionesAsync(int page)
         {
-            string request = "api/publicaciones/allposts?page="+page;
+            string request = "api/publicaciones/allposts?page=" + page;
             List<Post> posts = await this.CallApiAsync<List<Post>>(request);
             return posts;
         }

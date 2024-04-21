@@ -1,0 +1,57 @@
+﻿@model List<Vuelo>
+@{
+    List<Destino> destinos = ViewData["DESTINOS"] as List<Destino>;
+}
+<section id="flights" class=" py-3">
+    <div class="container">
+        <h1 class="upcomming">próximos vuelos</h1>
+        @foreach (Vuelo vuelo in Model)
+        {
+            <div class="item">
+                <div class="item-right">
+                    <h2 class="num">@vuelo.FechaSalida.Day</h2>
+                    <p class="day">@vuelo.FechaSalida.ToString("MMMM")</p>
+                    <span class="up-border"></span>
+                    <span class="down-border"></span>
+                </div>
+                <!-- end item-right -->
+
+                <div class="item-left">
+                    <p class="event">@vuelo.Aerolinea</p>
+                    @{
+                        var dt = destinos.FirstOrDefault(x => x.IdDestino == vuelo.IdDestino);
+
+                    }
+                    <h2 class="title">@dt.Nombre</h2>
+
+                    <div class="sce">
+                        <div class="icon">
+                            <i class="fa fa-table"></i>
+                        </div>
+                        <p>
+                            @vuelo.FechaSalida.ToString("D") <br />
+                            Duración del vuelo: @vuelo.Duracion h
+                        </p>
+                    </div>
+                    <div class="fix"></div>
+                    <div class="loc">
+                        <div class="icon">
+                            <i class="fa fa-map-marker"></i>
+                        </div>
+                        <p>
+                            @dt.Nombre, @dt.Region <br />
+                            @vuelo.FechaLlegada.ToString("D") <br />
+                        </p>
+                    </div>
+                    <div class="fix"></div>
+                    <div class="d-flex flex-wrap gap-2 justify-content-end">
+                        <button class="btn btn-primary detailVuelo" data-id="@vuelo.IdVuelo">ver vuelo</button>
+                        <button class="btn comprarVuelo" data-id="@vuelo.IdVuelo">comprar ticket</button>
+                    </div>
+                </div>
+                <!-- end item-right -->
+            </div>
+        }
+        <!-- end item -->
+    </div>
+</section>

@@ -1,91 +1,133 @@
-﻿@model List<string>
+﻿@{
 
-<section id="flights" class=" py-3 wow fadeInUp flights" data-wow-delay="0.1s">
-    <div class="container">
-        <h1 class="upcomming">próximos vuelos</h1>
-        <div class="item">
-            <div class="item-right">
-                <h2 class="num">23</h2>
-                <p class="day">Feb</p>
-                <span class="up-border"></span>
-                <span class="down-border"></span>
-            </div>
-            <!-- end item-right -->
+}
 
-            <div class="item-left">
-                <p class="event">Music Event</p>
-                <h2 class="title">Live In Sydney</h2>
+<!-- paginación -->
+<!-- fin paginación-->
+<!-- vuelos -->
+<div class="mt-4" id="contentVuelos">
+</div>
 
-                <div class="sce">
-                    <div class="icon">
-                        <i class="fa fa-table"></i>
-                    </div>
-                    <p>
-                        Monday 15th 2016 <br />
-                        15:20Pm & 11:00Am
-                    </p>
-                </div>
-                <div class="fix"></div>
-                <div class="loc">
-                    <div class="icon">
-                        <i class="fa fa-map-marker"></i>
-                    </div>
-                    <p>
-                        North,Soth, United State , Amre <br />
-                        Party Number 16,20
-                    </p>
-                </div>
-                <div class="fix"></div>
-                <button class="btn">Tickets</button>
-            </div>
-            <!-- end item-right -->
-        </div>
-        <!-- end item -->
+@section Scripts {
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB_sNNhR1rCinzXXrVxI6VhQlYUTbQbAyo&callback=initMap" async defer></script>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script>
 
-        <div class="item">
-            <div class="item-right">
-                <h2 class="num">23</h2>
-                <p class="day">Feb</p>
-                <span class="up-border"></span>
-                <span class="down-border"></span>
-            </div>
-            <!-- end item-right -->
+        var map;
+        var marcador;
 
-            <div class="item-left">
-                <p class="event">Music Event</p>
-                <h2 class="title">Live Been Corrage</h2>
+        $(function () {
+            $("#contentVuelos").load("/Vuelos/_Vuelos");
 
-                <div class="sce">
-                    <div class="icon">
-                        <i class="fa fa-table"></i>
-                    </div>
-                    <p>
-                        Monday 15th 2016 <br />
-                        15:20Pm & 11:00Am
-                    </p>
-                </div>
-                <div class="fix"></div>
-                <div class="loc">
-                    <div class="icon">
-                        <i class="fa fa-map-marker"></i>
-                    </div>
-                    <p>
-                        North,Soth, United State , Amre <br />
-                        Party Number 16,20
-                    </p>
-                </div>
-                <div class="fix"></div>
-                <button class="btn">Tickets</button>
-            </div>
-            <!-- end item-right -->
-        </div>
-    </div>
-</section>
+            // -ver detalles vuelo
+            $(document).on("click", ".detailVuelo", function () {
 
+                var idVuelo = $(this).data("id");
+                console.log(idVuelo);
 
+                $("#contentVuelos").load("/Vuelos/_DetalleVuelo?idvuelo=" + idVuelo);
+            });
 
+            // -comprar vuelo
+            $(document).on("click", ".comprarVuelo", function () {
+                var idVuelo = $(this).data("id");
+                console.log(idVuelo);
+            });
 
+            $(document).on("click", ".modVuelo", function () {
+                var idVuelo = $(this).data("id");
+                $("#contentVuelos").load("/Vuelos/_UpdateVuelo?idvuelo=" + idVuelo);
+            });
 
+            $(function () {
+                $(document).on("click", "#guardarcambios", function () {
+                    var aerolinea = $("#aerolinea").val();
+                    var destino = parseInt($("#iddestino").val());
+                    var origen = $("#origen").val();
+                    var fechaSalida = $("#fechasalida").val();
+                    var precio = $("#precio").val();
+                    var latitud = $("#latitudOrigen").val();
+                    var longitud = $("#longitudOrigen").val();
+                    var idvuelo = parseInt($(this).data("id"));
+
+                    var data = {
+                        IdVuelo: idvuelo,
+                        Origen: origen,
+                        IdDestino: destino,
+                        Aerolinea: aerolinea,
+                        FechaSalida: fechaSalida,
+                        FechaLlegada: "01/01/0001",
+                        Duracion: "00:00",
+                        Precio: precio
+                    }
+
+                    var json = JSON.stringify(data);
+
+                    $.ajax({
+                        url: "/Vuelos/_UpdateVuelo?latitud=" + latitud + "&longitud=" + longitud,
+                        method: "PUT",
+                        data: json,
+                        success: function (data) {
+                            setTimeout(function () {
+                                $("#mensaje").addClass("text-success");
+                                $("#mensaje").text("Vuelo modificado correctamente");
+                            }, 5000)
+                        },
+                        error: function (data) {
+                            setTimeout(function () {
+                                $("#mensaje").addClass("text-danger");
+                                $("#mensaje").text("Error al modificar el Vuelo");
+                            }, 5000)
+                        }
+                    })
+                });
+            });
+
+            $(document).on("change", "#origen", async function () {
+                await initMap();
+            });
+
+            async function initMap() {
+                map = new google.maps.Map(document.getElementById("mapadestino"), {
+                    zoom: 14,
+                    mapTypeId: google.maps.MapTypeId.ROADMAP
+                });
+
+                marcador = new google.maps.Marker({
+                    draggable: true
+                });
+
+                await movePin();
+            }
+
+            async function movePin() {
+
+                var geocoder = new google.maps.Geocoder();
+                var searched_destino = $("#origen").val();
+
+                geocoder.geocode({
+                    "address": searched_destino
+                }, function (results, status) {
+                    if (status == google.maps.GeocoderStatus.OK) {
+
+                        console.log("Latitud: ", results[0].geometry.location.lat());
+                        console.log("Longitud: ", results[0].geometry.location.lng());
+
+                        console.log(results[0].address_components);
+
+                        $("#origen").val(results[0].address_components[0].long_name);
+                        $("#latitudOrigen").val(results[0].geometry.location.lat());
+                        $("#longitudOrigen").val(results[0].geometry.location.lng());
+
+                    } else {
+                        console.error("Geocode was not successful for the following reason: " + status);
+                    }
+                });
+            }
+        });
+    </script>
+
+}
 @section Styles {
     <style>
         body {
@@ -98,7 +140,7 @@
         }
 
         #flights {
-            height:100%;
+            height: 100%;
             background: #DDD;
         }
 
@@ -117,7 +159,7 @@
         }
 
         .container .item {
-            width: 48%;
+            width: 100%;
             float: left;
             padding: 0 20px;
             background: #fff;

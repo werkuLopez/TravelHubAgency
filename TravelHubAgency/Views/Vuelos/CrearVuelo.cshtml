@@ -1,0 +1,112 @@
+﻿@model Vuelo
+@{
+    List<Destino> destinos = ViewData["DESTINOS"] as List<Destino>;
+}
+
+<div class="container-xxl py-3 wow fadeInUp" data-wow-delay="0.1s">
+    <div style="margin:0 1em;">
+        <div class="p-3">
+            <form method="post">
+                @Html.AntiForgeryToken()
+                <div class="row g-5 align-items-center">
+                    <div class="col-12">
+                        <h1 class="text-black mb-4">Crear vuelo</h1>
+
+                        <div class="row gy-2">
+                            <div class="col-md-12">
+                                <div class="form-floating">
+                                    <input type="text" name="origen" class="form-control " id="origen" placeholder="Aeropuerto de Barajas" required>
+                                    <label for="origen">Punto de salida</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="text" name="aerolinea" class="form-control " id="aerolinea" placeholder="Air Europa" required>
+                                    <label for="aerolinea">Aerolinea</label>
+                                </div>
+                            </div>                            
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="date" name="fechaSalida" class="form-control " id="fechaSalida" required>
+                                    <label for="fechaSalida">Fecha</label>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="form-floating">
+                                    <select name="idDestino" class="form-select " id="idDestino" required>
+                                        @foreach (Destino pais in destinos)
+                                        {
+                                            <option value="@pais.IdDestino">@pais.Nombre</option>
+                                        }
+                                    </select>
+                                    <label for="idDestino">Destino</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="text" name="latitud" class="form-control " id="latitudOrigen" placeholder="latitud" readonly>
+                                    <label for="latitudOrigen">Latitud</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="text" name="longitud" class="form-control " id="longitudOrigen" placeholder="longitud" readonly>
+                                    <label for="longitudOrigen">Longitud</label>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-floating">
+                                    <input type="text" name="precio" class="form-control " id="precio" placeholder="precio">
+                                    <label for="precio">Precio</label>
+                                </div>
+                            </div>
+                            <div class="col-12 text-center">
+                                <button class="btn btn-outline-dark py-3 w-75"> Guardar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB_sNNhR1rCinzXXrVxI6VhQlYUTbQbAyo&callback=initMap" async defer></script>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script>
+        var map;
+        var marcador;
+
+        $(document).ready(function () {
+            $("#origen").on("change", function () {
+                movePin();
+            });
+        });
+
+        function movePin() {
+
+            var geocoder = new google.maps.Geocoder();
+            var searched_destino = $("#origen").val();
+
+            geocoder.geocode({
+                "address": searched_destino
+            }, function (results, status) {
+                if (status == google.maps.GeocoderStatus.OK) {
+
+                    console.log("Latitud: ", results[0].geometry.location.lat());
+                    console.log("Longitud: ", results[0].geometry.location.lng());
+
+                    console.log(results[0].address_components);
+
+                    $("#origen").val(results[0].address_components[0].long_name);
+                    $("#latitudOrigen").val(results[0].geometry.location.lat());
+                    $("#longitudOrigen").val(results[0].geometry.location.lng());
+
+                } else {
+                    console.error("Geocode was not successful for the following reason: " + status);
+                }
+            });
+        }
+    </script>
+}

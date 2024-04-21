@@ -16,12 +16,12 @@ namespace TravelHubAgency.Models
         [Column("Aerolinea")]
         public string Aerolinea { get; set; }
         [Column("Fecha_Salida")]
-        public DateTime FechaSalida { get; set; } 
-        [Column("Fecha_Salida")]
-        public DateTime FechaLlegada {  get; set; }
+        public DateTime FechaSalida { get; set; }
+        [Column("Fecha_Llegada")]
+        public DateTime FechaLlegada { get; set; }
         [Column("Duracion")]
-        public int Duracion { get; set; }
+        public string Duracion { get; set; }
         [Column("Precio")]
-        public int Precio { get; set; }
+        public decimal Precio { get; set; }
     }
 }

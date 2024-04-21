@@ -16,14 +16,9 @@ namespace TravelHubAgency.Controllers
             this.service = service;
             this.cache = cache;
         }
-        public async Task<IActionResult> Destinos(int? idcontinente, int? page)
+
+        public async Task<IActionResult> Index(int? idcontinente)
         {
-            if (page == null || page == 0)
-            {
-                page = 1;
-            }
-
-
             List<Destino> destinos;
             if (idcontinente == null)
             {
@@ -32,19 +27,42 @@ namespace TravelHubAgency.Controllers
             else
             {
                 destinos = await this.service.GetAllDestinosContinenteAsync(idcontinente.Value);
+
             }
 
             int numRegistros = destinos.Count;
-
             ViewData["numRegistros"] = numRegistros;
+            ViewData["idcontinente"] = idcontinente;
+            ViewData["atualPage"] = 1;
 
             return View(destinos);
         }
-
-        public async Task<IActionResult> SingleDestino(int id)
+        public async Task<IActionResult> _Destinos(int? idcontinente, int? page)
         {
-            Destino destino = await this.service.GetDestinoByIdAsync(id);
-            return View(destino);
+            if (page == null || page == 0)
+            {
+                page = 1;
+            }
+
+            List<Destino> destinos;
+            if (idcontinente == null)
+            {
+                destinos = await this.service.GetDestinosPaginadosAsync(page.Value);
+            }
+            else
+            {
+                destinos = await this.service.GetAllDestinosContinenteAsync(idcontinente.Value);
+            }
+
+            ViewData["atualPage"] = page.Value;
+            return PartialView(destinos);
+        }
+
+        public async Task<IActionResult> _SingleDestino(int iddestino)
+        {
+            Destino destino = await this.service.GetDestinoByIdAsync(iddestino);
+            ViewData["atualPage"] = 1;
+            return PartialView("_SingleDestino", destino);
         }
 
         [AuthorizeUsuario(Policy = "Administrador")]

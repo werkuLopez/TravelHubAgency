@@ -27,5 +27,9 @@ namespace TravelHubAgency.Models
         public string Descripcion { get; set; }
         [Column("Imagen")]
         public string Imagen { get; set; }
+        [Column("ID_Hotel")]
+        public int? IdHotel { get; set; }
+        [Column("ID_Vuelo")]
+        public int? IdVuelo { get; set; }
     }
 }

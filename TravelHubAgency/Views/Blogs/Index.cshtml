@@ -1,87 +1,193 @@
-﻿@model List<Post>
-@{
-    int numRegistros = (int)ViewData["numRegistros"];
-    int numPaginas = 1;
+﻿@{
+    int numRegistros = 0;
+    int actualPage = 1;
+    List<string> tags = ViewData["ETIQUETAS"] as List<string>;
+
+    if (ViewData["numRegistros"] != null)
+    {
+        numRegistros = (int)ViewData["numRegistros"];
+        actualPage = (int)ViewData["atualPage"];
+    }
+
+    int paginas = (int)Math.Ceiling((double)numRegistros / 8);
 }
-@if (Model != null)
-{
-    <!-- Blog Start -->
-    <div class="container-xxl py-5 wow fadeInUp" data-wow-delay="0.1s">
-        <div class="container py-5">
-            <div class="row gap-5">
-                <div class="col-lg-9 wow fadeInUp" data-wow-delay="0.2s">
-                    <div class="row pb-3">
-                        @foreach (Post post in Model)
+
+<!-- Blog Start -->
+<div class="container-xxl py-5 wow fadeInUp" data-wow-delay="0.1s">
+    <div class="container py-5">
+        <div class="row gap-5">
+            <div id="contentPost" class="col-lg-9 wow fadeIn" data-wow-delay="0.2s">
+            </div>
+            <div class="col-lg-2 mt-5">
+                <!-- Etiquetas -->
+                <div class="mb-5">
+                    <h4 class="text-uppercase mb-4" style="letter-spacing: 5px;">Etiquetas</h4>
+                    <div class="d-flex flex-wrap m-n1">
+                        @foreach (string tag in tags)
                         {
-                            <div class="col-md-6 mb-4 pb-2">
-                                <div class="blog-item">
-                                    <div class="position-relative">
-                                        <img class="img-fluid w-100" src="~/img/@post.Imagen" alt="@post.Titulo">
-                                        <div class="blog-date">
-                                            <h6 class="font-weight-bold mb-n1">@post.FechaPublicacion.Date.Day</h6>
-                                            <small class="text-white text-uppercase">@post.FechaPublicacion.ToString("MMMM")</small>
-                                        </div>
-                                    </div>
-                                    <div class="bg-white p-4">
-                                        <div class="d-flex mb-2">
-                                            <a class="text-primary text-uppercase text-decoration-none" asp-controller="Blogs" asp-action="SingleBlog" asp-route-idpost="@post.IdPublicacion">Usuario: @post.IdUsuario</a>
-                                            <span class="text-primary px-2">|</span>
-                                            <a class="text-primary text-uppercase text-decoration-none" asp-controller="Blogs" asp-action="SingleBlog" asp-route-idpost="@post.IdPublicacion">@post.Titulo</a>
-                                        </div>
-                                        <a class="h5 m-0 text-decoration-none" asp-controller="Blogs" asp-action="SingleBlog" asp-route-idpost="@post.IdPublicacion">@post.Contenido</a>
-                                    </div>
-                                </div>
-                            </div>
+                            <a href="#@tag" class="btn btn-light m-1">@tag</a>
                         }
-                        <div class="col-12">
-                            <nav aria-label="Page navigation">
-                                <ul class="pagination pagination-lg justify-content-center bg-white mb-0" style="padding: 30px;">
-
-                                    <li class="page-item disabled">
-                                        <a class="page-link" href="#" aria-label="Previous">
-                                            <span aria-hidden="true">&laquo;</span>
-                                            <span class="sr-only">Previous</span>
-                                        </a>
-                                    </li>
-                                    @for (int i = 1; i <= numRegistros; i++)
-                                    {
-                                        <li class="page-item active">
-                                            <a class="page-link"
-                                               asp-controller="Blogs"
-                                               asp-route-page="@i">@i</a>
-                                        </li>
-
-                                        numPaginas += 1;
-                                    }
-                                    <li class="page-item">
-                                        <a class="page-link" href="#" aria-label="Next">
-                                            <span aria-hidden="true">&raquo;</span>
-                                            <span class="sr-only">Next</span>
-                                        </a>
-                                    </li>
-
-                                </ul>
-                            </nav>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-lg-2 mt-5">
-                    <!-- Etiquetas -->
-                    <div class="mb-5">
-                        <h4 class="text-uppercase mb-4" style="letter-spacing: 5px;">Etiquetas</h4>
-                        <div class="d-flex flex-wrap m-n1">
-                            <a href="" class="btn btn-light m-1">Vaciones</a>
-                            <a href="" class="btn btn-light m-1">Playa</a>
-                            <a href="" class="btn btn-light m-1">Montaña</a>
-                            <a href="" class="btn btn-light m-1">Naturaleza</a>
-                            <a href="" class="btn btn-light m-1">Madrid</a>
-                            <a href="" class="btn btn-light m-1">Segovia</a>
-                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-}
+</div>
+
 <!-- Blog End -->
+@section Scripts {
+    <script>
+        $(function () {
+            $("#contentPost").load("/Blogs/_Publicaciones?page=1");
+
+            $(document).on("click", ".btn-detail", function () {
+                var idpost = $(this).data("idpost");
+                $("#contentPost").load("/Blogs/_SingleBlog?idpost=" + idpost);
+            });
+
+            document.querySelectorAll(".replays-btn").forEach((btn) => {
+
+                // expand btn
+                var replaysBtn = document.querySelectorAll(".replays-btn");
+                var comments = document.querySelectorAll(".replays");
+
+                replaysBtn.forEach((btn) => {
+                    btn.addEventListener("click", function (e) {
+                        var idreplayBlog = e.target.parentElement.dataset.id;
+
+
+                        comments.forEach((coment) => {
+                            // var replaysblog = document.querySelectorAll(
+                            //     ".replay-blog-" + idreplayBlog
+                            // );
+                            var idcometblog = coment.classList[1].split("-")[2];
+                            if (idcometblog != idreplayBlog) {
+                                coment.classList.remove("show");
+                            }
+                        });
+
+                        var replaysblog = document.querySelectorAll(
+                            ".replay-blog-" + idreplayBlog
+                        );
+
+                        replaysblog.forEach((comment) => {
+                            var idsreplay = comment;
+                            console.log(replaysblog[idsreplay]);
+                            // if (coment.target){
+
+                            // }
+
+                            if (comment.classList.contains("show")) {
+                                comment.classList.remove("show");
+                                e.currentTarget.classList.remove("active-replays");
+                            } else {
+                                comment.classList.add("show");
+                                e.currentTarget.classList.add("active-replays");
+                            }
+                        });
+                    });
+                });
+            });
+        });
+    </script>
+}
+@section Styles {
+    <style>
+        .expand-all-button {
+            display: inline-flex;
+            align-items: center;
+        }
+
+            .expand-all-button label {
+                font-size: 14px;
+                margin-right: 8px;
+            }
+
+            .expand-all-button input[type="checkbox"]:checked {
+                background-color: #e8604c;
+            }
+
+            .expand-all-button input[type="checkbox"] {
+                -webkit-appearance: none;
+                -moz-appearance: none;
+                appearance: none;
+                width: 54px;
+                height: 24px;
+                border-radius: 12px;
+                background-color: rgba(4, 15, 26, 0.15);
+                position: relative;
+                display: inline-block;
+                vertical-align: middle;
+                transition: all 0.3s ease;
+                cursor: pointer;
+            }
+
+        [type="checkbox"],
+        [type="radio"] {
+            box-sizing: border-box;
+            padding: 0;
+        }
+
+        .expand-all-button input[type="checkbox"]:checked::before {
+            left: 31px;
+        }
+
+        .expand-all-button input[type="checkbox"]::before {
+            content: "";
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background-color: #fff;
+            position: absolute;
+            left: 1px;
+            top: 1px;
+            bottom: 1px;
+            transition: all 0.3s ease;
+            z-index: 1;
+        }
+
+        .expand-all-button input[type="checkbox"]:checked::after {
+            content: "ON";
+            color: #fff;
+            left: 8px;
+        }
+
+        .expand-all-button input[type="checkbox"]::after {
+            content: "OFF";
+            color: rgba(0, 0, 0, 0.32);
+            position: absolute;
+            top: 50%;
+            left: 27px;
+            transform: translateY(-50%);
+            font-size: 10px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .replays {
+            overflow: hidden;
+            transition: all 0.5s ease-in-out;
+            height: 0;
+            will-change: max-height;
+        }
+
+            .replays.show {
+                height: 125px;
+            }
+
+        .replays-btn {
+            margin: 0 1em;
+            color: rgba(0, 0, 0, 0.32);
+            cursor: pointer;
+            transition: 0.5s ease-in-out;
+        }
+
+            .replays-btn i {
+                font-size: 18px;
+            }
+
+        .active-replays {
+            transform: rotate(180deg);
+        }
+    </style>
+}

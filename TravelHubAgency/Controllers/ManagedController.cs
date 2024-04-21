@@ -60,7 +60,8 @@ namespace TravelHubAgency.Controllers
                 if (usuario.TipoUsuario == 1)
                 {
                     //creamos su propio claimId
-                    identity.AddClaim(new Claim("Administrador", usuario.TipoUsuario.ToString()));
+                   identity.AddClaim(new Claim("Administrador", usuario.TipoUsuario.ToString()));
+                   identity.AddClaim(new Claim(ClaimTypes.Role, "Administrador"));
                 }
 
                 ClaimsPrincipal principal = new ClaimsPrincipal(identity);
