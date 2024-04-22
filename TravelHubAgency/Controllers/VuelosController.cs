@@ -80,17 +80,19 @@ namespace TravelHubAgency.Controllers
         }
 
 
-        public async Task<IActionResult> _ComrprarVuelo(int idvuelo)
+        public async Task<IActionResult> _ComprarVuelo(int idvuelo)
         {
             Vuelo vuelo = await this.service.GetVueloByIdAsync(idvuelo);
+            ViewData["DESTINOS"] = await this.service.GetAllDestinosAsync();
             return PartialView("_ComprarVuelo", vuelo);
         }
 
         [AuthorizeUsuario]
         [HttpPost]
-        public async Task<IActionResult> _ComprarVuelo(int idvuelo)
+        public async Task<IActionResult> _ComprarVuelo(int? idvuelo)
         {
-            ReservaVuelo reserva = await this.service.ComprarVueloAsync(idvuelo);
+            ReservaVuelo reserva = await this.service.ComprarVueloAsync(idvuelo.Value);
+            ViewData["DESTINOS"] = await this.service.GetAllDestinosAsync();
             return PartialView();
             //return RedirectToAction("Index", "Reservas");
         }

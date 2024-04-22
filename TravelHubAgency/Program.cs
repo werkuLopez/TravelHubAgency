@@ -1,11 +1,13 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using TravelHubAgency.Data;
+using TravelHubAgency.Helpers;
 using TravelHubAgency.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
-
+builder.Services.AddTransient<HelperUploadFiles>();
+builder.Services.AddTransient<HelperPathProvider>();
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddAuthentication(options =>
 {

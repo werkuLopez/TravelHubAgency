@@ -39,6 +39,11 @@
                 $("#contentVuelos").load("/Vuelos/_UpdateVuelo?idvuelo=" + idVuelo);
             });
 
+            $(document).on("click", ".comprarVuelo", function () {
+                var idvuelo = $(this).data("id");
+                $("#contentVuelos").load("/Vuelos/_ComprarVuelo?idvuelo=" + idvuelo);
+            })
+
             $(function () {
                 $(document).on("click", "#guardarcambios", function () {
                     var aerolinea = $("#aerolinea").val();
