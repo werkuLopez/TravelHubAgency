@@ -10,5 +10,14 @@ function initAutocomplete() {
 }
 
 function getGoogleMapsIframes(destino) {
-    console.log(destino.name);
+
+    $(function () {
+        $.ajax({
+            url: "/Destinos/Index?destinosearched=" + destino.name,
+            method: "POST",
+            success: function () {
+                console.log("destino buscado: ", destino.name);
+            };
+        });
+    });
 }

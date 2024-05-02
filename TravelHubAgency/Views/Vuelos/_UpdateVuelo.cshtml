@@ -5,6 +5,11 @@
 }
 <div class="container-xxl py-3">
     <div style="margin:0 1em;">
+        <div class="d-flex justify-content-end align-items-center">
+            <a class="btn btn" asp-controller="Vuelos" asp-action="Index">
+                volver
+            </a>
+        </div>
         <div class="p-3">
             <form method="post" asp-action="_UpdateVuelo">
                 @Html.AntiForgeryToken()
@@ -98,58 +103,3 @@
 
 <div id="mapadestino" hidden>
 </div>
-@* @section Scripts {
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB_sNNhR1rCinzXXrVxI6VhQlYUTbQbAyo&callback=initMap" async defer></script>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-
-                     // geocoder
-    <script>
-        var map;
-        var marcador;
-
-        $(function () {
-            $(document).on("change", "#origen", async function () {
-                await initMap();
-            });
-
-            async function initMap() {
-                map = new google.maps.Map(document.getElementById("mapadestino"), {
-                    zoom: 14,
-                    mapTypeId: google.maps.MapTypeId.ROADMAP
-                });
-
-                marcador = new google.maps.Marker({
-                    draggable: true
-                });
-
-                await movePin();
-            }
-
-            async function movePin() {
-
-                var geocoder = new google.maps.Geocoder();
-                var searched_destino = $("#origen").val();
-
-                geocoder.geocode({
-                    "address": searched_destino
-                }, function (results, status) {
-                    if (status == google.maps.GeocoderStatus.OK) {
-
-                        console.log("Latitud: ", results[0].geometry.location.lat());
-                        console.log("Longitud: ", results[0].geometry.location.lng());
-
-                        console.log(results[0].address_components);
-
-                        $("#origen").val(results[0].address_components[0].long_name);
-                        $("#latitudOrigen").val(results[0].geometry.location.lat());
-                        $("#longitudOrigen").val(results[0].geometry.location.lng());
-
-                    } else {
-                        console.error("Geocode was not successful for the following reason: " + status);
-                    }
-                });
-            }
-        });
-    </script>
-}
- *@

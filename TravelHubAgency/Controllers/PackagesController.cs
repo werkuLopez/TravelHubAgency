@@ -13,7 +13,13 @@ namespace TravelHubAgency.Controllers
         {
             this.service = service;
         }
-        public async Task<IActionResult> Index(string? destino)
+
+        public async Task<IActionResult> Index()
+        {
+            return View();
+        }
+
+        public async Task<IActionResult> _Paquetes(string? destino)
         {
             List<Package> packages;
 
@@ -28,21 +34,41 @@ namespace TravelHubAgency.Controllers
                     await this.service.GetPackagesByDestinoAsync(destino);
             }
 
-            return View(packages);
+            ViewData["destino"] = destino;
+            ViewData["destinos"] = await this.service.GetAllDestinosAsync();
+            return PartialView("_Paquetes", packages);
         }
 
-        public async Task<IActionResult> SinglePack(int id)
+        public async Task<IActionResult> _SinglePack(int id)
         {
             Package package =
                 await this.service.GetPackageByIdAsync(id);
             ViewData["destinos"] = await this.service.GetAllDestinosAsync();
-            return View(package);
+            return PartialView("_SinglePack", package);
         }
+
+        public async Task<IActionResult> _ReservarPack()
+        {
+            return PartialView("_ReservarPaquete");
+        }
+
+        [AuthorizeUsuario]
+        [HttpPost]
+        public async Task<IActionResult> _ReservarPack(ReservaPaquete paquete)
+        {
+            ReservaPaquete reserva =
+                await this.service.ReservarPaqueteAsync(paquete);
+
+            return PartialView("_Paquetes");
+        }
+
 
         [AuthorizeUsuario(Policy = "Administrador")]
         public async Task<IActionResult> CrearPack(Package package, IFormFile file)
         {
             return RedirectToAction("Index");
         }
+
+
     }
 }

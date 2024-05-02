@@ -37,13 +37,21 @@ namespace TravelHubAgency.Controllers
 
             }
 
-            int numRegistros = destinos.Count;
-            ViewData["numRegistros"] = numRegistros;
-            ViewData["idcontinente"] = idcontinente;
-            ViewData["atualPage"] = 1;
+            //int numRegistros = destinos.Count;
+            //ViewData["numRegistros"] = numRegistros;
+            //ViewData["idcontinente"] = idcontinente;
+            //ViewData["atualPage"] = 1;
+            return View(destinos);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Index(string destinosearched)
+        {
+            List<Destino> destinos = await this.service.GetDestinoByNameAsync(destinosearched);
 
             return View(destinos);
         }
+
         public async Task<IActionResult> _Destinos(int? idcontinente, int? page)
         {
             if (page == null || page == 0)
@@ -61,6 +69,9 @@ namespace TravelHubAgency.Controllers
                 destinos = await this.service.GetAllDestinosContinenteAsync(idcontinente.Value);
             }
 
+            int numRegistros = destinos.Count;
+            ViewData["numRegistros"] = numRegistros;
+            ViewData["idcontinente"] = idcontinente;
             ViewData["atualPage"] = page.Value;
             return PartialView(destinos);
         }

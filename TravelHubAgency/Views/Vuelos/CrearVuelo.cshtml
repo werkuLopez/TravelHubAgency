@@ -5,6 +5,11 @@
 
 <div class="container-xxl py-3 wow fadeInUp" data-wow-delay="0.1s">
     <div style="margin:0 1em;">
+        <div class="d-flex justify-content-end align-items-center">
+            <a class="btn btn" asp-controller="Vuelos" asp-action="Index">
+                volver
+            </a>
+        </div>
         <div class="p-3">
             <form method="post">
                 @Html.AntiForgeryToken()

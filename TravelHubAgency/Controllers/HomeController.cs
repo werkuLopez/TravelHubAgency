@@ -43,6 +43,9 @@ namespace TravelHubAgency.Controllers
 
             ViewData["continentes"] = continentes;
             ViewData["paises"] = paises;
+            ViewData["publicaciones"] = await this.service.GetAllPublicacionesAsync(1);
+            ViewData["paquetes"] = await this.service.GetAllPackagesAsync();
+            ViewData["destinos"] = await this.service.GetAllDestinosAsync();
             return View();
         }
 

@@ -401,13 +401,13 @@
 .replays {
     display: flex;
     align-items: flex-start;
-    gap:25px;
+    gap: 25px;
 }
 
 .media {
     display: flex;
     align-items: flex-start;
-    gap:20px;
+    gap: 20px;
     border-bottom: 1px solid #8c8c8c;
 }
 
@@ -496,3 +496,112 @@
     background: #df574d;
     color: #fff;
 }
+
+.booking-form {
+    display: none;
+    transition: all 0.5s ease-in;
+}
+
+    .booking-form.show {
+        display: block;
+        padding-bottom: 3rem;
+    }
+
+    .booking-form form {
+        padding-left: 24px;
+        padding-right: 24px;
+        margin-top: 3rem;
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    .booking-form form {
+        background-color: #fff;
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.04), 0px 0px 1px rgba(0, 0, 0, 0.04);
+        border-radius: 4px;
+        padding: 40px 32px;
+    }
+
+        .booking-form form .form-row {
+            margin: 0 0 32px;
+            width: 100% !important;
+        }
+
+    .booking-form .form-row label {
+        font-size: 16px;
+        font-weight: normal;
+        display: block;
+        margin: 0 0 8px;
+    }
+
+.form-row
+input:not([type="submit"]):not([type="checkbox"]):not([type="radio"]) {
+    width: 100%;
+    font-size: 14px;
+}
+
+.form-row input[type="text"],
+.form-row input[type="email"],
+.form-row input[type="password"],
+.form-row input[type="tel"],
+.form-row input[type="datetime"],
+.form-row input[type="date"],
+.form-row textarea,
+.form-row select {
+    padding: 12px;
+    font-size: 14px;
+    line-height: 1.7;
+    border: 1px solid rgba(6, 22, 38, 0.2);
+    border-radius: 4px;
+    font-family: inherit;
+    vertical-align: top;
+    resize: none;
+}
+
+.form-row label {
+    font-size: 16px;
+    font-weight: normal;
+    display: block;
+    margin: 0 0 8px;
+}
+
+    .form-row label .required {
+        color: #e8604c;
+    }
+
+.form-row textarea {
+    width: 100%;
+    font-size: 14px;
+    min-height: 166px;
+}
+
+.booking-form .form-row .btn-wrap {
+    margin-top: 24px;
+    padding: 0 25px;
+    padding: 16px 0 0;
+    margin: 0;
+}
+
+    .booking-form .form-row .btn-wrap button {
+        width: 100%;
+        background: #efefef;
+        border: none;
+        cursor: pointer;
+        font-weight: 400;
+        padding: 12px 32px;
+        font-size: 16px;
+        line-height: 1.5;
+        text-transform: uppercase;
+    }
+
+    .booking-form .form-row .btn-wrap #btn-book-package {
+        font-size: 18px;
+        background: #e8604c;
+        color: #fff;
+        min-width: 250px;
+        transition: all 0.3s ease-in-out;
+    }
+
+        .booking-form .form-row .btn-wrap #btn-book-package:hover {
+            background: #d34b42;
+        }

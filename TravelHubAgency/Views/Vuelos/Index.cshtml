@@ -1,8 +1,4 @@
-﻿@{
-
-}
-
-<!-- paginación -->
+﻿<!-- paginación -->
 <!-- fin paginación-->
 <!-- vuelos -->
 <div class="mt-4" id="contentVuelos">
@@ -15,9 +11,17 @@
 
         var map;
         var marcador;
+        var currentTab = 0;
 
         $(function () {
-            $("#contentVuelos").load("/Vuelos/_Vuelos");
+
+            loadVuelosPartial();
+
+            async function loadVuelosPartial() {
+                $("#contentVuelos").load("/Vuelos/_Vuelos", async function () {
+                    await initMap();
+                });
+            }
 
             // -ver detalles vuelo
             $(document).on("click", ".detailVuelo", function () {
@@ -28,64 +32,57 @@
                 $("#contentVuelos").load("/Vuelos/_DetalleVuelo?idvuelo=" + idVuelo);
             });
 
-            // -comprar vuelo
-            $(document).on("click", ".comprarVuelo", function () {
-                var idVuelo = $(this).data("id");
-                console.log(idVuelo);
-            });
-
             $(document).on("click", ".modVuelo", function () {
                 var idVuelo = $(this).data("id");
                 $("#contentVuelos").load("/Vuelos/_UpdateVuelo?idvuelo=" + idVuelo);
             });
 
+            // -comprar vuelo
             $(document).on("click", ".comprarVuelo", function () {
                 var idvuelo = $(this).data("id");
                 $("#contentVuelos").load("/Vuelos/_ComprarVuelo?idvuelo=" + idvuelo);
-            })
+            });
 
-            $(function () {
-                $(document).on("click", "#guardarcambios", function () {
-                    var aerolinea = $("#aerolinea").val();
-                    var destino = parseInt($("#iddestino").val());
-                    var origen = $("#origen").val();
-                    var fechaSalida = $("#fechasalida").val();
-                    var precio = $("#precio").val();
-                    var latitud = $("#latitudOrigen").val();
-                    var longitud = $("#longitudOrigen").val();
-                    var idvuelo = parseInt($(this).data("id"));
+            $(document).on("click", "#guardarcambios", function () {
+                var aerolinea = $("#aerolinea").val();
+                var destino = parseInt($("#iddestino").val());
+                var origen = $("#origen").val();
+                var fechaSalida = $("#fechasalida").val();
+                var precio = $("#precio").val();
+                var latitud = $("#latitudOrigen").val();
+                var longitud = $("#longitudOrigen").val();
+                var idvuelo = parseInt($(this).data("id"));
 
-                    var data = {
-                        IdVuelo: idvuelo,
-                        Origen: origen,
-                        IdDestino: destino,
-                        Aerolinea: aerolinea,
-                        FechaSalida: fechaSalida,
-                        FechaLlegada: "01/01/0001",
-                        Duracion: "00:00",
-                        Precio: precio
+                var data = {
+                    IdVuelo: idvuelo,
+                    Origen: origen,
+                    IdDestino: destino,
+                    Aerolinea: aerolinea,
+                    FechaSalida: fechaSalida,
+                    FechaLlegada: "01/01/0001",
+                    Duracion: "00:00",
+                    Precio: precio
+                }
+
+                var json = JSON.stringify(data);
+
+                $.ajax({
+                    url: "/Vuelos/_UpdateVuelo?latitud=" + latitud + "&longitud=" + longitud,
+                    method: "PUT",
+                    data: json,
+                    success: function (data) {
+                        setTimeout(function () {
+                            $("#mensaje").addClass("text-success");
+                            $("#mensaje").text("Vuelo modificado correctamente");
+                        }, 5000)
+                    },
+                    error: function (data) {
+                        setTimeout(function () {
+                            $("#mensaje").addClass("text-danger");
+                            $("#mensaje").text("Error al modificar el Vuelo");
+                        }, 5000)
                     }
-
-                    var json = JSON.stringify(data);
-
-                    $.ajax({
-                        url: "/Vuelos/_UpdateVuelo?latitud=" + latitud + "&longitud=" + longitud,
-                        method: "PUT",
-                        data: json,
-                        success: function (data) {
-                            setTimeout(function () {
-                                $("#mensaje").addClass("text-success");
-                                $("#mensaje").text("Vuelo modificado correctamente");
-                            }, 5000)
-                        },
-                        error: function (data) {
-                            setTimeout(function () {
-                                $("#mensaje").addClass("text-danger");
-                                $("#mensaje").text("Error al modificar el Vuelo");
-                            }, 5000)
-                        }
-                    })
-                });
+                })
             });
 
             $(document).on("change", "#origen", async function () {
@@ -129,7 +126,120 @@
                     }
                 });
             }
+
+            function showTab(n) {
+                var steps = $(".step");
+                steps.hide();
+                $(steps[n]).show();
+
+                $(".stepIndicator").removeClass("active");
+                $(`.stepIndicator:eq(${n})`).addClass("active");
+
+                if (n == 0) {
+                    $("#prevBtn").hide();
+                } else {
+                    $("#prevBtn").show();
+                }
+
+                if (n == (steps.length - 1)) {
+                    $("#nextBtn").hide();
+                    var submitBtn = $("<button>");
+                    submitBtn.text("Confirmar pago");
+                    submitBtn.attr("id", "submitBtn");
+                    submitBtn.attr("type", "button");
+
+
+                    $("#nextBtn").replaceWith(submitBtn);
+
+                    $(document).on("click", "#submitBtn", function () {
+
+                        if (validatePaymentMethod()) {
+
+                            var precio = parseInt($("#signUpForm #precio").val());
+                            var metodoPago = $("#signUpForm input[name='MetodoPago']:checked").val();
+                            var idvuelo = parseInt($("#signUpForm #IdVuelo").val());
+
+                            var data = {
+                                IdPago: 0,
+                                IdVuelo: idvuelo,
+                                FechaPago: "01/01/0001",
+                                MetodoPago: metodoPago,
+                                Usuario: 0,
+                                Precio: precio
+                            }
+
+                            var json = JSON.stringify(data);
+
+                            $.ajax({
+                                url: "/Vuelos/_ComprarVuelo?idvuelo=" + idvuelo,
+                                method: "POST",
+                                data: json,
+                                success: function (data) {
+                                    console.log(data);
+                                    setTimeout(function () {
+                                        $("#mensaje").addClass("text-success");
+                                        $("#mensaje").text("Pago realizado correctamente");
+                                    }, 3000)
+                                },
+                                error: function (data) {
+                                    setTimeout(function () {
+                                        $("#mensaje").addClass("text-danger");
+                                        $("#mensaje").text("Error al realizar el Pago");
+                                    }, 3000)
+                                }
+                            });
+                        } else {
+                            alert("Seleccione un método de pago");
+                        }
+                    });
+                } else {
+                    var nextBtn = $("<button>");
+                    nextBtn.attr("id", "nextBtn");
+                    nextBtn.data("step", 1);
+                    nextBtn.attr("type", "button");
+                    nextBtn.text("Siguiente");
+                    $("#submitBtn").replaceWith(nextBtn);
+                }
+
+                console.log("Step activo: ", steps[n]);
+            }
+
+            $(document).on("click", "#nextBtn", function () {
+                if (currentTab === 1) {
+                    if (validatePaymentMethod()) {
+                        nextPrev(1);
+                    } else {
+                        alert("Seleccione un método de pago");
+                    }
+                } else {
+                    var next = $(this).data("step");
+                    console.log("next: ", next);
+                    nextPrev(next);
+                }
+            });
+
+            $(document).on("click", "#prevBtn", function () {
+                var prev = $(this).data("step");
+                console.log("prev: ", prev);
+                nextPrev(prev);
+            });
+
+            function nextPrev(n) {
+                var steps = $(".step");
+                if (currentTab + n >= 0 && currentTab + n < steps.length) {
+                    steps[currentTab].style.display = "none";
+                    currentTab += n;
+                    showTab(currentTab);
+                }
+            }
+
+            function validatePaymentMethod() {
+                // Validar que se haya seleccionado un método de pago
+                return $("input[name='MetodoPago']:checked").length > 0;
+            }
+
         });
+
     </script>
 
 }

@@ -349,7 +349,7 @@ namespace TravelHubAgency.Repositories
 
                 Package model = new Package
                 {
-                    idPack = 0,
+                    IdPack = 0,
                     Nombre = package.Nombre,
                     FechaInicio = package.FechaInicio,
                     FechaFin = package.FechaFin,
@@ -400,7 +400,7 @@ namespace TravelHubAgency.Repositories
 
                 Package model = new Package
                 {
-                    idPack = package.idPack,
+                    IdPack = package.IdPack,
                     Nombre = package.Nombre,
                     FechaInicio = package.FechaInicio,
                     FechaFin = package.FechaFin,
@@ -724,18 +724,34 @@ namespace TravelHubAgency.Repositories
             }
         }
 
-        public async Task<ReservaVuelo> ComprarVueloAsync(int idvuelo)
+        public async Task<ReservaVuelo> ComprarVueloAsync(int idvuelo, PagoVuelo pago)
         {
             string token =
                 this.context.HttpContext.User.FindFirst(x => x.Type == "TOKEN").Value;
             using (HttpClient client = new HttpClient())
             {
                 string request = "api/vuelos/comprarvuelo";
+                client.BaseAddress = new Uri(this.ApiUrl);
+                client.DefaultRequestHeaders.Clear();
+                client.DefaultRequestHeaders.Accept.Add(this.header);
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
                 Vuelo vuelo = await GetVueloByIdAsync(idvuelo);
 
+                PagoVuelo nuevo = new PagoVuelo();
+                nuevo.IdVuelo = vuelo.IdVuelo;
+                nuevo.MetodoPago = pago.MetodoPago;
+                nuevo.FechaPago = DateTime.Now;
+                nuevo.Precio = pago.Precio;
+
+                ModelPagoVuelo model = new ModelPagoVuelo
+                {
+                    Vuelo = vuelo,
+                    PagoVuelo = nuevo
+                };
+
                 string jsonData =
-    JsonConvert.SerializeObject(vuelo);
+    JsonConvert.SerializeObject(model);
                 StringContent content =
                     new StringContent(jsonData, Encoding.UTF8, "application/json");
 
@@ -768,6 +784,101 @@ namespace TravelHubAgency.Repositories
         }
 
 
+        #endregion
+
+        #region RESERVAS 
+
+        public async Task<ReservaPaquete> ReservarPaqueteAsync(ReservaPaquete reserva)
+        {
+            string token =
+            this.context.HttpContext.User.FindFirst(x => x.Type == "TOKEN").Value;
+
+            using (HttpClient client = new HttpClient())
+            {
+                string request = "api/reservas/paquete";
+                client.BaseAddress = new Uri(this.ApiUrl);
+                client.DefaultRequestHeaders.Clear();
+                client.DefaultRequestHeaders.Accept.Add(this.header);
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+                ReservaPaquete paquete = new ReservaPaquete
+                {
+                    IdPaquete = reserva.IdPaquete,
+                    FechaReserva = reserva.FechaReserva,
+                    IdEstadoReserva = 1,
+                    IdReserva = 0,
+                    IdUsuario = 0 // se recupera del token
+                };
+
+                string jsonData =
+                        JsonConvert.SerializeObject(paquete);
+
+                StringContent content =
+                    new StringContent(jsonData, Encoding.UTF8, "application/json");
+
+                HttpResponseMessage response =
+                   await client.PostAsync(request, content);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    ReservaPaquete uploaded =
+                        await response.Content.ReadAsAsync<ReservaPaquete>();
+                    return uploaded;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+        }
+
+        public async Task<ReservaDestino> ReservarDestinoAsync(ReservaDestino reserva)
+        {
+            string token =
+            this.context.HttpContext.User.FindFirst(x => x.Type == "TOKEN").Value;
+
+            using (HttpClient client = new HttpClient())
+            {
+                string request = "api/reservas/destino";
+                client.BaseAddress = new Uri(this.ApiUrl);
+                client.DefaultRequestHeaders.Clear();
+                client.DefaultRequestHeaders.Accept.Add(this.header);
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+                ReservaDestino destino = new ReservaDestino
+                {
+                    IdDestino = reserva.IdDestino,
+                    FechaReserva = reserva.FechaReserva,
+                    IdEstadoReserva = 1,
+                    IdReservaDestino = 0,
+                    IdUsuario = 0, // se recupera del token
+                    FechaReservaFin = reserva.FechaReservaFin,
+                    FechaReservaInicio = reserva.FechaReservaInicio,
+                    NumPersonas = reserva.NumPersonas,
+                    Precio = reserva.Precio
+                };
+
+                string jsonData =
+                        JsonConvert.SerializeObject(destino);
+
+                StringContent content =
+                    new StringContent(jsonData, Encoding.UTF8, "application/json");
+
+                HttpResponseMessage response =
+                   await client.PostAsync(request, content);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    ReservaDestino uploaded =
+                        await response.Content.ReadAsAsync<ReservaDestino>();
+                    return uploaded;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+        }
         #endregion
 
         #region POSTSCOMENTARIOSMODEL
@@ -1017,7 +1128,6 @@ this.context.HttpContext.User.FindFirst(x => x.Type == "TOKEN").Value;
         }
 
         #endregion
-
 
         #region AUTH
 
