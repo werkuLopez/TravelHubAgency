@@ -3,8 +3,44 @@
 }
 
 <div id="contentPackages" class="mt-4">
+    <div class="text-center">
+        <span class="fas fa-spinner spin" style="display: none;"></span>
+    </div>
 </div>
 <!-- Packages End -->
+@section Styles {
+    <style>
+
+        @@keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .spin {
+            font-size: 22px;
+            animation: spin 1s infinite linear;
+        }
+
+        .required {
+            color: #e8604c;
+        }
+
+        .hidden-form {
+            display: none;
+            transition: all .5s ease-in-out;
+        }
+
+        .show-form {
+            display: block;
+        }
+    </style>
+}
+
 @section Scripts {
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB_sNNhR1rCinzXXrVxI6VhQlYUTbQbAyo&callback=initMap" async defer></script>
     <script src="~/js/SearchDestinoMapa.js"></script>
@@ -12,11 +48,19 @@
         $(function () {
             var destino = @(ViewData["destino"] ?? "null"); // Obtener el destino de ViewData
 
-            if (destino != null) {
-                $("#contentPackages").load("/Packages/_Paquetes?destino=" + destino);
-            } else {
-                $("#contentPackages").load("/Packages/_Paquetes");
+            function loadPackages(url) {
+                $(".fa-spinner").show();
+                $("#contentPackages").load(url, function () {
+                    $(".fa-spinner").hide();
+                });
             }
+
+            if (destino != null) {
+                loadPackages("/Packages/_Paquetes?destino=" + destino);
+            } else {
+                loadPackages("/Packages/_Paquetes");
+            }
+
 
             function loadSinglePackAndMap(idPack) {
                 $("#contentPackages").load("/Packages/_SinglePack?id=" + idPack, function () {
@@ -27,10 +71,17 @@
             $(document).on("click", ".btn", function () {
                 var idPack = $(this).data("id");
 
+                $(".fa-spinner").show();
                 loadSinglePackAndMap(idPack);
+                $(".fa-spinner").hide();
             });
 
-           // initMap();
+            $(document).on("click", ".book-now", function (e) {
+                e.preventDefault();
+                $("#booking-form").removeClass("hidden-form");
+                $("#booking-form").addClass("show-form");
+            });
         });
     </script>
 }
+

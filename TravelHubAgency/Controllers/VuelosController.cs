@@ -79,7 +79,7 @@ namespace TravelHubAgency.Controllers
             return RedirectToAction("_Vuelos");
         }
 
-
+        [HttpGet]
         public async Task<IActionResult> _ComprarVuelo(int idvuelo)
         {
             Vuelo vuelo = await this.service.GetVueloByIdAsync(idvuelo);
@@ -89,12 +89,11 @@ namespace TravelHubAgency.Controllers
 
         [AuthorizeUsuario]
         [HttpPost]
-        public async Task<IActionResult> _ComprarVuelo(int? idvuelo, PagoVuelo pago)
+        public async Task<IActionResult> _ComprarVuelo(PagoVuelo pago)
         {
-            ReservaVuelo reserva = await this.service.ComprarVueloAsync(idvuelo.Value, pago);
+            ReservaVuelo reserva = await this.service.ComprarVueloAsync(pago.IdVuelo, pago);
             ViewData["DESTINOS"] = await this.service.GetAllDestinosAsync();
             return PartialView();
-            //return RedirectToAction("Index", "Reservas");
         }
     }
 }

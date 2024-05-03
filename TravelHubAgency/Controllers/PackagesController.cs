@@ -16,6 +16,7 @@ namespace TravelHubAgency.Controllers
 
         public async Task<IActionResult> Index()
         {
+            ViewData["destinos"] = await this.service.GetAllDestinosAsync();
             return View();
         }
 

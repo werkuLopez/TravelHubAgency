@@ -2,7 +2,11 @@
 <!-- fin paginación-->
 <!-- vuelos -->
 <div class="mt-4" id="contentVuelos">
+    <div class="text-center">
+        <span class="fas fa-spinner spin" style="display: none;"></span>
+    </div>
 </div>
+
 
 @section Scripts {
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB_sNNhR1rCinzXXrVxI6VhQlYUTbQbAyo&callback=initMap" async defer></script>
@@ -18,9 +22,12 @@
             loadVuelosPartial();
 
             async function loadVuelosPartial() {
+                $(".fa-spinner").show();
                 $("#contentVuelos").load("/Vuelos/_Vuelos", async function () {
                     await initMap();
+                    $(".fa-spinner").hide();
                 });
+
             }
 
             // -ver detalles vuelo
@@ -28,19 +35,25 @@
 
                 var idVuelo = $(this).data("id");
                 console.log(idVuelo);
-
+                $(".fa-spinner").show();
                 $("#contentVuelos").load("/Vuelos/_DetalleVuelo?idvuelo=" + idVuelo);
+                $(".fa-spinner").hide();
+
             });
 
             $(document).on("click", ".modVuelo", function () {
                 var idVuelo = $(this).data("id");
+                $(".fa-spinner").show();
                 $("#contentVuelos").load("/Vuelos/_UpdateVuelo?idvuelo=" + idVuelo);
+                $(".fa-spinner").hide();
             });
 
             // -comprar vuelo
             $(document).on("click", ".comprarVuelo", function () {
                 var idvuelo = $(this).data("id");
+                $(".fa-spinner").show();
                 $("#contentVuelos").load("/Vuelos/_ComprarVuelo?idvuelo=" + idvuelo);
+                $(".fa-spinner").hide();
             });
 
             $(document).on("click", "#guardarcambios", function () {
@@ -159,23 +172,23 @@
                             var metodoPago = $("#signUpForm input[name='MetodoPago']:checked").val();
                             var idvuelo = parseInt($("#signUpForm #IdVuelo").val());
 
-                            var data = {
+                            var fecha = new Date().toISOString();
+
+                            var pago = {
                                 IdPago: 0,
                                 IdVuelo: idvuelo,
-                                FechaPago: "01/01/0001",
+                                FechaPago: fecha,
                                 MetodoPago: metodoPago,
                                 Usuario: 0,
                                 Precio: precio
                             }
 
-                            var json = JSON.stringify(data);
-
                             $.ajax({
-                                url: "/Vuelos/_ComprarVuelo?idvuelo=" + idvuelo,
+                                url: "/Vuelos/_ComprarVuelo",
                                 method: "POST",
-                                data: json,
+                                contentType: "application/json",
+                                data: JSON.stringify(pago),
                                 success: function (data) {
-                                    console.log(data);
                                     setTimeout(function () {
                                         $("#mensaje").addClass("text-success");
                                         $("#mensaje").text("Pago realizado correctamente");
@@ -412,6 +425,21 @@
             .down-border {
                 display: none;
             }
+        }
+
+        @@keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .spin {
+            font-size: 22px;
+            animation: spin 1s infinite linear;
         }
     </style>
 }
