@@ -74,8 +74,30 @@ namespace TravelHubAgency.Repositories
             }
             catch (Exception ex)
             {
-                // Manejar cualquier excepción aquí
-                // Por ejemplo, puedes registrarla o lanzarla nuevamente
+                throw ex;
+            }
+        }
+
+        public async Task<T> CallApiAsyncDelete<T>(string request, string token)
+        {
+            try
+            {
+                using (HttpClient client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(this.ApiUrl);
+                    client.DefaultRequestHeaders.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(this.header);
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+                    HttpResponseMessage response = await client.DeleteAsync(request);
+                    response.EnsureSuccessStatusCode();
+
+                    T data = await response.Content.ReadAsAsync<T>();
+                    return data;
+                }
+            }
+            catch (Exception ex)
+            {
                 throw ex;
             }
         }
@@ -168,7 +190,7 @@ namespace TravelHubAgency.Repositories
 
         public async Task<List<Destino>> GetDestinoByNameAsync(string destino)
         {
-            string request = "api/destinos/destinos?destino=" + destino;
+            string request = "api/destinos/finddestinosnombre/" + destino;
             List<Destino> destinos = await this.CallApiAsync<List<Destino>>(request);
             return destinos;
         }
@@ -528,6 +550,13 @@ namespace TravelHubAgency.Repositories
             };
         }
 
+        public async Task<Usuario> GetUsuarioByIdAsync(int id)
+        {
+            List<Usuario> usuarios = await GetAllUsuariosAsync();
+
+            return usuarios.FirstOrDefault(x => x.IdUsuario == id);
+        }
+
         public async Task<Usuario> GetUsuarioByUsername(string username)
         {
             List<Usuario> usuarios = await this.GetAllUsuariosAsync();
@@ -730,7 +759,7 @@ namespace TravelHubAgency.Repositories
                 this.context.HttpContext.User.FindFirst(x => x.Type == "TOKEN").Value;
             using (HttpClient client = new HttpClient())
             {
-                string request = "api/vuelos/comprarvuelo";
+                string request = "api/reservas/vuelos";
                 client.BaseAddress = new Uri(this.ApiUrl);
                 client.DefaultRequestHeaders.Clear();
                 client.DefaultRequestHeaders.Accept.Add(this.header);
@@ -756,7 +785,7 @@ namespace TravelHubAgency.Repositories
                     new StringContent(jsonData, Encoding.UTF8, "application/json");
 
                 HttpResponseMessage response =
-                   await client.PutAsync(request, content);
+                   await client.PostAsync(request, content);
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -778,17 +807,16 @@ namespace TravelHubAgency.Repositories
 
             using (HttpClient client = new HttpClient())
             {
-                string request = "api/vuelos/eliminarvuelo/" + idvuelo;
+                string request = "api/Vuelos/EliminarReserva/" + idvuelo;
                 int result = await this.CallApiAsync<int>(request, token);
             }
         }
-
 
         #endregion
 
         #region RESERVAS 
 
-        public async Task<ReservaPaquete> ReservarPaqueteAsync(ReservaPaquete reserva)
+        public async Task<ReservaPaquete> ReservarPaqueteAsync(int idPaquete)
         {
             string token =
             this.context.HttpContext.User.FindFirst(x => x.Type == "TOKEN").Value;
@@ -803,8 +831,8 @@ namespace TravelHubAgency.Repositories
 
                 ReservaPaquete paquete = new ReservaPaquete
                 {
-                    IdPaquete = reserva.IdPaquete,
-                    FechaReserva = reserva.FechaReserva,
+                    IdPaquete = idPaquete,
+                    FechaReserva = DateTime.Now,
                     IdEstadoReserva = 1,
                     IdReserva = 0,
                     IdUsuario = 0 // se recupera del token
@@ -879,6 +907,114 @@ namespace TravelHubAgency.Repositories
                 }
             }
         }
+
+        public async Task<ReservaModel> ReservasUsuarioAsync()
+        {
+            string token =
+            this.context.HttpContext.User.FindFirst(x => x.Type == "TOKEN").Value;
+
+            string request = "api/reservas/reservasusuario";
+
+            ReservaModel model =
+                await this.CallApiAsync<ReservaModel>(request, token);
+
+            return model;
+        }
+
+        public async Task EliminarReservaVuelo(int idreservavuelo)
+        {
+            string token =
+    this.context.HttpContext.User.FindFirst(x => x.Type == "TOKEN").Value;
+
+            using (HttpClient client = new HttpClient())
+            {
+                string request = "api/vuelos/eliminarreserva/" + idreservavuelo;
+                int result = await this.CallApiAsyncDelete<int>(request, token);
+            }
+        }
+
+        public async Task EliminarReservaDestino(int idreservadestino)
+        {
+            string token =
+    this.context.HttpContext.User.FindFirst(x => x.Type == "TOKEN").Value;
+
+            using (HttpClient client = new HttpClient())
+            {
+                string request = "api/reservas/eliminardestino/" + idreservadestino;
+                int result = await this.CallApiAsyncDelete<int>(request, token);
+            }
+        }
+
+        public async Task EliminarReservaPaquete(int idreservapaquete)
+        {
+            string token =
+    this.context.HttpContext.User.FindFirst(x => x.Type == "TOKEN").Value;
+
+            using (HttpClient client = new HttpClient())
+            {
+                string request = "api/reservas/eliminarpaquete/" + idreservapaquete;
+                int result = await this.CallApiAsyncDelete<int>(request, token);
+            }
+        }
+
+        public async Task<ReservaHotel> InsertarReservaHotelAsync(ReservaHotel hotel)
+        {
+            string token =
+                this.context.HttpContext.User.FindFirst(x => x.Type == "TOKEN").Value;
+
+            using (HttpClient client = new HttpClient())
+            {
+                string request = "/api/Reservas/Hotel";
+                client.BaseAddress = new Uri(this.ApiUrl);
+                client.DefaultRequestHeaders.Clear();
+                client.DefaultRequestHeaders.Accept.Add(this.header);
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+                ReservaHotel newHotel = new ReservaHotel
+                {
+                    IdReservaHotel = 0,
+                    Hotel = hotel.Hotel,
+                    Fecha = hotel.Fecha,
+                    Personas = hotel.Personas,
+                    Precio = hotel.Precio,
+                    Usuario = 0 //-> token
+                };
+
+                string jsonData =
+                    JsonConvert.SerializeObject(newHotel);
+                StringContent content =
+                    new StringContent(jsonData, Encoding.UTF8, "application/json");
+
+                HttpResponseMessage response =
+                   await client.PostAsync(request, content);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    ReservaHotel h =
+                        await response.Content.ReadAsAsync<ReservaHotel>();
+                    return h;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+        }
+
+        public async Task EliminarReservaHotelAsync(int idreservahotel)
+        {
+            string token =
+                this.context.HttpContext.User.FindFirst(x => x.Type == "TOKEN").Value;
+
+            using (HttpClient client = new HttpClient())
+            {
+                string request = "api/reservas/eliminarhotel/" + idreservahotel;
+                int result = await this.CallApiAsyncDelete<int>(request, token);
+            }
+
+        }
+
+
         #endregion
 
         #region POSTSCOMENTARIOSMODEL
@@ -955,7 +1091,7 @@ namespace TravelHubAgency.Repositories
                 {
                     IdPublicacion = 0,
                     Contenido = post.Contenido,
-                    FechaPublicacion = post.FechaPublicacion,
+                    FechaPublicacion = DateTime.Now,
                     Imagen = imagen,
                     Titulo = post.Titulo,
 
@@ -991,6 +1127,19 @@ namespace TravelHubAgency.Repositories
         {
             string request = "api/publicaciones/EliminarPost/" + id;
             int reult = await this.CallApiAsync<int>(request);
+        }
+
+        public async Task<List<Post>> GetPublicacionesUsuario()
+        {
+            string token =
+                this.context.HttpContext.User.FindFirst(x => x.Type == "TOKEN").Value;
+
+            string request = "api/publicaciones/postsusuario";
+
+            List<Post> posts =
+                await this.CallApiAsync<List<Post>>(request, token);
+
+            return posts;
         }
 
         #endregion
@@ -1171,6 +1320,154 @@ this.context.HttpContext.User.FindFirst(x => x.Type == "TOKEN").Value;
                 }
 
             }
+        }
+        #endregion
+
+        #region HOTELES
+        public async Task<List<Hotel>> GetAllHotelesAsync()
+        {
+            string request = "api/hoteles";
+
+            List<Hotel> hoteles =
+                await this.CallApiAsync<List<Hotel>>(request);
+            return hoteles;
+        }
+
+        public async Task<Hotel> GetHotelByIdAsync(int id)
+        {
+            string request = "api/hoteles/" + id;
+            Hotel hotel =
+                await this.CallApiAsync<Hotel>(request);
+            return hotel;
+        }
+
+        public async Task<Hotel> InsertarHotelAsync(Hotel hotel)
+        {
+            string token =
+            this.context.HttpContext.User.FindFirst(x => x.Type == "TOKEN").Value;
+
+            using (HttpClient client = new HttpClient())
+            {
+                string request = "api/hoteles";
+                client.BaseAddress = new Uri(this.ApiUrl);
+                client.DefaultRequestHeaders.Clear();
+                client.DefaultRequestHeaders.Accept.Add(this.header);
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+                Hotel newHotel = new Hotel
+                {
+                    IdHotel = 0,
+                    Nombre = hotel.Nombre,
+                    Descripcion = hotel.Descripcion,
+                    Telefono = hotel.Telefono,
+                    Imagen = hotel.Imagen,
+                    Precio = hotel.Precio,
+                };
+
+                string jsonData =
+                    JsonConvert.SerializeObject(newHotel);
+                StringContent content =
+                    new StringContent(jsonData, Encoding.UTF8, "application/json");
+
+                HttpResponseMessage response =
+                   await client.PostAsync(request, content);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    Hotel h =
+                        await response.Content.ReadAsAsync<Hotel>();
+                    return h;
+                }
+                else
+                {
+                    return null;
+                }
+
+            }
+        }
+
+        public async Task<Hotel> UpdateHotelAsync(Hotel hotel)
+        {
+            string token =
+            this.context.HttpContext.User.FindFirst(x => x.Type == "TOKEN").Value;
+
+            using (HttpClient client = new HttpClient())
+            {
+                string request = "api/hoteles";
+                client.BaseAddress = new Uri(this.ApiUrl);
+                client.DefaultRequestHeaders.Clear();
+                client.DefaultRequestHeaders.Accept.Add(this.header);
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+                Hotel newHotel = new Hotel
+                {
+                    IdHotel = hotel.IdHotel,
+                    Nombre = hotel.Nombre,
+                    Descripcion = hotel.Descripcion,
+                    Telefono = hotel.Telefono,
+                    Imagen = hotel.Imagen,
+                    Precio = hotel.Precio,
+                };
+
+                string jsonData =
+                    JsonConvert.SerializeObject(newHotel);
+                StringContent content =
+                    new StringContent(jsonData, Encoding.UTF8, "application/json");
+
+                HttpResponseMessage response =
+                   await client.PutAsync(request, content);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    Hotel h =
+                        await response.Content.ReadAsAsync<Hotel>();
+                    return h;
+                }
+                else
+                {
+                    return null;
+                }
+
+            }
+        }
+
+        public async Task ELiminarHotelAsync(int id)
+        {
+            string token =
+                this.context.HttpContext.User.FindFirst(x => x.Type == "TOKEN").Value;
+
+            using (HttpClient client = new HttpClient())
+            {
+                string request = "api/hoteles/" + id;
+                int result = await this.CallApiAsyncDelete<int>(request, token);
+            }
+        }
+
+
+        #endregion
+
+        #region ESTADO_RESERVA
+        public async Task<List<EstadoReserva>> GetEstadoReservaAsync()
+        {
+
+            string request = "api/estadosreserva";
+
+            List<EstadoReserva> estados =
+                await this.CallApiAsync<List<EstadoReserva>>(request);
+            return estados;
+        }
+
+        #endregion
+
+        #region ETIQUESTAS
+
+        public async Task<List<Etiqueta>> GetAllEtiquetasAsync()
+        {
+            string request = "api/etiquetas";
+
+            List<Etiqueta> etiquetas =
+                await this.CallApiAsync<List<Etiqueta>>(request);
+            return etiquetas;
         }
         #endregion
     }

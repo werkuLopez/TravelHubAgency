@@ -66,16 +66,16 @@
                                     <label for="iddestino">Destino</label>
                                 </div>
                             </div>
-                            <input name="idvuelo" id="idvuelo" value="@Model.IdVuelo" readonly class="form-control" />
+                            <input hidden name="idvuelo" id="idvuelo" value="@Model.IdVuelo" readonly class="form-control" />
                             <div class="col-md-6">
                                 <div class="form-floating">
-                                    <input type="text" name="latitud" class="form-control " id="latitudOrigen" placeholder="latitud" readonly>
+                                    <input hidden type="text" name="latitud" class="form-control " id="latitudOrigen" placeholder="latitud" readonly>
                                     <label for="latitudOrigen">Latitud</label>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-floating">
-                                    <input type="text" name="longitud" class="form-control" id="longitudOrigen" placeholder="longitud" readonly>
+                                    <input hidden type="text" name="longitud" class="form-control" id="longitudOrigen" placeholder="longitud" readonly>
                                     <label for="longitudOrigen">Longitud</label>
                                 </div>
                             </div>

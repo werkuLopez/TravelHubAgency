@@ -1,9 +1,13 @@
 ﻿﻿@using System.Security.Claims
 @model Usuario
 
+
 <div class="container-xxl py-5 fadeInUp" data-wow-delay="0.1s">
     <div class="container">
-        <form method="post" asp-action="Perfil" enctype="multipart/form-data">
+        <div class="text-center mt-5">
+            <span class="fas fa-spinner spin"></span>
+        </div>
+        <form method="post" asp-action="Perfil" enctype="multipart/form-data" id="userprofile" style="display:none;">
             <div class="row">
                 <div class="col-md-3 border-right" style="border:1px solid #e8604c !important;">
 
@@ -67,8 +71,20 @@
 
 @section Scripts {
     <script>
+        $(function () {
+            $.get('@Url.Action("Perfil", "Usuarios")', function (data) {
+                $(".fa-spinner").show();
+                setTimeout(function () {
+                    $("#userprofile").html(data.response);
+                    $("#userprofile").show();
+                    $(".fa-spinner").hide();
+                }, 3000);
+            });
+        });
+
         document.getElementById('fileInput').addEventListener('change', function () {
             document.getElementById('profileForm').submit();
+            $(".fa-spinner").hide();
         });
     </script>
 }
@@ -114,6 +130,21 @@
             color: #fff;
             cursor: pointer;
             border: solid 1px #BA68C8
+        }
+
+        @@keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .spin {
+            font-size: 22px;
+            animation: spin 1s infinite linear;
         }
     </style>
 }

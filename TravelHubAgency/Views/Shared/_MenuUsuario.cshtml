@@ -3,8 +3,11 @@
     <div class="nav-item dropdown">
         <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Perfil</a>
         <div class="dropdown-menu">
-            <a href="#reservas" class="dropdown-item">Reservas</a>
-            <a href="#mis-post" class="dropdown-item">Mis publicaciones</a>
+            @if (!Context.User.IsInRole("Administrador"))
+            {
+                <a asp-controller="Reservas" asp-action="ReservasUsuario" class="dropdown-item">Reservas</a>
+                <a asp-controller="Usuarios" asp-action="Publicaciones" class="dropdown-item">Mis publicaciones</a>
+            }
             <a asp-controller="Usuarios" asp-action="Perfil" class="dropdown-item">Perfil</a>
             <a asp-controller="Managed" asp-action="LogOut" class="dropdown-item text-primary">Cerrar sesión</a>
         </div>
@@ -16,8 +19,8 @@
             <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Acciones</a>
             <div class="dropdown-menu">
                 <a asp-controller="Destinos" asp-action="CrearDestino" class="dropdown-item">Crear destino</a>
-                <a asp-controller="Packages" asp-action="nuevo" class="dropdown-item">Crear pack</a>
-                <a asp-controller="Hoteles" asp-action="nuevo" class="dropdown-item">Crear hotel</a>
+                <a asp-controller="Packages" asp-action="CrearPack" class="dropdown-item">Crear pack</a>
+                <a asp-controller="Hoteles" asp-action="CrearHotel" class="dropdown-item">Crear hotel</a>
                 <a asp-controller="Vuelos" asp-action="CrearVuelo" class="dropdown-item">Crear vuelo</a>
             </div>
         </div>

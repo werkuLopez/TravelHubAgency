@@ -3,11 +3,12 @@
     int numRegistros = 0;
     int actualPage = 1;
     int? idcontinente = 0;
+    string destinoSearched = ViewData["destinosearched"] as string;
 
     if (ViewData["numRegistros"] != null)
     {
         numRegistros = (int)ViewData["numRegistros"];
-        actualPage = (int)ViewData["atualPage"];
+        actualPage = (int)ViewData["actualPage"];
         idcontinente = ViewData["idcontinente"] as int?;
 
     }
@@ -63,52 +64,21 @@
 </div>
 
 
-@* <div class="col-12">
-    <div class="d-flex justify-content-center">
-        <nav aria-label="Page navigation">
-            <ul class="pagination pagination-lg bg-white mb-0" style="padding: 30px;">
-                <li class="page-item">
-                    <a class="page-link @(actualPage == 0 ? "disabled" : "")"
-                       id="prev"
-                       data-page="@(actualPage > 1 ? actualPage - 1 : 1)" aria-label="Previous">
-                        <span aria-hidden="true">
-                            &laquo;
-                        </span>
-                    </a>
-                </li>
-                @for (int i = 1; i <= paginas; i++)
-                {
-                    <li class="page-item @(i == actualPage ? "active" : "")">
-                        <a class="page-link"
-                           data-page="@i"
-                           style="background-color:@(i == actualPage ? "#e8604c" : ""); border-color:@(i == actualPage ? "#e8604c" : "")">@i</a>
-                    </li>
-                }
-                <li class="page-item">
-                    <a class="page-link @(actualPage == paginas - 1 ? "disabled" : "")"
-                       id="next"
-                       data-page="@(actualPage < paginas ? actualPage + 1 : actualPage)"
-                       aria-label="Next">
-                        <span aria-hidden="true">
-                            &raquo;
-                        </span>
-                    </a>
-                </li>
-            </ul>
-        </nav>
-    </div>
-</div>
- *@
-
 
 @section Scripts {
     <script>
         $(function () {
+
             var idcontinente = @(ViewData["idcontinente"] ?? "null"); // Obtener el idcontinente de ViewData
+            var destinosearched = @(ViewData["destinosearched"] ?? "null");
 
             if (idcontinente != null) {
                 $("#contentDestinos").load("/Destinos/_Destinos?idcontinente=" + idcontinente);
-            } else {
+            }
+            else if (destinosearched != null) {
+                $("#contentDestinos").load("/Destinos/_Destinos?destinosearched=" + destinosearched);
+            }
+            else {
                 $("#contentDestinos").load("/Destinos/_Destinos");
             }
 
@@ -135,13 +105,4 @@
             $("#contentDestinos").load("/Destinos/_Destinos?page=" + page);
         }
     </script>
-}
-
-@section googleMapsScripts {
-    <script src="https://maps.googleapis.com/maps/api/js?libraries=places&key=AIzaSyB_sNNhR1rCinzXXrVxI6VhQlYUTbQbAyo&callback=initAutocomplete"
-            async
-            defer>
-    </script>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/js/googleMapAutocomplete.js"></script>
 }

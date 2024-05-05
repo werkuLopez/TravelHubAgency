@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using TravelHubAgency.Filters;
 using TravelHubAgency.Models;
 using TravelHubAgency.Repositories;
@@ -17,9 +18,19 @@ namespace TravelHubAgency.Controllers
         [AuthorizeUsuario]
         public async Task<IActionResult> Perfil()
         {
-            Usuario usuario = await this.service.GetPerfilUsuarioAsync();
+            string claimId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            int idusuario = int.Parse(claimId);
 
-            return View(usuario);
+            if (idusuario != null)
+            {
+                Usuario usuario = await this.service.GetUsuarioByIdAsync(idusuario);
+                //usuario = await this.service.GetPerfilUsuarioAsync();
+                return View(usuario);
+            }
+
+            return RedirectToAction("LogOut", "Managed");
+
+
         }
 
         [AuthorizeUsuario]
@@ -39,12 +50,14 @@ namespace TravelHubAgency.Controllers
             return View(usuario);
         }
 
-        //[AuthorizeUsuario]
-        //[HttpPost]
-        //public async Task<IActionResult> Perfil(IFormFile file)
-        //{
-        //    ///Usuario usuario = await this.service
-        //    return View(new Usuario());
-        //}
+        [AuthorizeUsuario]
+        public async Task<IActionResult> Publicaciones()
+        {
+
+            List<Post> misPublicaciones = await this.service.GetPublicacionesUsuario();
+            ViewData["usuarios"] = await this.service.GetAllUsuariosAsync();
+
+            return View(misPublicaciones);
+        }
     }
 }

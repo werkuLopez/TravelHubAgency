@@ -1,0 +1,449 @@
+﻿@model ReservaModel
+@{
+    List<EstadoReserva> estados = ViewData["estadoReserva"] as List<EstadoReserva>;
+    List<Package> packages = ViewData["paquetes"] as List<Package>;
+    List<Destino> destinos = ViewData["destinos"] as List<Destino>;
+    List<Vuelo> vuelos = ViewData["vuelos"] as List<Vuelo>;
+    List<Hotel> hoteles = ViewData["hoteles"] as List<Hotel>;
+}
+
+<div class="mt-4">
+    @if (Model != null &&
+    (Model.ReservaPaquetes?.Any() == true ||
+    Model.ReservaHoteles?.Any() == true ||
+    Model.ReservaDestinos?.Any() == true ||
+    Model.ReservaVuelos?.Any() == true))
+    {
+        <section id="flights" class=" py-3">
+            <div class="container">
+                @if (Model.ReservaPaquetes != null && Model.ReservaPaquetes.Count != 0)
+                {
+                    <h1 class="text-center py-3"> Packs reservados</h1>
+                    <div class="row gap-2 mb-3">
+                        @foreach (ReservaPaquete packs in Model.ReservaPaquetes)
+                        {
+                            <div class="card" style="margin:0 1em;width: 39rem; padding-bottom:1em;">
+
+                                @{
+                                    var estado = estados.FirstOrDefault(x => x.IdEstado == packs.IdEstadoReserva);
+                                    var pack = packages.FirstOrDefault(z => z.IdPack == packs.IdPaquete);
+                                    var destino = destinos.FirstOrDefault(y => y.IdDestino == pack.IdDestino);
+                                }
+
+                                <img src="~/img/@destino.Imagen" class="img-fluid" alt="@pack.Nombre" />
+
+                                <div class="card-body">
+                                    <h3 class="card-title">@destino.Nombre</h3>
+
+                                    <p class="card-text">
+                                        @pack.Descripcion
+
+                                    </p>
+                                    <ul class="list-group list-group-flush">
+                                        <li class="list-group-item">Destino: @destino.Nombre</li>
+                                        <li class="list-group-item">Fecha: @pack.FechaInicio.ToShortDateString()</li>
+                                        <li class="list-group-item">Estado: @estado.Estado</li>
+                                    </ul>
+                                    <div class="card-body">
+                                        <div class="d-flex flex-wrap gap-2 justify-content-end">
+                                            <form method="post" asp-action="EliminarReservaPack">
+                                                <button class="btn @(DateTime.Now > pack.FechaFin ? "btn-secondary" : "btn-primary")"
+                                                        data-id="@packs.IdReserva"
+                                                        name="id"
+                                                        value="@packs.IdReserva"
+                                                @(DateTime.Now > pack.FechaFin ? "disabled" : "")>
+                                                    @(DateTime.Now > pack.FechaFin ? "Reserva finalizada" : "Cancelar reserva")
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+                @if (Model.ReservaHoteles != null && Model.ReservaHoteles.Count != 0)
+                {
+                    <h2 class="text-center py-3">Hoteles reservados </h2>
+                    <div class="row gap-2 mb-3">
+                        @foreach (ReservaHotel reservaHoteles in Model.ReservaHoteles)
+                        {
+                            <div class="card" style="margin:0 1em;width: 39rem; padding-bottom:1em;">
+
+                                @{
+                                    var hotel = hoteles.FirstOrDefault(d => d.IdHotel == reservaHoteles.Hotel);
+                                }
+
+                                <img src="~/img/@hotel.Imagen" class="img-fluid" alt="@hotel.Nombre" />
+
+                                <div class="card-body">
+                                    <h3 class="card-title">@hotel.Nombre</h3>
+
+                                    <p class="card-text">
+                                        @hotel.Descripcion
+
+                                    </p>
+                                    <ul class="list-group list-group-flush">
+                                        <li class="list-group-item">Destino: @hotel.Nombre</li>
+                                        <li class="list-group-item">Fecha reserva: @reservaHoteles.Fecha.ToShortDateString()</li>
+                                        <li class="list-group-item">Número de personas: @reservaHoteles.Personas</li>
+                                        <li class="list-group-item">Precio: @((int)reservaHoteles.Precio) €</li>
+                                    </ul>
+                                    <div class="card-body">
+                                        <div class="d-flex flex-wrap gap-2 justify-content-end">
+                                            <form method="post" asp-action="EliminarReservaHotel">
+                                                <button class="btn @(DateTime.Now > reservaHoteles.Fecha ? "btn-secondary" : "btn-primary")"
+                                                        data-id="@reservaHoteles.IdReservaHotel"
+                                                        name="id"
+                                                        value="@reservaHoteles.IdReservaHotel"
+                                                @(DateTime.Now > reservaHoteles.Fecha ? "disabled" : "")>
+                                                    @(DateTime.Now > reservaHoteles.Fecha ? "Reserva finalizada" : "Cancelar reserva")
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+                @if (Model.ReservaDestinos != null && Model.ReservaDestinos.Count != 0)
+                {
+                    <h2 class="text-center py-3">Destinos reservados </h2>
+                    <div class="row gap-2 mb-3">
+                        @foreach (ReservaDestino destino in Model.ReservaDestinos)
+                        {
+                            <div class="card" style="margin:0 1em;width: 39rem; padding-bottom:1em;">
+
+                                @{
+                                    var destinoInfo = destinos.FirstOrDefault(d => d.IdDestino == destino.IdDestino);
+                                    var estado = estados.FirstOrDefault(e => e.IdEstado == destino.IdEstadoReserva);
+                                }
+
+                                <img src="~/images/@destinoInfo.Imagen" class="img-fluid" alt="@destinoInfo.Nombre" />
+
+                                <div class="card-body">
+                                    <h3 class="card-title">@destinoInfo.Nombre</h3>
+
+                                    <p class="card-text">
+                                        @destinoInfo.Descripcion
+
+                                    </p>
+                                    <ul class="list-group list-group-flush">
+                                        <li class="list-group-item">Destino: @destinoInfo.Nombre</li>
+                                        <li class="list-group-item">Fecha reserva: @destino.FechaReserva.ToShortDateString()</li>
+                                        <li class="list-group-item">Número de personas: @destino.NumPersonas</li>
+                                        <li class="list-group-item">Duracion: @destino.FechaReservaInicio.ToShortDateString() - @destino.FechaReservaFin.ToShortDateString()</li>
+                                        <li class="list-group-item">Precio: @((int)destino.Precio) €</li>
+                                        <li class="list-group-item">Estado: @estado.Estado</li>
+                                    </ul>
+                                    <div class="card-body">
+                                        <div class="d-flex flex-wrap gap-2 justify-content-end">
+                                            <form method="post" asp-action="EliminarReservaDestino">
+                                                <button class="btn @(DateTime.Now > destino.FechaReservaFin ? "btn-secondary" : "btn-primary")"
+                                                        name="id"
+                                                        value="@destino.IdReservaDestino"
+                                                @(DateTime.Now > destino.FechaReservaFin ? "disabled" : "")>
+                                                    @(DateTime.Now > destino.FechaReservaFin ? "Reserva finalizada" : "Cancelar reserva")
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+
+                @if (Model.ReservaVuelos != null && Model.ReservaVuelos.Count != 0)
+                {
+                    <h2 class="text-center py-3">Vuelos reservados </h2>
+                    <div class="row">
+                        @foreach (ReservaVuelo reserva in Model.ReservaVuelos)
+                        {
+                            var vuelo = vuelos.FirstOrDefault(d => d.IdVuelo == reserva.Vuelo);
+
+                            <div class="col-md-6">
+                                <div class="item">
+                                    <div class="item-right">
+                                        <h2 class="num">@vuelo.FechaSalida.Day</h2>
+                                        <p class="day">@vuelo.FechaSalida.ToString("MMMM")</p>
+                                        <span class="up-border"></span>
+                                        <span class="down-border"></span>
+                                    </div>
+                                    <!-- end item-right -->
+
+                                    <div class="item-left">
+                                        <p class="event">@vuelo.Aerolinea</p>
+                                        @{
+                                            var dt = destinos.FirstOrDefault(x => x.IdDestino == vuelo.IdDestino);
+
+                                        }
+                                        <h2 class="title">@dt.Nombre</h2>
+
+                                        <div class="sce">
+                                            <div class="icon">
+                                                <i class="fa fa-table"></i>
+                                            </div>
+                                            <p>
+                                                Horario: @vuelo.FechaSalida.ToString("D") <br />
+                                                Duración del vuelo: @vuelo.Duracion h
+                                            </p>
+                                        </div>
+                                        <div class="fix"></div>
+                                        <div class="loc">
+                                            <div class="icon">
+                                                <i class="fa fa-location-crosshairs"></i>
+                                            </div>
+                                            <p>
+                                                Punto de salida: @vuelo.Origen <br />
+                                                @vuelo.FechaSalida.ToString("D") <br />
+                                            </p>
+                                        </div>
+                                        <div class="fix"></div>
+                                        <div class="loc">
+                                            <div class="icon">
+                                                <i class="fa fa-map-marker"></i>
+                                            </div>
+                                            <p>
+                                                Destino: @dt.Nombre, @dt.Region <br />
+                                                @vuelo.FechaLlegada.ToString("D") <br />
+                                            </p>
+                                        </div>
+                                        <div class="fix"></div>
+                                        <div class="d-flex flex-wrap gap-2 justify-content-end">
+                                            <form method="post" asp-action="EliminarReservaVuelo">
+                                                <button class="btn @(DateTime.Now > vuelo.FechaLlegada ? "btn-secondary" : "btn-primary")"
+                                                        name="id"
+                                                        value="@reserva.IdReservaVuelo"
+                                                @(DateTime.Now > vuelo.FechaLlegada ? "disabled" : "")>
+                                                    @(DateTime.Now > vuelo.FechaLlegada ? "Reserva finalizada" : "Cancelar reserva")
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                    <!-- end item-right -->
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        </section>
+    }
+    else
+    {
+        <div style="height:100vh; margin:0 1em;">
+            <h1 class="text-center text-uppercase py-5" style="color:#0000004d">
+                No hay reservas pendientes
+            </h1>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        $(function () {
+            $(document).on("click", "#eliminarvuelo", function () {
+                $.ajax({
+                    url: "/Vuelos/EliminarReserva?idreservavuelo=" + parseInt($(this).data("id")),
+                    method: "DELETE",
+                    success: function () {
+                        window.location.reload();
+                    }
+                });
+            })
+        })
+    </script>
+}
+@section Styles {
+    <style>
+        body {
+            font-family: 'Inknut Antiqua', serif;
+            font-family: 'Ravi Prakash', cursive;
+            font-family: 'Lora', serif;
+            font-family: 'Indie Flower', cursive;
+            font-family: 'Cabin', sans-serif;
+            font-family: "Heebo", sans-serif;
+        }
+
+        #flights {
+            height: 100%;
+            background: #DDD;
+        }
+
+        div.container {
+            max-width: 1350px;
+            margin: 0 auto;
+            overflow: hidden;
+        }
+
+        .upcomming {
+            font-size: 25px;
+            text-transform: uppercase;
+            border-left: 14px solid rgba(232, 96, 76,0.78);
+            padding-left: 12px;
+            margin: 18px 8px;
+        }
+
+        .container .item {
+            width: 100%;
+            float: left;
+            padding: 0 20px;
+            background: #fff;
+            overflow: hidden;
+            margin: 10px
+        }
+
+        .container .item-right, .container .item-left {
+            float: left;
+            padding: 20px
+        }
+
+        .container .item-right {
+            padding: 79px 50px;
+            margin-right: 20px;
+            width: 25%;
+            position: relative;
+            height: 286px
+        }
+
+            .container .item-right .up-border, .container .item-right .down-border {
+                padding: 14px 15px;
+                background-color: #ddd;
+                border-radius: 50%;
+                position: absolute
+            }
+
+            .container .item-right .up-border {
+                top: -8px;
+                right: -35px;
+            }
+
+            .container .item-right .down-border {
+                bottom: -13px;
+                right: -35px;
+            }
+
+            .container .item-right .num {
+                font-size: 60px;
+                text-align: center;
+                color: #111
+            }
+
+            .container .item-right .day, .container .item-left .event {
+                color: #555;
+                font-size: 20px;
+                margin-bottom: 9px;
+            }
+
+            .container .item-right .day {
+                text-align: center;
+                font-size: 25px;
+            }
+
+        .container .item-left {
+            width: 71%;
+            padding: 34px 0px 19px 46px;
+            border-left: 3px dotted #999;
+        }
+
+            .container .item-left .title {
+                color: #111;
+                font-size: 34px;
+                margin-bottom: 12px
+            }
+
+            .container .item-left .sce {
+                margin-top: 5px;
+                display: block
+            }
+
+                .container .item-left .sce .icon, .container .item-left .sce p,
+                .container .item-left .loc .icon, .container .item-left .loc p {
+                    float: left;
+                    word-spacing: 5px;
+                    letter-spacing: 1px;
+                    color: #888;
+                    margin-bottom: 10px;
+                }
+
+                .container .item-left .sce .icon, .container .item-left .loc .icon {
+                    margin-right: 10px;
+                    font-size: 20px;
+                    color: #666
+                }
+
+            .container .item-left .loc {
+                display: block
+            }
+
+        .fix {
+            clear: both
+        }
+
+        .container .item .btn {
+            color: #fff;
+            padding: 6px 14px;
+            float: right;
+            margin-top: 10px;
+            font-size: 18px;
+            border: none;
+            cursor: pointer
+        }
+
+        .container .item .btn {
+            background: #14141f
+        }
+
+            .container .item .btn:hover {
+                background: #343a40;
+            }
+
+            .container .item .btn:disabled {
+                background: #fe8800;
+            }
+
+        .linethrough {
+            text-decoration: line-through
+        }
+
+        @@media only screen and (max-width: 1150px) {
+            .container .item {
+                width: 100%;
+                margin: 1em 0;
+            }
+
+            div.container {
+                margin: auto 0;
+            }
+        }
+
+        @@media only screen and (max-width:1149.98px) {
+            .down-border {
+                display: block !important;
+            }
+        }
+
+        @@media only screen and (max-width:1189.89px) {
+            .down-border {
+                display: none;
+            }
+        }
+
+        @@keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .spin {
+            font-size: 22px;
+            animation: spin 1s infinite linear;
+        }
+    </style>
+}

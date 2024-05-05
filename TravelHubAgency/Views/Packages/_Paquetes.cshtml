@@ -1,5 +1,8 @@
 ﻿@model List<Package>
-
+@{
+    List<Vuelo> vuelos = ViewData["vuelos"] as List<Vuelo>;
+    List<Hotel> hoteles = ViewData["hoteles"] as List<Hotel>;
+}
 @if (Model != null)
 {
     <!-- Packages Start -->
@@ -12,18 +15,29 @@
             <div class="row g-4 justify-content-center">
                 @foreach (Package package in Model)
                 {
-                    <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.1s">
+                    var hotel = hoteles.FirstOrDefault(x => x.IdHotel == package.IdHotel);
+                    var vuelo = vuelos.FirstOrDefault(x => x.IdVuelo == package.IdVuelo);
+
+                    <div class="col-lg-6 col-md-6 wow fadeInUp" data-wow-delay="0.1s">
                         <div class="package-item">
                             <div class="overflow-hidden">
-                                <img class="img-fluid" src="~/img/package-1.jpg" alt="">
+                                <img class="img-fluid" src="~/img/@package.Imagen" alt="@package.Nombre">
                             </div>
                             <div class="d-flex border-bottom">
                                 <small class="flex-fill text-center border-end py-2"><i class="fa fa-map-marker-alt text-primary me-2"></i>@package.Nombre</small>
                                 <small class="flex-fill text-center border-end py-2"><i class="fa fa-calendar-alt text-primary me-2"></i>@package.Duracion días</small>
                                 <small class="flex-fill text-center py-2"><i class="fa fa-user text-primary me-2"></i>@package.Personas Personas</small>
+                                @if (vuelo != null)
+                                {
+                                    <small class="flex-fill text-center border-end py-2"><i class="fa fa-plane text-primary me-2"></i>incluido</small>
+                                }
+                                @if (hotel != null)
+                                {
+                                    <small class="flex-fill text-center py-2"><i class="fa fa-bed text-primary me-2"></i>incluido</small>
+                                }
                             </div>
                             <div class="text-center p-4">
-                                <h3 class="mb-0">@package.Precio</h3>
+                                <h3 class="mb-0">@((int)package.Precio) €</h3>
                                 <div class="mb-3">
                                     <small class="fa fa-star text-primary"></small>
                                     <small class="fa fa-star text-primary"></small>

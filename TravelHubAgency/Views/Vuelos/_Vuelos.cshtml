@@ -34,8 +34,18 @@
                             <i class="fa fa-table"></i>
                         </div>
                         <p>
-                            @vuelo.FechaSalida.ToString("D") <br />
+                           Horario: @vuelo.FechaSalida.ToString("D") <br />
                             Duración del vuelo: @vuelo.Duracion h
+                        </p>
+                    </div>
+                    <div class="fix"></div>
+                    <div class="loc">
+                        <div class="icon">
+                            <i class="fa fa-location-crosshairs"></i>
+                        </div>
+                        <p>
+                            Punto de salida: @vuelo.Origen <br />
+                            @vuelo.FechaSalida.ToString("D") <br />
                         </p>
                     </div>
                     <div class="fix"></div>
@@ -44,7 +54,7 @@
                             <i class="fa fa-map-marker"></i>
                         </div>
                         <p>
-                            @dt.Nombre, @dt.Region <br />
+                            Destino: @dt.Nombre, @dt.Region <br />
                             @vuelo.FechaLlegada.ToString("D") <br />
                         </p>
                     </div>
@@ -59,7 +69,7 @@
                         }
                         else
                         {
-                            <button class="btn comprarVuelo" id="comprarVuelo" data-id="@vuelo.IdVuelo">comprar ticket</button>
+                            <a class="btn" asp-controller="Vuelos" asp-action="ComprarVuelo" asp-route-idvuelo="@vuelo.IdVuelo">comprar ticket</a>
 
                         }
                     </div>

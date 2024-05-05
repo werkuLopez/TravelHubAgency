@@ -4,7 +4,7 @@
 
 <div id="contentPackages" class="mt-4">
     <div class="text-center">
-        <span class="fas fa-spinner spin" style="display: none;"></span>
+        <span class="fas fa-spinner spin"></span>
     </div>
 </div>
 <!-- Packages End -->
@@ -42,11 +42,10 @@
 }
 
 @section Scripts {
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB_sNNhR1rCinzXXrVxI6VhQlYUTbQbAyo&callback=initMap" async defer></script>
-    <script src="~/js/SearchDestinoMapa.js"></script>
+
     <script>
         $(function () {
-            var destino = @(ViewData["destino"] ?? "null"); 
+            var destino = @(ViewData["destino"] ?? "null");
 
             function loadPackages(url) {
                 $(".fa-spinner").show();
@@ -63,8 +62,8 @@
 
 
             function loadSinglePackAndMap(idPack) {
-                $("#contentPackages").load("/Packages/_SinglePack?id=" + idPack, function () {
-                    initMap();
+                $("#contentPackages").load("/Packages/_SinglePack?id=" + idPack, async function () {
+                    await initMap();
                 });
             }
 
@@ -76,11 +75,11 @@
                 $(".fa-spinner").hide();
             });
 
-            $(document).on("click", ".book-now", function (e) {
-                e.preventDefault();
-                $("#booking-form").removeClass("hidden-form");
-                $("#booking-form").addClass("show-form");
+            $(document).on("click", ".book-pack", function () {
+                $("#booking-form").toggleClass("hidden-form");
             });
+
+
         });
     </script>
 }

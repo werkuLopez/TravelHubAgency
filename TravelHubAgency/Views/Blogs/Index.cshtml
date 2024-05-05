@@ -1,19 +1,11 @@
-﻿@{
-    int numRegistros = 0;
-    int actualPage = 1;
-    List<string> tags = ViewData["ETIQUETAS"] as List<string>;
-
-    if (ViewData["numRegistros"] != null)
-    {
-        numRegistros = (int)ViewData["numRegistros"];
-        actualPage = (int)ViewData["atualPage"];
-    }
-
-    int paginas = (int)Math.Ceiling((double)numRegistros / 8);
-}
+﻿@model List<Etiqueta>
 
 <!-- Blog Start -->
 <div class="container-xxl py-5 wow fadeInUp" data-wow-delay="0.1s">
+    <div class="d-flex justify-content-between mb-2 mx-auto">
+        <a asp-controller="Blogs" asp-action="Index" class="btn btn-outline-primary">publicaciones</a>
+        <a asp-controller="Blogs" asp-action="PublicarPost" class="btn btn-outline-primary">publicar post</a>
+    </div>
     <div class="container py-5">
         <div class="row gap-5">
             <div id="contentPost" class="col-lg-9 wow fadeIn" data-wow-delay="0.2s">
@@ -23,9 +15,9 @@
                 <div class="mb-5">
                     <h4 class="text-uppercase mb-4" style="letter-spacing: 5px;">Etiquetas</h4>
                     <div class="d-flex flex-wrap m-n1">
-                        @foreach (string tag in tags)
+                        @foreach (Etiqueta tag in Model)
                         {
-                            <a href="#@tag" class="btn btn-light m-1">@tag</a>
+                            <a href="#@tag.Nombre" class="btn btn-light m-1">@tag.Nombre</a>
                         }
                     </div>
                 </div>
@@ -57,9 +49,6 @@
 
 
                         comments.forEach((coment) => {
-                            // var replaysblog = document.querySelectorAll(
-                            //     ".replay-blog-" + idreplayBlog
-                            // );
                             var idcometblog = coment.classList[1].split("-")[2];
                             if (idcometblog != idreplayBlog) {
                                 coment.classList.remove("show");
@@ -73,9 +62,6 @@
                         replaysblog.forEach((comment) => {
                             var idsreplay = comment;
                             console.log(replaysblog[idsreplay]);
-                            // if (coment.target){
-
-                            // }
 
                             if (comment.classList.contains("show")) {
                                 comment.classList.remove("show");
@@ -88,6 +74,27 @@
                     });
                 });
             });
+
+            // leave a comment
+            $(document).on("click", "#sendcomment", function () {
+                var idpost = parseInt($("#idpost").val());
+                var contenido = $("#contenido").val();
+
+                sendComment(idpost, contenido);
+            })
+
+            function sendComment(idpost, contenido) {
+
+                var request = "/Blogs/_SingleBlog?idpost=" + idpost + "&contenido=" + contenido;
+
+                $.ajax({
+                    url: request,
+                    type: "POST",
+                    success: function (data) {
+                        console.log(data);
+                    }
+                })
+            }
         });
     </script>
 }

@@ -1,7 +1,11 @@
 ﻿@model PostComentariosModel
-
+@{
+    List<Usuario> usuarios = ViewData["usuarios"] as List<Usuario>;
+}
 @if (Model.Post != null)
 {
+    var usuario = usuarios.FirstOrDefault(x => x.IdUsuario == Model.Post.IdUsuario);
+
     <div class="container-xxl py-5 wow fadeInUp" data-wow-delay="0.1s">
         <div class="container py-5">
             <div class="row">
@@ -19,7 +23,7 @@
                         </div>
                         <div class="bg-white mb-3" style="padding: 30px;">
                             <div class="d-flex mb-3">
-                                <a class="text-primary text-uppercase text-decoration-none" href="#">Usuario: @Model.Post.IdUsuario</a>
+                                <a class="text-primary text-uppercase text-decoration-none" href="#">@usuario.Nombre @usuario.Apellido</a>
                                 <span class="text-primary px-2">|</span>
                                 <a class="text-primary text-uppercase text-decoration-none" href="#">@Model.Post.Titulo</a>
                             </div>
@@ -38,14 +42,16 @@
                             <!-- comentario -->
                             @foreach (Comentario comentario in Model.Comentarios)
                             {
+                                var usuariocoment = usuarios.FirstOrDefault(x => x.IdUsuario == comentario.IdUsuario);
+
                                 <div class="media mb-4">
-                                    <img src="~/img/testimonial-@(comentario.IdUsuario).jpg"
+                                    <img src="~/img/@usuariocoment.Imagen"
                                          alt="Image"
                                          class="img-fluid mr-3 mt-1"
                                          style="width: 45px" />
                                     <div class="media-body">
                                         <h6 class="d-flex justify-content-between align-items-center mb-3">
-                                            <a href="">Usuario: @comentario.IdUsuario</a>
+                                            <a href="">@usuariocoment.Nombre @usuariocoment.Apellido</a>
                                             <small style="margin-right: 30px;"><i>@comentario.Fecha.ToShortDateString()</i></small>
                                         </h6>
                                         <p>
@@ -59,14 +65,16 @@
                                         </div>
                                         @foreach (ReplayComentario replay in Model.Replays)
                                         {
+                                            var user = usuarios.FirstOrDefault(x => x.IdUsuario == replay.IdUsuario);
+
                                             <div class="replays replay-blog-@(replay.IdComentario) mt-4" data-id="@replay.IdReplay">
-                                                <img src="~/img/testimonial-@(replay.IdUsuario).jpg"
+                                                <img src="~/img/@user.Imagen"
                                                      alt="Image"
                                                      class="img-fluid mr-3 mt-1"
                                                      style="width: 45px" />
                                                 <div class="media-body">
                                                     <h6>
-                                                        <a href="">Usuario: @replay.IdUsuario</a>
+                                                        <a href="">@user.Nombre @user.Apellido</a>
                                                         <small><i>@replay.Fecha.ToShortDateString()</i></small>
                                                     </h6>
                                                     <p>
@@ -104,8 +112,8 @@
                                 </div>
                                 <div class="col-12">
                                     <div class="form-floating">
-                                        <textarea class="form-control" name="contenido" placeholder="comentario " 
-                                        id="contenido" style="height: 100px; resize:none;" required> </textarea>
+                                        <textarea class="form-control" name="contenido" placeholder="comentario "
+                                                  id="contenido" style="height: 100px; resize:none;" required> </textarea>
                                         <label for="contenido">Comentario *</label>
                                     </div>
                                 </div>
@@ -122,182 +130,4 @@
             </div>
         </div>
     </div>
-}
-
-
-
-@* @section Styles {
-    <style>
-        .expand-all-button {
-            display: inline-flex;
-            align-items: center;
-        }
-
-            .expand-all-button label {
-                font-size: 14px;
-                margin-right: 8px;
-            }
-
-            .expand-all-button input[type="checkbox"]:checked {
-                background-color: #e8604c;
-            }
-
-            .expand-all-button input[type="checkbox"] {
-                -webkit-appearance: none;
-                -moz-appearance: none;
-                appearance: none;
-                width: 54px;
-                height: 24px;
-                border-radius: 12px;
-                background-color: rgba(4, 15, 26, 0.15);
-                position: relative;
-                display: inline-block;
-                vertical-align: middle;
-                transition: all 0.3s ease;
-                cursor: pointer;
-            }
-
-        [type="checkbox"],
-        [type="radio"] {
-            box-sizing: border-box;
-            padding: 0;
-        }
-
-        .expand-all-button input[type="checkbox"]:checked::before {
-            left: 31px;
-        }
-
-        .expand-all-button input[type="checkbox"]::before {
-            content: "";
-            width: 22px;
-            height: 22px;
-            border-radius: 50%;
-            background-color: #fff;
-            position: absolute;
-            left: 1px;
-            top: 1px;
-            bottom: 1px;
-            transition: all 0.3s ease;
-            z-index: 1;
-        }
-
-        .expand-all-button input[type="checkbox"]:checked::after {
-            content: "ON";
-            color: #fff;
-            left: 8px;
-        }
-
-        .expand-all-button input[type="checkbox"]::after {
-            content: "OFF";
-            color: rgba(0, 0, 0, 0.32);
-            position: absolute;
-            top: 50%;
-            left: 27px;
-            transform: translateY(-50%);
-            font-size: 10px;
-            font-weight: 500;
-            transition: all 0.3s ease;
-        }
-
-        .replays {
-            overflow: hidden;
-            transition: all 0.5s ease-in-out;
-            height: 0;
-            will-change: max-height;
-        }
-
-            .replays.show {
-                height: 125px;
-            }
-
-        .replays-btn {
-            margin: 0 1em;
-            color: rgba(0, 0, 0, 0.32);
-            cursor: pointer;
-            transition: 0.5s ease-in-out;
-        }
-
-            .replays-btn i {
-                font-size: 18px;
-            }
-
-        .active-replays {
-            transform: rotate(180deg);
-        }
-    </style>
-} *@
-
-
-@section Scripts {
-
-    <script>
-
-        $(document).ready(function () {
-
-            $("#sendcomment").on("click", function () {
-                var idpost = parseInt($("#idpost").val());
-                var contenido = $("#contenido").val();
-
-                sendComment(idpost, contenido);
-            })
-        });
-
-        function sendComment(idpost, contenido) {
-
-            var request = "/Blogs/SingleBlog?idpost=" + idpost + "&contenido=" + contenido;
-
-            $.ajax({
-                url: request,
-                type: "POST",
-                success: function (data) {
-                    console.log(data);
-                }
-            })
-        }
-    </script>
-@*     <script>
-        document.querySelectorAll(".replays-btn").forEach((btn) => {
-
-            // expand btn
-            var replaysBtn = document.querySelectorAll(".replays-btn");
-            var comments = document.querySelectorAll(".replays");
-
-            replaysBtn.forEach((btn) => {
-                btn.addEventListener("click", function (e) {
-                    var idreplayBlog = e.target.parentElement.dataset.id;
-
-
-                    comments.forEach((coment) => {
-                        // var replaysblog = document.querySelectorAll(
-                        //     ".replay-blog-" + idreplayBlog
-                        // );
-                        var idcometblog = coment.classList[1].split("-")[2];
-                        if (idcometblog != idreplayBlog) {
-                            coment.classList.remove("show");
-                        }
-                    });
-
-                    var replaysblog = document.querySelectorAll(
-                        ".replay-blog-" + idreplayBlog
-                    );
-
-                    replaysblog.forEach((comment) => {
-                        var idsreplay = comment;
-                        console.log(replaysblog[idsreplay]);
-                        // if (coment.target){
-
-                        // }
-
-                        if (comment.classList.contains("show")) {
-                            comment.classList.remove("show");
-                            e.currentTarget.classList.remove("active-replays");
-                        } else {
-                            comment.classList.add("show");
-                            e.currentTarget.classList.add("active-replays");
-                        }
-                    });
-                });
-            });
-        });
-    </script> *@
 }

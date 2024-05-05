@@ -79,21 +79,64 @@ namespace TravelHubAgency.Controllers
             return RedirectToAction("_Vuelos");
         }
 
+        //[HttpGet]
+        //public async Task<IActionResult> _ComprarVuelo(int idvuelo)
+        //{
+        //    Vuelo vuelo = await this.service.GetVueloByIdAsync(idvuelo);
+        //    ViewData["DESTINOS"] = await this.service.GetAllDestinosAsync();
+        //    return PartialView("_ComprarVuelo", vuelo);
+        //}
+
+        //[AuthorizeUsuario]
+        //[HttpPost]
+        //public async Task<IActionResult> _ComprarVuelo(PagoVuelo pago)
+        //{
+        //    ReservaVuelo reserva = await this.service.ComprarVueloAsync(pago.IdVuelo, pago);
+        //    ViewData["DESTINOS"] = await this.service.GetAllDestinosAsync();
+        //    return PartialView();
+        //}
+
+        [AuthorizeUsuario]
         [HttpGet]
-        public async Task<IActionResult> _ComprarVuelo(int idvuelo)
+        public async Task<IActionResult> ComprarVuelo(int idvuelo)
         {
+            //if (HttpContext.Session.GetString("idvuelo") != null)
+            //{
+            //    idvuelo = int.Parse(HttpContext.Session.GetString("idvuelo"));
+            //}
+            //else
+            //{
+            //    HttpContext.Session.SetString("idvuelo", idvuelo.ToString());
+            //}
+
             Vuelo vuelo = await this.service.GetVueloByIdAsync(idvuelo);
             ViewData["DESTINOS"] = await this.service.GetAllDestinosAsync();
-            return PartialView("_ComprarVuelo", vuelo);
+            return View(vuelo);
         }
 
         [AuthorizeUsuario]
         [HttpPost]
-        public async Task<IActionResult> _ComprarVuelo(PagoVuelo pago)
+        public async Task<IActionResult> ComprarVuelo(int idvuelo, string metodopago, int precio)
         {
+            PagoVuelo pago = new PagoVuelo
+            {
+                IdVuelo = idvuelo,
+                MetodoPago = metodopago,
+                Precio = precio
+            };
+
             ReservaVuelo reserva = await this.service.ComprarVueloAsync(pago.IdVuelo, pago);
             ViewData["DESTINOS"] = await this.service.GetAllDestinosAsync();
-            return PartialView();
+            return RedirectToAction("ReservasUsuario", "Reservas");
+        }
+
+        [AuthorizeUsuario]
+        [HttpDelete]
+        public async Task<IActionResult> EliminarReserva(int idreservavuelo)
+        {
+            await this.service.EliminarReservaVuelo(idreservavuelo);
+
+            return RedirectToAction("ReservasUsuario", "Reservas");
         }
     }
 }

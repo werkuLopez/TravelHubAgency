@@ -9,7 +9,7 @@
     if (ViewData["numRegistros"] != null)
     {
         numRegistros = (int)ViewData["numRegistros"];
-        actualPage = (int)ViewData["atualPage"];
+        actualPage = (int)ViewData["actualPage"];
         idcontinente = ViewData["idcontinente"] as int?;
 
     }
@@ -109,7 +109,7 @@ else
         <div class="container">
             <div class="text-center wow fadeInUp" data-wow-delay="0.1s">
                 <h1 class="mb-5">No se han encontrado destinos </h1>
-                <a asp-controller="Destinos" asp-action="Destinos" class="btn btn-sm btn-primary px-3 border-end">
+                <a asp-controller="Destinos" asp-action="Index" class="btn btn-sm btn-primary px-3 border-end">
                     volver
                 </a>
             </div>

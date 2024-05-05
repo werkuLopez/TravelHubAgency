@@ -24,35 +24,64 @@ namespace TravelHubAgency.Controllers
             this.uploadFiles = uploadFiles;
         }
 
-        public async Task<IActionResult> Index(int? idcontinente)
+        //public async Task<IActionResult> Index(int? idcontinente)
+        //{
+        //    List<Destino> destinos;
+        //    if (idcontinente == null)
+        //    {
+        //        destinos = await this.service.GetAllDestinosAsync();
+        //    }
+        //    else
+        //    {
+        //        destinos = await this.service.GetAllDestinosContinenteAsync(idcontinente.Value);
+        //        ViewData["idcontinente"] = idcontinente;
+        //    }
+
+        //int numRegistros = destinos.Count;
+        //ViewData["numRegistros"] = numRegistros;
+
+        //ViewData["atualPage"] = 1;
+        //return View(destinos);
+        //}
+
+        public async Task<IActionResult> Index(int? idcontinente, string destinosearched)
         {
-            List<Destino> destinos;
-            if (idcontinente == null)
+            if (destinosearched != null )
             {
-                destinos = await this.service.GetAllDestinosAsync();
+                List<Destino> destinos = await this.service.GetDestinoByNameAsync(destinosearched);
+
+                if (this.cache.Get("destinosearched") != null)
+                {
+                    List<Destino> destinosSearched = this.cache.Get<List<Destino>>("destinosearched");
+
+                    foreach (var item in destinos)
+                    {
+                        if (!destinosSearched.Any(d => d.Nombre == item.Nombre))
+                        {
+
+                            destinosSearched.AddRange(destinos);
+                        }
+                    }
+
+                    this.cache.Set("destinosearched", destinosSearched);
+                }
+                else
+                {
+                    this.cache.Set("destinosearched", destinos);
+                }
+
+                ViewData["destinosearched"] = destinosearched;
             }
-            else
+
+            if (idcontinente != null)
             {
-                destinos = await this.service.GetAllDestinosContinenteAsync(idcontinente.Value);
-
+                ViewData["idcontinente"] = idcontinente;
             }
 
-            //int numRegistros = destinos.Count;
-            //ViewData["numRegistros"] = numRegistros;
-            //ViewData["idcontinente"] = idcontinente;
-            //ViewData["atualPage"] = 1;
-            return View(destinos);
+            return View();
         }
 
-        [HttpPost]
-        public async Task<IActionResult> Index(string destinosearched)
-        {
-            List<Destino> destinos = await this.service.GetDestinoByNameAsync(destinosearched);
-
-            return View(destinos);
-        }
-
-        public async Task<IActionResult> _Destinos(int? idcontinente, int? page)
+        public async Task<IActionResult> _Destinos(int? idcontinente, int? page, string? destinosearched)
         {
             if (page == null || page == 0)
             {
@@ -63,23 +92,32 @@ namespace TravelHubAgency.Controllers
             if (idcontinente == null)
             {
                 destinos = await this.service.GetDestinosPaginadosAsync(page.Value);
+
+                if (destinosearched != null)
+                {
+                    destinos = destinos.Where(x => x.Nombre == destinosearched).ToList();
+
+                    ViewData["destinosearched"] = destinosearched;
+                }
+
+
             }
             else
             {
                 destinos = await this.service.GetAllDestinosContinenteAsync(idcontinente.Value);
+                ViewData["idcontinente"] = idcontinente;
             }
 
             int numRegistros = destinos.Count;
             ViewData["numRegistros"] = numRegistros;
-            ViewData["idcontinente"] = idcontinente;
-            ViewData["atualPage"] = page.Value;
-            return PartialView(destinos);
+            ViewData["actualPage"] = page.Value;
+            return PartialView("_Destinos", destinos);
         }
 
         public async Task<IActionResult> _SingleDestino(int iddestino)
         {
             Destino destino = await this.service.GetDestinoByIdAsync(iddestino);
-            ViewData["atualPage"] = 1;
+            ViewData["actualPage"] = 1;
             return PartialView("_SingleDestino", destino);
         }
 

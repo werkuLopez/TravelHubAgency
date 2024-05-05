@@ -1,0 +1,440 @@
+﻿@model Vuelo
+@{
+    List<Destino> destinos = ViewData["DESTINOS"] as List<Destino>;
+}
+<section id="flights" class=" py-3">
+    <div class="container">
+        <div class="d-flex justify-content-end align-items-center">
+            <a class="btn btn" asp-controller="Vuelos" asp-action="Index">
+                volver
+            </a>
+        </div>
+        <div class="row g-4 justify-content-center">
+            <div class="col-lg-7 col-md-6 col-sm-12">
+                <div class="item">
+                    <div class="item-right">
+                        <h2 class="num">@Model.FechaSalida.Day</h2>
+                        <p class="day">@Model.FechaSalida.ToString("MMMM")</p>
+                        <span class="up-border"></span>
+                        <span class="down-border"></span>
+                    </div>
+                    <!-- end item-right -->
+
+                    <div class="item-left">
+                        <p class="event">@Model.Aerolinea</p>
+                        @{
+                            var dt = destinos.FirstOrDefault(x => x.IdDestino == Model.IdDestino);
+
+                        }
+                        <h2 class="title">@dt.Nombre</h2>
+
+                        <div class="sce">
+                            <div class="icon">
+                                <i class="fa fa-table"></i>
+                            </div>
+                            <p>
+                                Horario: @Model.FechaSalida.ToString("D") <br />
+                                Duración del vuelo: @Model.Duracion h
+                            </p>
+                        </div>
+                        <div class="fix"></div>
+                        <div class="loc">
+                            <div class="icon">
+                                <i class="fa fa-location-crosshairs"></i>
+                            </div>
+                            <p>
+                                Punto de salida: @Model.Origen <br />
+                                @Model.FechaSalida.ToString("D") <br />
+                            </p>
+                        </div>
+                        <div class="fix"></div>
+                        <div class="loc">
+                            <div class="icon">
+                                <i class="fa fa-map-marker"></i>
+                            </div>
+                            <p>
+                                Destino: @dt.Nombre, @dt.Region <br />
+                                @Model.FechaLlegada.ToString("D") <br />
+                            </p>
+                        </div>
+                        <div class="fix"></div>
+                    </div>
+                    <!-- end item-right -->
+                </div>
+            </div>
+            <!-- end item -->
+            <div class="col-lg-5 col-md-6 col-sm-12">
+                <form id="signUpForm" method="post" asp-action="ComprarVuelo" style="margin:1em;">
+                    @Html.AntiForgeryToken()
+                    <input name="idvuelo" id="IdVuelo" value="@Model.IdVuelo" hidden />
+                    <!-- start step indicators -->
+                    <div class="form-header d-flex mb-4">
+                        <span class="stepIndicator">Datos personales</span>
+                        <span class="stepIndicator">Metodo de pago</span>
+                    </div>
+                    <!-- end step indicators -->
+                    <!-- step one -->
+                    <div class="step">
+                        <p class="text-center mb-4"> Datos personales</p>
+                        <div class="mb-3">
+                            <input type="text" placeholder="Nombre" name="nombre" required>
+                        </div>
+                        <div class="mb-3">
+                            <input type="text" placeholder="Apellidos" name="apellidos" required>
+                        </div>
+                        <div class="mb-3">
+                            <input type="email" placeholder="Email" name="email" required>
+                        </div>
+                    </div>
+
+                    <!-- step four - payment methods -->
+                    <div class="step">
+                        <div class="mb-3">
+                            <label for="vuelo">Vuelo: </label>
+                            <input type="text" placeholder="Vuelo" id="vuelo" name="IdVuelo" value="@dt.Nombre" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label for="aerolinea">Aerolinea: </label>
+                            <input type="text" placeholder="Aerolinea" id="aerolinea" name="aerolinea" value="@Model.Aerolinea" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label for="precio">Precio: </label>
+                            <input type="text" placeholder="precio" id="precio" name="precio" value="@((int)Model.Precio)" readonly>
+                        </div>
+                        <p class="text-center mb-4">Seleccione el método de pago</p>
+                        <div class="mb-3">
+                            <label for="Tarjeta de credito">Tarjeta de credito</label>
+                            <input type="radio" id="Tarjeta de credito" name="metodopago" value="Tarjeta de credito">
+                        </div>
+                        <div class="mb-3">
+                            <label for="Paypal">PayPal</label>
+                            <input type="radio" id="Paypal" name="metodopago" value="Paypal">
+                        </div>
+                        <div class="mb-3">
+                            <label for="Transferencia">Transferencia bancaria</label>
+                            <input type="radio" id="Transferencia" name="metodopago" value="Transferencia">
+                        </div>
+                    </div>
+
+                    <!-- start previous / next buttons -->
+                    <div class="form-footer d-flex">
+                        <button type="button" id="prevBtn" data-step="-1">volver</button>
+                        <button type="button" id="nextBtn" data-step="1">siguiente</button>
+                    </div>
+                    <!-- end previous / next buttons -->
+                </form>
+
+                <div class="mt-4">
+                    <span id="mensaje">
+
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        $(function () {
+            var currentTab = 0;
+
+            showTab(currentTab);
+
+            function realizarCompra(idvuelo, metodopago, precio) {
+                $.ajax({
+                    url: "/Vuelos/ComprarVuelo?idvuelo=" + idvuelo + "&metodopago=" + metodopago + "&precio=" + precio,
+                    method: "POST",
+                    success: function (data) {
+                        setTimeout(function () {
+                            $("#mensaje").addClass("text-success");
+                            $("#mensaje").text("Pago realizado correctamente");
+                            window.location.href = '@Url.Action("ReservasUsuario", "Usuarios")';
+                        }, 3000)
+                    },
+                    error: function (data) {
+                        setTimeout(function () {
+                            $("#mensaje").addClass("text-danger");
+                            $("#mensaje").text("Error al realizar el Pago");
+                        }, 3000)
+                    }
+                });
+            }
+
+            function showTab(n) {
+                var steps = $(".step");
+                steps.hide();
+                $(steps[n]).show();
+
+                $(".stepIndicator").removeClass("active");
+                $(`.stepIndicator:eq(${n})`).addClass("active");
+
+                if (n == 0) {
+                    $("#prevBtn").hide();
+                } else {
+                    $("#prevBtn").show();
+                }
+
+                if (n == (steps.length - 1)) {
+                    $("#nextBtn").hide();
+                    var submitBtn = $("<button>");
+                    submitBtn.text("Confirmar pago");
+                    submitBtn.attr("id", "submitBtn");
+                    submitBtn.attr("type", "submit");
+
+
+                    $("#nextBtn").replaceWith(submitBtn);
+
+                    $(document).on("click", "#submitBtn", function () {
+
+                        if (validatePaymentMethod()) {
+
+                            var precio = parseInt($("#signUpForm #precio").val());
+                            var metodoPago = $("#signUpForm input[name='MetodoPago']:checked").val();
+                            var idvuelo = parseInt($("#signUpForm #IdVuelo").val());
+
+                            var fecha = new Date().toISOString();
+
+                            realizarCompra(idvuelo, metodopago, precio);
+
+                        } else {
+                            alert("Seleccione un método de pago");
+                        }
+                    });
+                } else {
+                    var nextBtn = $("<button>");
+                    nextBtn.attr("id", "nextBtn");
+                    nextBtn.data("step", 1);
+                    nextBtn.attr("type", "button");
+                    nextBtn.text("Siguiente");
+                    $("#submitBtn").replaceWith(nextBtn);
+                }
+
+                console.log("Step activo: ", steps[n]);
+            }
+
+
+            $(document).on("click", "#nextBtn", function () {
+                if (currentTab === 1) {
+                    if (validatePaymentMethod()) {
+                        nextPrev(1);
+                    } else {
+                        alert("Seleccione un método de pago");
+                    }
+                } else {
+                    var next = $(this).data("step");
+                    console.log("next: ", next);
+                    nextPrev(next);
+                }
+            });
+
+            $(document).on("click", "#prevBtn", function () {
+                var prev = $(this).data("step");
+                console.log("prev: ", prev);
+                nextPrev(prev);
+            });
+
+            function nextPrev(n) {
+                var steps = $(".step");
+                if (currentTab + n >= 0 && currentTab + n < steps.length) {
+                    steps[currentTab].style.display = "none";
+                    currentTab += n;
+                    showTab(currentTab);
+                }
+            }
+
+            function validatePaymentMethod() {
+                // Validar que se haya seleccionado un método de pago
+                return $("input[name='metodopago']:checked").length > 0;
+            }
+        });
+    </script>
+}
+
+@section Styles {
+    <style>
+        body {
+            font-family: 'Inknut Antiqua', serif;
+            font-family: 'Ravi Prakash', cursive;
+            font-family: 'Lora', serif;
+            font-family: 'Indie Flower', cursive;
+            font-family: 'Cabin', sans-serif;
+            font-family: "Heebo", sans-serif;
+        }
+
+        #flights {
+            height: 100%;
+            background: #DDD;
+        }
+
+        div.container {
+            max-width: 1350px;
+            margin: 0 auto;
+            overflow: hidden;
+        }
+
+        .upcomming {
+            font-size: 25px;
+            text-transform: uppercase;
+            border-left: 14px solid rgba(232, 96, 76,0.78);
+            padding-left: 12px;
+            margin: 18px 8px;
+        }
+
+        .container .item {
+            width: 100%;
+            float: left;
+            padding: 0 20px;
+            background: #fff;
+            overflow: hidden;
+            margin: 10px
+        }
+
+        .container .item-right, .container .item-left {
+            float: left;
+            padding: 20px
+        }
+
+        .container .item-right {
+            padding: 79px 50px;
+            margin-right: 20px;
+            width: 25%;
+            position: relative;
+            height: 286px
+        }
+
+            .container .item-right .up-border, .container .item-right .down-border {
+                padding: 14px 15px;
+                background-color: #ddd;
+                border-radius: 50%;
+                position: absolute
+            }
+
+            .container .item-right .up-border {
+                top: -8px;
+                right: -35px;
+            }
+
+            .container .item-right .down-border {
+                bottom: -13px;
+                right: -35px;
+            }
+
+            .container .item-right .num {
+                font-size: 60px;
+                text-align: center;
+                color: #111
+            }
+
+            .container .item-right .day, .container .item-left .event {
+                color: #555;
+                font-size: 20px;
+                margin-bottom: 9px;
+            }
+
+            .container .item-right .day {
+                text-align: center;
+                font-size: 25px;
+            }
+
+        .container .item-left {
+            width: 71%;
+            padding: 34px 0px 19px 46px;
+            border-left: 3px dotted #999;
+        }
+
+            .container .item-left .title {
+                color: #111;
+                font-size: 34px;
+                margin-bottom: 12px
+            }
+
+            .container .item-left .sce {
+                margin-top: 5px;
+                display: block
+            }
+
+                .container .item-left .sce .icon, .container .item-left .sce p,
+                .container .item-left .loc .icon, .container .item-left .loc p {
+                    float: left;
+                    word-spacing: 5px;
+                    letter-spacing: 1px;
+                    color: #888;
+                    margin-bottom: 10px;
+                }
+
+                .container .item-left .sce .icon, .container .item-left .loc .icon {
+                    margin-right: 10px;
+                    font-size: 20px;
+                    color: #666
+                }
+
+            .container .item-left .loc {
+                display: block
+            }
+
+        .fix {
+            clear: both
+        }
+
+        .container .item .btn {
+            color: #fff;
+            padding: 6px 14px;
+            float: right;
+            margin-top: 10px;
+            font-size: 18px;
+            border: none;
+            cursor: pointer
+        }
+
+        .container .item .btn {
+            background: #14141f
+        }
+
+            .container .item .btn:hover {
+                background: #343a40;
+            }
+
+        .linethrough {
+            text-decoration: line-through
+        }
+
+        @@media only screen and (max-width: 1150px) {
+            .container .item {
+                width: 100%;
+                margin: 1em 0;
+            }
+
+            div.container {
+                margin: auto 0;
+            }
+        }
+
+        @@media only screen and (max-width:1149.98px) {
+            .down-border {
+                display: block !important;
+            }
+        }
+
+        @@media only screen and (max-width:1189.89px) {
+            .down-border {
+                display: none;
+            }
+        }
+
+        @@keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .spin {
+            font-size: 22px;
+            animation: spin 1s infinite linear;
+        }
+    </style>
+}

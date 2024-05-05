@@ -1,3 +1,4 @@
+using Azure.Storage.Blobs;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using TravelHubAgency.Data;
@@ -37,6 +38,10 @@ builder.Services.AddAuthorization(options =>
 
 });
 
+//string azureKeys = builder.Configuration.GetValue<string>("AzureKeys:StorageAccount");
+//BlobServiceClient blobServiceClient = new BlobServiceClient(azureKeys);
+//builder.Services.AddTransient<BlobServiceClient>(x => blobServiceClient);
+
 // Add services to the container.
 builder.Services.AddControllersWithViews(options =>
     options.EnableEndpointRouting = false)
@@ -48,7 +53,6 @@ builder.Services.AddSession(options =>
 {
     options.IdleTimeout = TimeSpan.FromMinutes(30);
 });
-
 
 var app = builder.Build();
 

@@ -2,8 +2,8 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<section style="height:100%;">
-    <div class="form-auth-container" id="form-auth-container" style="height:100vh;">
+<section style="height:100vh;">
+    <div class="form-auth-container" id="form-auth-container" style="height:100%;">
         <div class="form-container sign-up-container">
             <form method="post">
                 @Html.AntiForgeryToken()
@@ -24,14 +24,28 @@
                     </a>
                 </div>
                 <span class="with">o registrarse con cuenta nueva</span>
-                <input type="text" name="nombre" id="nombre" placeholder="nombre" required />
-                <input type="text" name="apellido" id="apellido" placeholder="apellido" required />
-                <input type="text" name="pais" id="pais" placeholder="pais" required />
-                <input type="text" name="telefono" id="telefono" placeholder="telefono" required />
-                <input type="email" name="email" id="email" placeholder="email" required />
-                <input type="password" name="password" id="password" placeholder="password" required />
+                <div class="row">
+                    <div class="col-md-6">
+                        <input type="text" name="nombre" id="nombre" placeholder="nombre" required />
+                    </div>
+                    <div class="col-md-6">
+                        <input type="text" name="apellido" id="apellido" placeholder="apellido" required />
+                    </div>
+                    <div class="col-md-6">
+                        <input type="text" name="pais" id="pais" placeholder="pais" required />
+                    </div>
+                    <div class="col-md-6">
+                        <input type="text" name="telefono" id="telefono" placeholder="telefono" required />
+                    </div>
+                    <div class="col-md-6">
+                        <input type="email" name="email" id="email" placeholder="email" required />
+                    </div>
+                    <div class="col-md-6">
+                        <input type="password" name="password" id="password" placeholder="password" required />
+                    </div>
+                </div>
                 <button id="submitSignUpbtn">registrarme</button>
-                <a href="#" id="signinbtn"> ya tengo cuenta? Sign in</a>
+                <a href="#" id="signinbtnlink"> ya tengo cuenta? Sign in</a>
                 <span id="messageSignUp">
 
                 </span>
@@ -60,7 +74,7 @@
                 <input type="email" name="email" placeholder="email" required />
                 <input type="password" name="password" placeholder="password" required />
                 <button id="submitSignInbtn">iniciar sesión</button>
-                <a href="#" id="signupbtn" class="mb-3"> no tengo cuenta? Sig up</a>
+                <a href="#" id="signupbtnlink" class="mb-3"> no tengo cuenta? Sig up</a>
                 <span id="messageSignIn">
 
                 </span>
@@ -130,13 +144,6 @@
                 url: url + request,
                 method: "POST",
                 success: function (response) {
-                    $("#nombre").val('');
-                    $("#apellido").val('');
-                    $("#email").val('');
-                    $("#password").val('');
-                    $("#telefono").val('');
-                    $("#pais").val('');
-
                     $("#messageSignIn").empty();
 
                     var messageHtml = $("<span></span>");
@@ -147,7 +154,10 @@
 
                     setTimeout(function () {
                         messageHtml.remove();
+                        window.location.href = '@Url.Action("Perfil", "Usuarios")';
                     }, 3000);
+
+
                 },
                 error: function (error) {
                     $("#messageSignIn").empty();
@@ -169,9 +179,19 @@
             var url = "/Managed/SignUp";
             var request = "?nombre=" + nombre + "&apellido=" + apellido + "&email=" + email + "&password=" + password + "&telefono=" + telefono + "&pais=" + pais;
 
+            var data = {
+                Nombre: nombre,
+                Apellido: apellido,
+                Email: email,
+                Password: password,
+                Pais: pais,
+                Telefono: telefono
+            }
+
             $.ajax({
-                url: url + request,
+                url: "/Managed/SignUp",
                 method: "POST",
+                data: data,
                 success: function (response) {
                     $("#messageSignUp").empty();
 
@@ -190,39 +210,21 @@
                 }
             });
         }
-    </script>
-    <script>
-        const signUpButton = document.getElementById("signUpBtn");
-        const signInButton = document.getElementById("signInBtn");
 
-        const signUplink = document.getElementById("signupbtn");
-        const signInlink = document.getElementById("signinbtn");
-
-        const container = document.getElementById("form-auth-container");
-
-        signUpButton.addEventListener("click", () => {
-            container.classList.add("right-panel-active");
+        $(document).on("click", "#signUpBtn", function () {
+            $("#form-auth-container").addClass("right-panel-active");
+        });
+        $(document).on("click", "#signInBtn", function () {
+            $("#form-auth-container").removeClass("right-panel-active");
         });
 
-        signInButton.addEventListener("click", () => {
-            container.classList.remove("right-panel-active");
-        });
-
-        signUplink.addEventListener("click", (e) => {
+        $(document).on("click", "#signupbtnlink", function (e) {
             e.preventDefault();
-            // if (window.innerWidth < 700) {
-            //     container.classList.remove("right-panel-active");
-            // }
-            container.classList.add("right-panel-active");
+            $("#form-auth-container").addClass("right-panel-active");
         });
-
-        signInlink.addEventListener("click", (e) => {
+        $(document).on("click", "#signinbtnlink", function (e) {
             e.preventDefault();
-            // if (window.innerWidth > 700) {
-            //     container.classList.add("right-panel-active");
-            // }
-            container.classList.remove("right-panel-active");
-            // container.children[0].style.Transform = "translateX(100%)";
+            $("#form-auth-container").removeClass("right-panel-active");
         });
     </script>
 }
@@ -325,7 +327,7 @@
         #form-auth-container input {
             background: #eee;
             border: none;
-            padding: 12px 15px;
+            padding: 8px 5px;
             margin: 8px 0;
             width: 100%;
             border-radius: 5px;
@@ -357,7 +359,7 @@
         .sign-up-container {
             left: 0;
             width: 50%;
-            height:auto;
+            height: auto;
             z-index: 2;
         }
 

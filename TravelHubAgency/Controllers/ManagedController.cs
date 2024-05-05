@@ -49,8 +49,8 @@ namespace TravelHubAgency.Controllers
 
                 Claim name = new Claim(ClaimTypes.Name, model.Email);
                 identity.AddClaim(name);
-                //Claim claimId = new Claim(ClaimTypes.NameIdentifier, usuario.IdUsuario.ToString());
-                //identity.AddClaim(claimId);
+                Claim claimId = new Claim(ClaimTypes.NameIdentifier, usuario.IdUsuario.ToString());
+                identity.AddClaim(claimId);
 
                 // añadimos el token al clams
                 //identity.AddClaim(new Claim("Token", token));
@@ -60,8 +60,8 @@ namespace TravelHubAgency.Controllers
                 if (usuario.TipoUsuario == 1)
                 {
                     //creamos su propio claimId
-                   identity.AddClaim(new Claim("Administrador", usuario.TipoUsuario.ToString()));
-                   identity.AddClaim(new Claim(ClaimTypes.Role, "Administrador"));
+                    identity.AddClaim(new Claim("Administrador", usuario.TipoUsuario.ToString()));
+                    identity.AddClaim(new Claim(ClaimTypes.Role, "Administrador"));
                 }
 
                 ClaimsPrincipal principal = new ClaimsPrincipal(identity);
@@ -87,7 +87,7 @@ namespace TravelHubAgency.Controllers
         public async Task<IActionResult> SignUp(RegisterModel model)
         {
             RegisterModel exist = await this.service.SigUp(model.Nombre, model.Apellido, model.Email, model.Password, model.Telefono, model.Pais);
-            if (exist == null)
+            if (exist != null)
             {
                 ViewData["MENSAJE"] = "Error al registrarse";
             }
@@ -99,7 +99,7 @@ namespace TravelHubAgency.Controllers
         {
             await HttpContext.SignOutAsync(
                 CookieAuthenticationDefaults.AuthenticationScheme);
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("LogIn", "Managed");
         }
 
 

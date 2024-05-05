@@ -46,6 +46,10 @@ namespace TravelHubAgency.Controllers
             ViewData["publicaciones"] = await this.service.GetAllPublicacionesAsync(1);
             ViewData["paquetes"] = await this.service.GetAllPackagesAsync();
             ViewData["destinos"] = await this.service.GetAllDestinosAsync();
+            ViewData["destinos"] = await this.service.GetAllDestinosAsync();
+            ViewData["vuelos"] = await this.service.GetAllVuelosAsync();
+            ViewData["hoteles"] = await this.service.GetAllHotelesAsync();
+            ViewData["usuarios"] = await this.service.GetAllUsuariosAsync();
             return View();
         }
 

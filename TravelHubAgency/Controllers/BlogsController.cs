@@ -12,31 +12,19 @@ namespace TravelHubAgency.Controllers
         private TravelhubServices service;
         private HelperUploadFiles uploadFiles;
 
-        //ejemplo
-        List<string> estiquetas;
 
         public BlogsController(TravelhubServices service,
             HelperUploadFiles uploadFiles)
         {
             this.service = service;
             this.uploadFiles = uploadFiles;
-
-            // ejemplo
-            this.estiquetas = new List<string>();
-            this.estiquetas.Add("Madrid");
-            this.estiquetas.Add("Valencia");
-            this.estiquetas.Add("Montaña");
-            this.estiquetas.Add("Playa");
-            this.estiquetas.Add("All");
         }
 
         public async Task<IActionResult> Index()
         {
             //await this.service.GetAllEtiquetasAsync();
-            ViewData["ETIQUETAS"] = this.estiquetas;
-            ViewData["actualPage"] = 1;
-
-            return View();
+            List<Etiqueta> etiquetas = await this.service.GetAllEtiquetasAsync();
+            return View(etiquetas);
         }
 
         public async Task<IActionResult> _Publicaciones(int? page)
@@ -52,8 +40,8 @@ namespace TravelHubAgency.Controllers
             int numRegistros = publicaciones.Count;
 
             ViewData["numRegistros"] = numRegistros;
-            ViewData["ETIQUETAS"] = this.estiquetas;
             ViewData["actualPage"] = page.Value;
+            ViewData["usuarios"] = await this.service.GetAllUsuariosAsync();
             return PartialView("_Publicaciones", publicaciones);
         }
 
@@ -62,6 +50,7 @@ namespace TravelHubAgency.Controllers
             PostComentariosModel model =
                 await this.service.GetPostComentariosModelAsync(idpost);
             ViewData["actualPage"] = 1;
+            ViewData["usuarios"] = await this.service.GetAllUsuariosAsync();
             return PartialView("_SingleBlog", model);
         }
 
@@ -75,19 +64,26 @@ namespace TravelHubAgency.Controllers
             //return RedirectToAction("SingleBlog", new { idpost = comment.IdPost });
             PostComentariosModel model =
                 await this.service.GetPostComentariosModelAsync(idpost);
-            return PartialView("_SingleBlog", model);
+            ViewData["usuarios"] = await this.service.GetAllUsuariosAsync();
+            return PartialView("_SingleBlog", model.Post.IdPublicacion);
         }
 
         [AuthorizeUsuario]
-        public async Task<IActionResult> _PublicrPost()
+        public async Task<IActionResult> PublicarPost()
         {
-            return PartialView("_PublicrPost");
+            return View();
         }
 
         [AuthorizeUsuario]
         [HttpPost]
-        public async Task<IActionResult> _PublicarPost(Post post, IFormFile file)
+        public async Task<IActionResult> PublicarPost(string contenido, string titulo, IFormFile file)
         {
+            Post post = new Post
+            {
+                Contenido = contenido,
+                Titulo = titulo
+            };
+
             if (file != null)
             {
                 await this.uploadFiles.UploadFileAsync(file, Foldders.Images);
@@ -98,7 +94,7 @@ namespace TravelHubAgency.Controllers
             else
             {
                 ViewData["mensaje"] = "Debe asignar alguna imagen para su post";
-                return PartialView();
+                return View();
             }
         }
 

@@ -1,0 +1,54 @@
+﻿@model Post
+
+<div style="margin:0 1em;" id="postform">
+    <div class="p-3">
+        <form method="post" enctype="multipart/form-data">
+            @Html.AntiForgeryToken()
+            <h1 class="text-black mb-4">Publicar post</h1>
+            <div class="row g-5 align-items-center">
+                <div class="col-6">
+                    <div class="mb-3">
+                        <div class="form-floating mt-3">
+                            <input class="form-control" id="titulo" name="titulo" required placeholder="Titulo" />
+                            <label class="form-label">
+                                Titulo:
+                            </label>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-floating mt-3">
+                            <textarea class="form-control h-50" id="contenido" name="contenido" placeholder="Contenido" required rows="5" style="resize:none;"></textarea>
+                            <label class="form-label">
+                                Contenido:
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 text-white">
+                    <div class="col-12 position-relative">
+                        <img src="~/img/booking.jpg" class="img-fluid" />
+                        <div class="position-absolute" style="top:0; left:0; bottom:0; right:0; background:rgba(0,0,0,0.5); padding: 10px;">
+                            <span style="color: white; text-align:center;">Seleccione una imagen</span>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="form-floating mt-3">
+                            <input type="file" class="form-control w-100" name="file" />
+                        </div>
+                        @if (@ViewData["mensaje"] != null)
+                        {
+                            @ViewData["mensaje"]
+                        }
+                    </div>
+                </div>
+                <div class="col-12 text-center">
+                    <button class="btn btn-outline-dark py-3 w-75"> Guardar</button>
+                </div>
+            </div>
+        </form>
+
+        <div class="text-center">
+            <span class="fas fa-spinner spin" style="display: none;"></span>
+        </div>
+    </div>
+</div>

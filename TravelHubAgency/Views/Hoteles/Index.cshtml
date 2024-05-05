@@ -1,0 +1,58 @@
+﻿
+<div id="hotelesContent" class="mt-4">
+    <div class="text-center">
+        <span class="fas fa-spinner spin" style="display: none;"></span>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script>
+
+        $(function () {
+
+            loadHoteles();
+
+            function loadHoteles() {
+                $(".fa-spinner").show();
+                $("#hotelesContent").load("/Hoteles/_Hoteles");
+                $(".fa-spinner").hide();
+            }
+
+            $(document).on("click", ".btn", function () {
+                var id = parseInt($(this).data("id"));
+                $(".fa-spinner").show();
+                $("#hotelesContent").load("/Hoteles/_SingleHotel?id=" + id);
+                $(".fa-spinner").hide();
+            });
+
+
+            $(document).on("change", "#personas", function () {
+                let personas = parseFloat($("#personas").val());
+                let precio = parseFloat($("#actualPrice").val());
+                let total = precio * personas;
+                $("#precio").val(total);
+            });
+        });
+    </script>
+}
+
+@section Styles {
+    <style>
+
+        @@keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .spin {
+            font-size: 22px;
+            animation: spin 1s infinite linear;
+        }
+    </style>
+}

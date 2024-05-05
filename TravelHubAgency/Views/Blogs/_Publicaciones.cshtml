@@ -4,6 +4,7 @@
     int numRegistros = 0;
     int actualPage = 1;
     List<string> tags = ViewData["ETIQUETAS"] as List<string>;
+    List<Usuario> usuarios = ViewData["usuarios"] as List<Usuario>;
 
     if (ViewData["numRegistros"] != null)
     {
@@ -19,6 +20,7 @@
     <div class="row pb-3">
         @foreach (Post post in Model)
         {
+            var usuario = usuarios.FirstOrDefault(x => x.IdUsuario == post.IdUsuario);
             <div class="col-md-6 mb-4 pb-2">
                 <div class="blog-item">
                     <div class="position-relative">
@@ -30,9 +32,11 @@
                     </div>
                     <div class="bg-white p-4">
                         <div class="d-flex mb-2">
-                            <a class="text-primary text-uppercase text-decoration-none" asp-controller="Blogs" asp-action="SingleBlog" asp-route-idpost="@post.IdPublicacion">Usuario: @post.IdUsuario</a>
+                            <a class="text-primary text-uppercase text-decoration-none btn-detail"
+                               data-idpost="@post.IdPublicacion">@usuario.Nombre @usuario.Apellido</a>
                             <span class="text-primary px-2">|</span>
-                            <a class="text-primary text-uppercase text-decoration-none" asp-controller="Blogs" asp-action="SingleBlog" asp-route-idpost="@post.IdPublicacion">@post.Titulo</a>
+                            <a class="text-primary text-uppercase text-decoration-none btn-detail"
+                               data-idpost="@post.IdPublicacion">@post.Titulo</a>
                         </div>
                         <a class="h5 m-0 text-decoration-none btn-detail"
                            data-idpost="@post.IdPublicacion">@post.Contenido</a>
@@ -53,10 +57,8 @@
                     </li>
                     @for (int i = 1; i <= numRegistros; i++)
                     {
-                        <li class="page-item active">
-                            <a class="page-link"
-                               asp-controller="Blogs"
-                               asp-route-page="@i">@i</a>
+                        <li class="page-item">
+                            <a class="page-link">@i</a>
                         </li>
 
                         actualPage += 1;
