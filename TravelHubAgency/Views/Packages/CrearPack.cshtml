@@ -1,0 +1,169 @@
+﻿@model Package
+@{
+    List<Destino> destinos = ViewData["destinos"] as List<Destino>;
+    List<Vuelo> vuelos = ViewData["vuelos"] as List<Vuelo>;
+    List<Hotel> hoteles = ViewData["hoteles"] as List<Hotel>;
+}
+
+<div class="container-xxl py-3 wow fadeInUp" data-wow-delay="0.1s">
+    <div style="margin:0 1em;">
+        <div class="d-flex justify-content-end align-items-center">
+            <a class="btn btn" asp-controller="Vuelos" asp-action="Index">
+                volver
+            </a>
+        </div>
+        <div class="p-3">
+            <form method="post" enctype="multipart/form-data">
+                @Html.AntiForgeryToken()
+                <div class="row g-5 align-items-center">
+                    <div class="col-6">
+                        <h1 class="text-black mb-4">Crear paquete turístico</h1>
+
+                        <div class="row gy-2">
+                            <div class="col-md-12">
+                                <div class="form-floating">
+                                    <input type="text" name="nombre" class="form-control " id="nombre" placeholder="Nombre del paquete" required>
+                                    <label for="nombre">Paquete turísco</label>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="form-floating">
+                                    <select name="idDestino" class="form-select " id="idDestino" required>
+                                        @foreach (Destino pais in destinos)
+                                        {
+                                            <option value="@pais.IdDestino">@pais.Nombre</option>
+                                        }
+                                    </select>
+                                    <label for="idDestino">Destino</label>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-floating">
+                                    <input type="date" name="fechainicio" class="form-control " id="fechainicio" required>
+                                    <label for="fechainicio">Fecha inicio</label>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-floating">
+                                    <input type="date" name="fechafin" class="form-control " id="fechafin" required>
+                                    <label for="fechafin">Fecha fin</label>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-floating">
+                                    <input type="text" name="duracion" class="form-control " id="duracion" placeholder="Días" readonly>
+                                    <label for="duracion">Días</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <select name="personas" id="personas" class="form-select">
+                                        @for (int i = 1; i <= 6; i++)
+                                        {
+                                            <option value="@i">@i</option>
+                                        }
+                                    </select>
+                                    <label for="personas">Num. de personas</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="text" name="precio" class="form-control " id="precio" placeholder="precio">
+                                    <label for="precio">Precio</label>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-floating">
+                                    <textarea type="text" name="descripcion" class="form-control " id="descripcion" placeholder="Descripcion"
+                                              style="resize:none; height:80px;">
+                                        </textarea>
+                                    <label for="descripcion">Descripcion</label>
+                                </div>
+                            </div>
+                            <div class="col-12 text-center">
+                                <input type="checkbox" id="add-options" name="add-options" class="form-check-input" />
+                                <label for="add-options"> Más opciones</label>
+                            </div>
+                            <div class="hidden-options row gy-2" id="more-options">
+                                <div class="col-12">
+                                    <div class="form-floating">
+                                        <select name="idHotel" class="form-select " id="idHotel">
+                                            <option value="" selected> Asigne un Hotel</option>
+                                            @foreach (Hotel hotel in hoteles)
+                                            {
+                                                <option value="@hotel.IdHotel">@hotel.Nombre</option>
+                                            }
+                                        </select>
+                                        <label for="idHotel">Hotel</label>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="form-floating">
+                                        <select name="idVuelo" class="form-select " id="idVuelo">
+                                            <option value="" selected> Asigne un vuelo</option>
+                                            @foreach (Vuelo vuelo in vuelos)
+                                            {
+                                                <option value="@vuelo.IdVuelo">@vuelo.Aerolinea</option>
+                                            }
+                                        </select>
+                                        <label for="idVuelo">Vuelo</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 text-white">
+                        <div class="col-12 position-relative">
+                            <img src="~/img/booking.jpg" class="img-fluid" />
+                            <div class="position-absolute" style="top:0; left:0; bottom:0; right:0; background:rgba(0,0,0,0.5); padding: 10px;">
+                                <span style="color: white; text-align:center;">Seleccione una imagen</span>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-floating mt-3">
+                                <input type="file" class="form-control w-100" name="file" />
+                            </div>
+                            @if (@ViewData["mensaje"] != null)
+                            {
+                                @ViewData["mensaje"]
+                            }
+                        </div>
+                    </div>
+                    <div class="col-12 text-center">
+                        <button class="btn btn-outline-dark py-3 w-75"> Guardar</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(function () {
+            $(document).on("click", "#add-options", function () {
+                $("#more-options").toggleClass("hidden-options", !$(this).is(":checked"));
+            });
+
+            $('#fechainicio, #fechafin').on('change', function () {
+                var fechaInicio = new Date($('#fechainicio').val());
+                var fechaFin = new Date($('#fechafin').val());
+                if (fechaInicio && fechaFin) {
+                    var diferencia = new Date(fechaFin) - new Date(fechaInicio);
+                    var dias = Math.ceil(diferencia / (1000 * 60 * 60 * 24));
+                    $('#duracion').val(dias);
+                } else {
+                    $('#duracion').val('');
+                }
+            });
+        })
+    </script>
+}
+
+@section Styles {
+    <style>
+        .hidden-options {
+            display: none;
+        }
+    </style>
+}
