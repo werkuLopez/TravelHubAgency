@@ -28,7 +28,7 @@ namespace TravelHubAgency.Models
         [Column("Pais")]
         public string Pais { get; set; }
         [Column("Telefono")]
-        public string Telefono {  get; set; }
+        public string Telefono { get; set; }
 
     }
 }

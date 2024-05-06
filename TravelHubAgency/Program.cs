@@ -1,6 +1,8 @@
+using Azure.Security.KeyVault.Secrets;
 using Azure.Storage.Blobs;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Azure;
 using TravelHubAgency.Data;
 using TravelHubAgency.Helpers;
 using TravelHubAgency.Repositories;
@@ -38,9 +40,19 @@ builder.Services.AddAuthorization(options =>
 
 });
 
-//string azureKeys = builder.Configuration.GetValue<string>("AzureKeys:StorageAccount");
-//BlobServiceClient blobServiceClient = new BlobServiceClient(azureKeys);
-//builder.Services.AddTransient<BlobServiceClient>(x => blobServiceClient);
+builder.Services.AddAzureClients(factory =>
+{
+    factory.AddSecretClient
+    (builder.Configuration.GetSection("KeyVault"));
+});
+
+SecretClient secretClient = builder.Services.BuildServiceProvider().GetService<SecretClient>();
+KeyVaultSecret secret = await secretClient.GetSecretAsync("StorageAccount");
+string azureKeys = secret.Value;
+BlobServiceClient blobServiceClient = new BlobServiceClient(azureKeys);
+builder.Services.AddTransient<BlobServiceClient>(x => blobServiceClient);
+
+
 
 // Add services to the container.
 builder.Services.AddControllersWithViews(options =>
