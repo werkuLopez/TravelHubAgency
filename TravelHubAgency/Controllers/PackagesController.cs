@@ -91,7 +91,7 @@ namespace TravelHubAgency.Controllers
                 this.uploadFiles.UploadFileAsync(file, Foldders.Images);
 
                 package.Imagen = file.FileName;
-                Package pack = await this.service.InsertarPackageAsync(package);
+                Package pack = await this.service.InsertarPackageAsync(package, file);
 
                 return RedirectToAction("Index");
             }

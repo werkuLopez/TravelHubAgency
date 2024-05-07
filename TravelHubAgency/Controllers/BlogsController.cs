@@ -87,7 +87,7 @@ namespace TravelHubAgency.Controllers
             if (file != null)
             {
                 await this.uploadFiles.UploadFileAsync(file, Foldders.Images);
-                await this.service.PublicarPostAsync(post, file.FileName);
+                await this.service.PublicarPostAsync(post, file.FileName,file);
 
                 return RedirectToAction("Index");
             }

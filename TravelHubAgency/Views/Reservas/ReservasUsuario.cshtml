@@ -30,7 +30,7 @@
                                     var destino = destinos.FirstOrDefault(y => y.IdDestino == pack.IdDestino);
                                 }
 
-                                <img src="~/img/@destino.Imagen" class="img-fluid" alt="@pack.Nombre" />
+                                <img src="@destino.Imagen" class="img-fluid" alt="@pack.Nombre" />
 
                                 <div class="card-body">
                                     <h3 class="card-title">@destino.Nombre</h3>
@@ -74,7 +74,7 @@
                                     var hotel = hoteles.FirstOrDefault(d => d.IdHotel == reservaHoteles.Hotel);
                                 }
 
-                                <img src="~/img/@hotel.Imagen" class="img-fluid" alt="@hotel.Nombre" />
+                                <img src="@hotel.Imagen" class="img-fluid" alt="@hotel.Nombre" />
 
                                 <div class="card-body">
                                     <h3 class="card-title">@hotel.Nombre</h3>

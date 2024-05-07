@@ -6,6 +6,8 @@ using System.Text;
 using TravelHubAgency.Data;
 using TravelHubAgency.Helpers;
 using TravelHubAgency.Models;
+using TravelHubAgency.Services;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 using static System.Net.Mime.MediaTypeNames;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
@@ -16,12 +18,14 @@ namespace TravelHubAgency.Repositories
         private string ApiUrl;
         private MediaTypeWithQualityHeaderValue header;
         private IHttpContextAccessor context;
+        private ServiceStorageBlobs blobs;
 
-        public TravelhubServices(IConfiguration config, IHttpContextAccessor context)
+        public TravelhubServices(IConfiguration config, IHttpContextAccessor context, ServiceStorageBlobs blobs)
         {
             this.ApiUrl = config.GetValue<string>("ApiUrls:ApiTravelHub");
             this.header = new MediaTypeWithQualityHeaderValue("application/json");
             this.context = context;
+            this.blobs = blobs;
         }
 
 
@@ -179,39 +183,68 @@ namespace TravelHubAgency.Repositories
         {
             string request = "api/destinos/alldestinos?page=" + page;
             List<Destino> destinos = await this.CallApiAsync<List<Destino>>(request);
-            return destinos;
+            List<Destino> news = new List<Destino>();
+
+            foreach (Destino destino in destinos)
+            {
+                destino.Imagen = await this.blobs.GetUrlImageBlob(destino.Imagen);
+                news.Add(destino);
+            }
+            return news;
         }
         public async Task<List<Destino>> GetAllDestinosAsync()
         {
             string request = "api/destinos/alldestinos";
             List<Destino> destinos = await this.CallApiAsync<List<Destino>>(request);
-            return destinos;
+            List<Destino> news = new List<Destino>();
+
+            foreach (Destino destino in destinos)
+            {
+                destino.Imagen = await this.blobs.GetUrlImageBlob(destino.Imagen);
+                news.Add(destino);
+            }
+            return news;
         }
 
-        public async Task<List<Destino>> GetDestinoByNameAsync(string destino)
+        public async Task<List<Destino>> GetDestinoByNameAsync(string destinosearche)
         {
-            string request = "api/destinos/finddestinosnombre/" + destino;
+            string request = "api/destinos/finddestinosnombre/" + destinosearche;
             List<Destino> destinos = await this.CallApiAsync<List<Destino>>(request);
-            return destinos;
+            List<Destino> news = new List<Destino>();
+
+            foreach (Destino destino in destinos)
+            {
+                destino.Imagen = await this.blobs.GetUrlImageBlob(destino.Imagen);
+                news.Add(destino);
+            }
+            return news;
         }
 
         public async Task<List<Destino>> GetAllDestinosContinenteAsync(int idcontinente)
         {
             string request = "/api/destinos/destinoscontinente/" + idcontinente;
             List<Destino> destinos = await this.CallApiAsync<List<Destino>>(request);
-            return destinos;
+            List<Destino> news = new List<Destino>();
+
+            foreach (Destino destino in destinos)
+            {
+                destino.Imagen = await this.blobs.GetUrlImageBlob(destino.Imagen);
+                news.Add(destino);
+            }
+            return news;
         }
 
         public async Task<Destino> GetDestinoByIdAsync(int iddestino)
         {
             string request = "api/destinos/finddestino/" + iddestino;
             Destino destinos = await this.CallApiAsync<Destino>(request);
+            destinos.Imagen = await this.blobs.GetUrlImageBlob(destinos.Imagen);
             return destinos;
         }
 
         public async Task<Destino> InsertarDestinoAsync(string nombre,
             int idpais, string region, string descripcion,
-            string imagen, string latitud, string longitud, decimal precio)
+            string imagen, string latitud, string longitud, decimal precio, IFormFile file)
         {
             string token =
                 this.context.HttpContext.User.FindFirst(x => x.Type == "TOKEN").Value;
@@ -254,6 +287,14 @@ namespace TravelHubAgency.Repositories
                     Destino data =
                         await response.Content.ReadAsAsync<Destino>();
 
+                    if (file != null)
+                    {
+                        string blobName = "destino" + data.Imagen + ".png";
+                        await this.blobs.UploadBlobAsync(file, blobName);
+                    }
+
+                    data.Imagen = await this.blobs.GetUrlImageBlob(data.Imagen);
+
                     return data;
                 }
                 else
@@ -265,7 +306,7 @@ namespace TravelHubAgency.Repositories
 
         public async Task<Destino> UpdateDestinoAsync(int iddestino, string nombre,
                 int idpais, string region, string descripcion,
-                string imagen, string latitud, string longitud, decimal precio)
+                string imagen, string latitud, string longitud, decimal precio, IFormFile file)
         {
             string token =
                 this.context.HttpContext.User.FindFirst(x => x.Type == "TOKEN").Value;
@@ -307,7 +348,11 @@ namespace TravelHubAgency.Repositories
                 {
                     Destino data =
                         await response.Content.ReadAsAsync<Destino>();
+                    string blobName = "destino" + data.Imagen + ".png";
+                    await this.blobs.UploadBlobAsync(file, blobName);
 
+
+                    data.Imagen = await this.blobs.GetUrlImageBlob(blobName);
                     return data;
                 }
                 else
@@ -324,6 +369,9 @@ namespace TravelHubAgency.Repositories
 
             using (HttpClient client = new HttpClient())
             {
+                string blobName = "destino" + iddestion + ".jpg";
+                await this.blobs.DeleteBlobAsync(blobName);
+
                 string request = "api/destinos/deletedestino/" + iddestion;
                 int result = await this.CallApiAsync<int>(request, token);
             }
@@ -336,15 +384,28 @@ namespace TravelHubAgency.Repositories
         {
             string request = "api/packages/allpackages";
             List<Package> packs = await this.CallApiAsync<List<Package>>(request);
-            return packs;
+            List<Package> news = new List<Package>();
+
+            foreach (Package package in packs)
+            {
+                package.Imagen = await this.blobs.GetUrlImageBlob(package.Imagen);
+                news.Add(package);
+            }
+            return news;
         }
 
         public async Task<List<Package>> GetPackagesByDestinoAsync(string destino)
         {
             string request = "api/packages/findpackage?destino=" + destino;
             List<Package> packages = await this.CallApiAsync<List<Package>>(request);
+            List<Package> news = new List<Package>();
 
-            return packages;
+            foreach (Package package in packages)
+            {
+                package.Imagen = await this.blobs.GetUrlImageBlob(package.Imagen);
+                news.Add(package);
+            }
+            return news;
         }
 
         public async Task<Package> GetPackageByIdAsync(int id)
@@ -353,10 +414,12 @@ namespace TravelHubAgency.Repositories
             Package package =
                 await this.CallApiAsync<Package>(request);
 
+            package.Imagen = await this.blobs.GetUrlImageBlob(package.Imagen);
+
             return package;
         }
 
-        public async Task<Package> InsertarPackageAsync(Package package)
+        public async Task<Package> InsertarPackageAsync(Package package, IFormFile file)
         {
             string token =
                 this.context.HttpContext.User.FindFirst(x => x.Type == "TOKEN").Value;
@@ -396,8 +459,12 @@ namespace TravelHubAgency.Repositories
                 if (response.IsSuccessStatusCode)
                 {
                     Package data =
-                        await response.Content.ReadAsAsync<Package>();
+                    await response.Content.ReadAsAsync<Package>();
 
+                    string blobName = "package" + data.Imagen + ".png";
+                    await this.blobs.UploadBlobAsync(file, blobName);
+
+                    data.Imagen = await this.blobs.GetUrlImageBlob(data.Imagen);
                     return data;
                 }
                 else
@@ -407,7 +474,7 @@ namespace TravelHubAgency.Repositories
             }
         }
 
-        public async Task<Package> UpdatePackageAsync(Package package)
+        public async Task<Package> UpdatePackageAsync(Package package, IFormFile file)
         {
             string token =
                 this.context.HttpContext.User.FindFirst(x => x.Type == "TOKEN").Value;
@@ -449,6 +516,10 @@ namespace TravelHubAgency.Repositories
                     Package data =
                         await response.Content.ReadAsAsync<Package>();
 
+                    string blobName = "package" + data.Imagen + ".png";
+                    await this.blobs.UploadBlobAsync(file, blobName);
+
+                    data.Imagen = await this.blobs.GetUrlImageBlob(blobName);
                     return data;
                 }
                 else
@@ -466,6 +537,10 @@ namespace TravelHubAgency.Repositories
             using (HttpClient client = new HttpClient())
             {
                 string request = "api/packages/eliminar/" + idPack;
+
+                string blobName = "package" + idPack + ".jpg";
+                await this.blobs.DeleteBlobAsync(blobName);
+
                 int result = await this.CallApiAsync<int>(request, token);
             }
 
@@ -480,8 +555,14 @@ namespace TravelHubAgency.Repositories
             string request = "api/usuarios/allusuarios";
             List<Usuario> usuarios =
                 await this.CallApiAsync<List<Usuario>>(request);
+            List<Usuario> news = new List<Usuario>();
 
-            return usuarios;
+            foreach (Usuario usuario in usuarios)
+            {
+                usuario.Imagen = await this.blobs.GetUrlImageBlob(usuario.Imagen);
+                news.Add(usuario);
+            }
+            return news;
         }
 
         public async Task<Usuario> GetPerfilUsuarioAsync()
@@ -493,7 +574,7 @@ namespace TravelHubAgency.Repositories
 
             Usuario usuario =
                 await this.CallApiAsync<Usuario>(request, token);
-
+            usuario.Imagen = await this.blobs.GetUrlImageBlob(usuario.Imagen);
             return usuario;
         }
 
@@ -540,7 +621,8 @@ namespace TravelHubAgency.Repositories
                     List<Usuario> usuarios = await GetAllUsuariosAsync();
 
                     Usuario updated = usuarios.Where(x => x.Email == model.Email).FirstOrDefault();
-
+                    
+                    //updated.Imagen = await this.blobs.GetUrlImageBlob(updated.Imagen);
                     return updated;
                 }
                 else
@@ -554,22 +636,26 @@ namespace TravelHubAgency.Repositories
         {
             List<Usuario> usuarios = await GetAllUsuariosAsync();
 
-            return usuarios.FirstOrDefault(x => x.IdUsuario == id);
+            Usuario user = usuarios.FirstOrDefault(x => x.IdUsuario == id);
+            user.Imagen = await this.blobs.GetUrlImageBlob(user.Imagen);
+            return user;
         }
 
         public async Task<Usuario> GetUsuarioByUsername(string username)
         {
             List<Usuario> usuarios = await this.GetAllUsuariosAsync();
 
-            return usuarios.FirstOrDefault(x => x.Email == username);
+            Usuario user = usuarios.FirstOrDefault(x => x.Email == username);
+            user.Imagen = await this.blobs.GetUrlImageBlob(user.Imagen);
+            return user;
         }
 
-        public async Task<Usuario> UpdateFotoPerfilUsuarioAsync(string imagen)
+        public async Task<Usuario> UpdateFotoPerfilUsuarioAsync(IFormFile file)
         {
             string token =
     this.context.HttpContext.User.FindFirst(x => x.Type == "TOKEN").Value;
 
-            string request = "api/usuarios/updatefotoperfil?imagen=" + imagen;
+            string request = "api/usuarios/updatefotoperfil?imagen=" + file.FileName;
 
             using (HttpClient client = new HttpClient())
             {
@@ -586,6 +672,11 @@ namespace TravelHubAgency.Repositories
                 {
                     Usuario usuario =
                         await response.Content.ReadAsAsync<Usuario>();
+
+                    string blobName = usuario.Nombre + usuario.IdUsuario + ".png";
+                    await this.blobs.UploadBlobAsync(file, blobName);
+
+                    usuario.Imagen = await this.blobs.GetUrlImageBlob(blobName);
                     return usuario;
                 }
                 else
@@ -1051,7 +1142,14 @@ namespace TravelHubAgency.Repositories
         {
             string request = "api/publicaciones/allposts?page=" + page;
             List<Post> posts = await this.CallApiAsync<List<Post>>(request);
-            return posts;
+            List<Post> news = new List<Post>();
+
+            foreach (Post post in posts)
+            {
+                post.Imagen = await this.blobs.GetUrlImageBlob(post.Imagen);
+                news.Add(post);
+            }
+            return news;
         }
 
         public async Task<List<Post>> GetPostsByUsuarioAsync()
@@ -1061,8 +1159,14 @@ namespace TravelHubAgency.Repositories
 
             string request = "api/publicaciones/postsusuario";
             List<Post> postsUsuario = await this.CallApiAsync<List<Post>>(request, token);
+            List<Post> news = new List<Post>();
 
-            return postsUsuario;
+            foreach (Post post in postsUsuario)
+            {
+                post.Imagen = await this.blobs.GetUrlImageBlob(post.Imagen);
+                news.Add(post);
+            }
+            return news;
         }
 
         public async Task<Post> GetPostByIdAsync(int id)
@@ -1070,11 +1174,11 @@ namespace TravelHubAgency.Repositories
             string request = "api/publicaciones/post/" + id;
             Post post =
                 await this.CallApiAsync<Post>(request);
-
+            post.Imagen = await this.blobs.GetUrlImageBlob(post.Imagen);
             return post;
         }
 
-        public async Task<Post> PublicarPostAsync(Post post, string imagen)
+        public async Task<Post> PublicarPostAsync(Post post, string imagen, IFormFile file)
         {
             string token =
             this.context.HttpContext.User.FindFirst(x => x.Type == "TOKEN").Value;
@@ -1112,6 +1216,11 @@ namespace TravelHubAgency.Repositories
                 {
                     Post postUloaded =
                         await response.Content.ReadAsAsync<Post>();
+
+                    string blobName = "post" + postUloaded.IdPublicacion + ".png";
+                    await this.blobs.UploadBlobAsync(file, blobName);
+
+                    postUloaded.Imagen = await this.blobs.GetUrlImageBlob(blobName);
                     return postUloaded;
                 }
                 else
@@ -1126,6 +1235,10 @@ namespace TravelHubAgency.Repositories
         public async Task EliminarPostAsync(int id)
         {
             string request = "api/publicaciones/EliminarPost/" + id;
+
+            string blobName = "post" + id + ".jpg";
+            await this.blobs.DeleteBlobAsync(blobName);
+
             int reult = await this.CallApiAsync<int>(request);
         }
 
@@ -1138,8 +1251,14 @@ namespace TravelHubAgency.Repositories
 
             List<Post> posts =
                 await this.CallApiAsync<List<Post>>(request, token);
+            List<Post> news = new List<Post>();
 
-            return posts;
+            foreach (Post post in posts)
+            {
+                post.Imagen = await this.blobs.GetUrlImageBlob(post.Imagen);
+                news.Add(post);
+            }
+            return news;
         }
 
         #endregion
@@ -1223,7 +1342,7 @@ namespace TravelHubAgency.Repositories
 
         public async Task<List<ReplayComentario>> GetReplaysByComentarioAsync(int idcomentario)
         {
-            string request = "api/replayscomentario/replayscomentario/" + idcomentario;
+            string request = "api/replayscomentario/replays/" + idcomentario;
             List<ReplayComentario> replays =
                 await this.CallApiAsync<List<ReplayComentario>>(request);
 
@@ -1245,7 +1364,7 @@ this.context.HttpContext.User.FindFirst(x => x.Type == "TOKEN").Value;
 
                 ReplayComentario newComent = new ReplayComentario
                 {
-                    IdReplay = 0,
+                    IdReply = 0,
                     Replay = model.Contenido,
                     Fecha = DateTime.Now,
                     IdComentario = model.IdComentario,
@@ -1311,7 +1430,6 @@ this.context.HttpContext.User.FindFirst(x => x.Type == "TOKEN").Value;
                 {
                     RegisterModel data =
                         await response.Content.ReadAsAsync<RegisterModel>();
-
                     return data;
                 }
                 else
@@ -1330,7 +1448,14 @@ this.context.HttpContext.User.FindFirst(x => x.Type == "TOKEN").Value;
 
             List<Hotel> hoteles =
                 await this.CallApiAsync<List<Hotel>>(request);
-            return hoteles;
+            List<Hotel> news = new List<Hotel>();
+
+            foreach (Hotel hotel in hoteles)
+            {
+                hotel.Imagen = await this.blobs.GetUrlImageBlob(hotel.Imagen);
+                news.Add(hotel);
+            }
+            return news;
         }
 
         public async Task<Hotel> GetHotelByIdAsync(int id)
@@ -1338,10 +1463,11 @@ this.context.HttpContext.User.FindFirst(x => x.Type == "TOKEN").Value;
             string request = "api/hoteles/" + id;
             Hotel hotel =
                 await this.CallApiAsync<Hotel>(request);
+            hotel.Imagen = await this.blobs.GetUrlImageBlob(hotel.Imagen);
             return hotel;
         }
 
-        public async Task<Hotel> InsertarHotelAsync(Hotel hotel)
+        public async Task<Hotel> InsertarHotelAsync(Hotel hotel, IFormFile file)
         {
             string token =
             this.context.HttpContext.User.FindFirst(x => x.Type == "TOKEN").Value;
@@ -1376,6 +1502,11 @@ this.context.HttpContext.User.FindFirst(x => x.Type == "TOKEN").Value;
                 {
                     Hotel h =
                         await response.Content.ReadAsAsync<Hotel>();
+
+                    string blobName = "hotel" + h.IdHotel + ".png";
+                    await this.blobs.UploadBlobAsync(file, blobName);
+
+                    h.Imagen = await this.blobs.GetUrlImageBlob(blobName);
                     return h;
                 }
                 else
@@ -1386,7 +1517,7 @@ this.context.HttpContext.User.FindFirst(x => x.Type == "TOKEN").Value;
             }
         }
 
-        public async Task<Hotel> UpdateHotelAsync(Hotel hotel)
+        public async Task<Hotel> UpdateHotelAsync(Hotel hotel, IFormFile file)
         {
             string token =
             this.context.HttpContext.User.FindFirst(x => x.Type == "TOKEN").Value;
@@ -1421,6 +1552,11 @@ this.context.HttpContext.User.FindFirst(x => x.Type == "TOKEN").Value;
                 {
                     Hotel h =
                         await response.Content.ReadAsAsync<Hotel>();
+
+                    string blobName = "hotel" + h.IdHotel + ".png";
+                    await this.blobs.UploadBlobAsync(file, blobName);
+
+                    h.Imagen = await this.blobs.GetUrlImageBlob(blobName);
                     return h;
                 }
                 else
@@ -1439,6 +1575,10 @@ this.context.HttpContext.User.FindFirst(x => x.Type == "TOKEN").Value;
             using (HttpClient client = new HttpClient())
             {
                 string request = "api/hoteles/" + id;
+
+                string blobName = "hotel" + id + ".jpg";
+                await this.blobs.DeleteBlobAsync(blobName);
+
                 int result = await this.CallApiAsyncDelete<int>(request, token);
             }
         }

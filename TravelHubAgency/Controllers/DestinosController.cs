@@ -46,7 +46,7 @@ namespace TravelHubAgency.Controllers
 
         public async Task<IActionResult> Index(int? idcontinente, string destinosearched)
         {
-            if (destinosearched != null )
+            if (destinosearched != null)
             {
                 List<Destino> destinos = await this.service.GetDestinoByNameAsync(destinosearched);
 
@@ -153,7 +153,7 @@ namespace TravelHubAgency.Controllers
                     await this.service.InsertarDestinoAsync(
                         destino.Nombre, destino.IdPais,
                     destino.Region, destino.Descripcion, file.FileName, destino.Latitud,
-                    destino.Longitud, destino.Precio);
+                    destino.Longitud, destino.Precio, file);
 
                 return RedirectToAction("Destinos");
             }
@@ -169,20 +169,18 @@ namespace TravelHubAgency.Controllers
         {
             if (file != null)
             {
-                this.uploadFiles.UploadFileAsync(file, Foldders.Images);
+                //this.uploadFiles.UploadFileAsync(file, Foldders.Images);
 
                 await this.service.UpdateDestinoAsync(destino.IdDestino, destino.Nombre, destino.IdPais,
                     destino.Region, destino.Descripcion, file.FileName, destino.Latitud,
-                    destino.Longitud, destino.Precio);
+                    destino.Longitud, destino.Precio, file);
 
                 return RedirectToAction("Destinos");
             }
             else
             {
-                await this.service.UpdateDestinoAsync(destino.IdDestino, destino.Nombre, destino.IdPais,
-                    destino.Region, destino.Descripcion, file.FileName, destino.Latitud,
-                    destino.Longitud, destino.Precio);
-                return RedirectToAction("Destinos");
+                ViewData["mensaje"] = "Debe asignar una imágen";
+                return View();
             }
         }
 

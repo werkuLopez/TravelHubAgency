@@ -15,7 +15,14 @@
                     <div class="d-flex flex-column align-items-center text-center p-3 py-5">
                         <div class="position-relative d-flex flex-column align-items-center text-center mb-5 overflow-hidden">
                             <input type="file" name="file" class="position-absolute top-50" style="opacity:0 !important; width:100%;" id="fileInput" />
-                            <img class="rounded-circle mt-5" width="150px" src="~/img/@Model.Imagen">
+                            @if (Model.Imagen != "")
+                            {
+                                <img class="rounded-circle mt-5" width="150px" src="@Model.Imagen">
+                            }
+                            else
+                            {
+                                <img class="rounded-circle mt-5" width="150px" src="~/img/defaultUsuario.jpg">
+                            }
                             <label for="fileInput" class="position-absolute" style="top:80% !important; color: #e8604c;">
                                 <i class="fas fa-camera" style="font-size:xx-large;"></i>
                             </label>

@@ -6,6 +6,7 @@ using Microsoft.Extensions.Azure;
 using TravelHubAgency.Data;
 using TravelHubAgency.Helpers;
 using TravelHubAgency.Repositories;
+using TravelHubAgency.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -51,7 +52,7 @@ KeyVaultSecret secret = await secretClient.GetSecretAsync("StorageAccount");
 string azureKeys = secret.Value;
 BlobServiceClient blobServiceClient = new BlobServiceClient(azureKeys);
 builder.Services.AddTransient<BlobServiceClient>(x => blobServiceClient);
-
+builder.Services.AddTransient<ServiceStorageBlobs>();
 
 
 // Add services to the container.

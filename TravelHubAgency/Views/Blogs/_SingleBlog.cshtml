@@ -14,7 +14,7 @@
                     <div class="pb-3">
                         <div class="blog-item">
                             <div class="position-relative">
-                                <img class="img-fluid w-100" src="~/img/@Model.Post.Imagen" alt="@Model.Post.Titulo">
+                                <img class="img-fluid w-100" src="@Model.Post.Imagen" alt="@Model.Post.Titulo">
                                 <div class="blog-date">
                                     <h6 class="font-weight-bold mb-n1">@Model.Post.FechaPublicacion.Date.Day</h6>
                                     <small class="text-white text-uppercase">@Model.Post.FechaPublicacion.ToString("MMMM")</small>
@@ -35,7 +35,7 @@
                     </div>
                     <!-- Blog  -->
                     <!-- comentarios -->
-                    @if (Model.Comentarios.Count != 0)
+                    @if (Model.Comentarios?.Any() == true)
                     {
                         <div class="bg-white" style="padding: 30px; margin-bottom: 30px;">
                             <h4 class="text-uppercase mb-4" style="letter-spacing: 5px;"> @Model.Comentarios.Count Comentarios</h4>
@@ -45,7 +45,7 @@
                                 var usuariocoment = usuarios.FirstOrDefault(x => x.IdUsuario == comentario.IdUsuario);
 
                                 <div class="media mb-4">
-                                    <img src="~/img/@usuariocoment.Imagen"
+                                    <img src="@usuariocoment.Imagen"
                                          alt="Image"
                                          class="img-fluid mr-3 mt-1"
                                          style="width: 45px" />
@@ -63,25 +63,28 @@
                                             </span>
                                             respuestas
                                         </div>
-                                        @foreach (ReplayComentario replay in Model.Replays)
+                                        @if (Model.Replays != null)
                                         {
-                                            var user = usuarios.FirstOrDefault(x => x.IdUsuario == replay.IdUsuario);
+                                            @foreach (ReplayComentario replay in Model.Replays.Where(r => r.IdUsuario == comentario.IdUsuario))
+                                            {
+                                                var user = usuarios.FirstOrDefault(x => x.IdUsuario == replay.IdUsuario);
 
-                                            <div class="replays replay-blog-@(replay.IdComentario) mt-4" data-id="@replay.IdReplay">
-                                                <img src="~/img/@user.Imagen"
-                                                     alt="Image"
-                                                     class="img-fluid mr-3 mt-1"
-                                                     style="width: 45px" />
-                                                <div class="media-body">
-                                                    <h6>
-                                                        <a href="">@user.Nombre @user.Apellido</a>
-                                                        <small><i>@replay.Fecha.ToShortDateString()</i></small>
-                                                    </h6>
-                                                    <p>
-                                                        @replay.Replay
-                                                    </p>
+                                                <div class="replays replay-blog-@(replay.IdComentario) mt-4" data-id="@replay.IdReply">
+                                                    <img src="@user.Imagen"
+                                                         alt="Image"
+                                                         class="img-fluid mr-3 mt-1"
+                                                         style="width: 45px" />
+                                                    <div class="media-body">
+                                                        <h6>
+                                                            <a href="">@user.Nombre @user.Apellido</a>
+                                                            <small><i>@replay.Fecha.ToShortDateString()</i></small>
+                                                        </h6>
+                                                        <p>
+                                                            @replay.Replay
+                                                        </p>
+                                                    </div>
                                                 </div>
-                                            </div>
+                                            }
                                         }
                                     </div>
                                 </div>

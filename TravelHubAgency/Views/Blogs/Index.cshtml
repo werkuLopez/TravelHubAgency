@@ -36,66 +36,44 @@
                 var idpost = $(this).data("idpost");
                 $("#contentPost").load("/Blogs/_SingleBlog?idpost=" + idpost);
             });
-
-            document.querySelectorAll(".replays-btn").forEach((btn) => {
-
-                // expand btn
-                var replaysBtn = document.querySelectorAll(".replays-btn");
-                var comments = document.querySelectorAll(".replays");
-
-                replaysBtn.forEach((btn) => {
-                    btn.addEventListener("click", function (e) {
-                        var idreplayBlog = e.target.parentElement.dataset.id;
-
-
-                        comments.forEach((coment) => {
-                            var idcometblog = coment.classList[1].split("-")[2];
-                            if (idcometblog != idreplayBlog) {
-                                coment.classList.remove("show");
-                            }
-                        });
-
-                        var replaysblog = document.querySelectorAll(
-                            ".replay-blog-" + idreplayBlog
-                        );
-
-                        replaysblog.forEach((comment) => {
-                            var idsreplay = comment;
-                            console.log(replaysblog[idsreplay]);
-
-                            if (comment.classList.contains("show")) {
-                                comment.classList.remove("show");
-                                e.currentTarget.classList.remove("active-replays");
-                            } else {
-                                comment.classList.add("show");
-                                e.currentTarget.classList.add("active-replays");
-                            }
-                        });
-                    });
-                });
-            });
-
-            // leave a comment
-            $(document).on("click", "#sendcomment", function () {
-                var idpost = parseInt($("#idpost").val());
-                var contenido = $("#contenido").val();
-
-                sendComment(idpost, contenido);
-            })
-
-            function sendComment(idpost, contenido) {
-
-                var request = "/Blogs/_SingleBlog?idpost=" + idpost + "&contenido=" + contenido;
-
-                $.ajax({
-                    url: request,
-                    type: "POST",
-                    success: function (data) {
-                        console.log(data);
-                    }
-                })
-            }
         });
+
+        $(document).ready(function () {
+            $(document).on("click", ".replays-btn", function () {
+                var $btn = $(this);
+                var idreplayBlog = $btn.data("id");
+
+                // Ocultar todas las respuestas que no corresponden al comentario actual
+                $(".replays").not(".replay-blog-" + idreplayBlog).removeClass("show");
+
+                // Mostrar solo las respuestas del usuario correspondiente
+                $(".replays").filter(".replay-blog-" + idreplayBlog).toggleClass("show");
+
+                // Alternar la clase active-replays en el botón
+                $btn.toggleClass("active-replays");
+            });
+        });
+
+        // leave a comment
+        $(document).on("click", "#sendcomment", function () {
+            var idpost = parseInt($("#idpost").val());
+            var contenido = $("#contenido").val();
+
+            sendComment(idpost, contenido);
+        })
+
+        function sendComment(idpost, contenido) {
+
+            var request = "/Blogs/_SingleBlog?idpost=" + idpost + "&contenido=" + contenido;
+
+            $.ajax({
+                url: request,
+                type: "POST",
+                success: function (data) {
+                    console.log(data);
+                }
+            });
+        }
     </script>
 }
 @section Styles {

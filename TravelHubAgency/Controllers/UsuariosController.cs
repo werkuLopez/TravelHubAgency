@@ -21,10 +21,9 @@ namespace TravelHubAgency.Controllers
             string claimId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
             int idusuario = int.Parse(claimId);
 
-            if (idusuario != null)
+            Usuario usuario= await this.service.GetPerfilUsuarioAsync();
+            if (usuario != null)
             {
-                Usuario usuario = await this.service.GetUsuarioByIdAsync(idusuario);
-                //usuario = await this.service.GetPerfilUsuarioAsync();
                 return View(usuario);
             }
 
@@ -44,7 +43,7 @@ namespace TravelHubAgency.Controllers
 
             if (file != null)
             {
-                usuario = await this.service.UpdateFotoPerfilUsuarioAsync(file.FileName);
+                usuario = await this.service.UpdateFotoPerfilUsuarioAsync(file);
             }
 
             return View(usuario);

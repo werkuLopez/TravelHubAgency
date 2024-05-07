@@ -15,7 +15,7 @@
                 <div class="col-lg-4 col-md-7 wow fadeInUp" data-wow-delay="0.1s">
                     <div class="package-item">
                         <div class="overflow-hidden">
-                            <img class="img-fluid" src="~/img/@Model.Imagen" alt="@Model.Nombre">
+                            <img class="img-fluid" src="@Model.Imagen" alt="@Model.Nombre">
                         </div>
                         <div class="d-flex border-bottom">
                             <small class="flex-fill text-center border-end py-2"><i class="fa fa-map-marker-alt text-primary me-2"></i>@Model.Nombre</small>
@@ -33,7 +33,12 @@
                             <p>@Model.Descripcion</p>
                             <div class="d-flex justify-content-center mb-2">
                                 <a asp-controller="Hoteles" asp-action="Index" class="btn btn-sm btn-primary px-3 border-end" style="border-radius: 30px 0 0 30px;">volver</a>
-                                <button class="btn btn-sm btn-primary px-3 book-hotel" data-id="@Model.IdHotel" style="border-radius: 0 30px 30px 0;">reservar ya</button>
+                                <a class="btn-sm btn-primary px-3"
+                                   asp-controller="Hoteles"
+                                   asp-action="ReservarHotel"
+                                   asp-route-id="@Model.IdHotel" style="border:none;color:#fff; border-radius: 0 30px 30px 0;">
+                                    reservar ya
+                                </a>
                             </div>
                         </div>
                     </div>

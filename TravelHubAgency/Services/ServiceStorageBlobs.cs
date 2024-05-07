@@ -15,20 +15,21 @@ namespace TravelHubAgency.Services
         }
 
         //METODO PARA SUBIR UN BLOB A UN CONTAINER 
-        public async Task UploadBlobAsync(string containerName, string blobName, Stream stream)
+        public async Task UploadBlobAsync(IFormFile file, string imageName)
         {
-            BlobContainerClient containerClient = this.client.GetBlobContainerClient(containerName);
-            BlobClient blobClient = containerClient.GetBlobClient(blobName);
-            //await containerClient.UploadBlobAsync(blobName, stream);
-            await blobClient.UploadAsync(stream, overwrite: true);
+            BlobContainerClient containerClient = this.client.GetBlobContainerClient("imagestravelhub");
+            BlobClient blobClient = containerClient.GetBlobClient(imageName);
+            using (Stream stream = file.OpenReadStream())
+            {
+                await blobClient.UploadAsync(stream, overwrite: true);
+            }
         }
 
         //METODO PARA ELIMINAR UN BLOB DE UN CONTAINER 
-        public async Task DeleteBlobAsync(string containerName, string blobName)
+        public async Task DeleteBlobAsync(string blobName)
         {
             BlobContainerClient containerClient =
-                this.client.GetBlobContainerClient(containerName);
-
+                this.client.GetBlobContainerClient("imagestravelhub");
             await containerClient.DeleteBlobAsync(blobName);
         }
 
@@ -53,9 +54,10 @@ namespace TravelHubAgency.Services
             await this.client.DeleteBlobContainerAsync(containerName);
         }
 
+        // ASIGNAMOS LA URL 
         public async Task<string> GetUrlImageBlob(string imagen)
         {
-            string url = this.UrlImages + imagen;
+            string url =this.UrlImages+ "/" + imagen;
             return url;
         }
     }

@@ -49,11 +49,11 @@ namespace TravelHubAgency.Controllers
         {
             if (file != null)
             {
-                this.uploadFiles.UploadFileAsync(file, Foldders.Images);
+                //this.uploadFiles.UploadFileAsync(file, Foldders.Images);
 
                 hotel.Imagen = file.FileName;
                 Hotel newHotel =
-                await this.service.InsertarHotelAsync(hotel);
+                await this.service.InsertarHotelAsync(hotel, file);
 
                 return RedirectToAction("Index");
             }
