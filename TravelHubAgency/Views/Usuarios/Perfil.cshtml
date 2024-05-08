@@ -17,11 +17,11 @@
                             <input type="file" name="file" class="position-absolute top-50" style="opacity:0 !important; width:100%;" id="fileInput" />
                             @if (Model.Imagen != "")
                             {
-                                <img class="rounded-circle mt-5" width="150px" src="@Model.Imagen">
+                                <img class="rounded-circle mt-5" width="200px" height="200px" src="@Model.Imagen">
                             }
                             else
                             {
-                                <img class="rounded-circle mt-5" width="150px" src="~/img/defaultUsuario.jpg">
+                                <img class="rounded-circle mt-5" width="200px" height="200px" src="~/img/defaultUsuario.jpg">
                             }
                             <label for="fileInput" class="position-absolute" style="top:80% !important; color: #e8604c;">
                                 <i class="fas fa-camera" style="font-size:xx-large;"></i>
@@ -90,7 +90,7 @@
         });
 
         document.getElementById('fileInput').addEventListener('change', function () {
-            document.getElementById('profileForm').submit();
+            document.getElementById('userprofile').submit();
             $(".fa-spinner").hide();
         });
     </script>
