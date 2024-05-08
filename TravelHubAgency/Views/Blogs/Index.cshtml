@@ -7,20 +7,26 @@
         <a asp-controller="Blogs" asp-action="PublicarPost" class="btn btn-outline-primary">publicar post</a>
     </div>
     <div class="container py-5">
+        <div class="text-center pt-5">
+            <span class="fas fa-spinner spin"></span>
+        </div>
         <div class="row gap-5">
-            <div id="contentPost" class="col-lg-9 wow fadeIn" data-wow-delay="0.2s">
-            </div>
-            <div class="col-lg-2 mt-5">
+            <div class="col-lg-3">
                 <!-- Etiquetas -->
                 <div class="mb-5">
                     <h4 class="text-uppercase mb-4" style="letter-spacing: 5px;">Etiquetas</h4>
-                    <div class="d-flex flex-wrap m-n1">
+                    <div class="d-flex flex-wrap m-n1 align-items-center">
                         @foreach (Etiqueta tag in Model)
                         {
-                            <a href="#@tag.Nombre" class="btn btn-light m-1">@tag.Nombre</a>
+                            <div class="mx-2">
+                                <input type="checkbox" id="tag@(tag.IdEtiqueta)" value="@tag.Nombre" name="tags" class="form-check-input tag" />
+                                <label for="tag@(tag.IdEtiqueta)"> @tag.Nombre</label>
+                            </div>
                         }
                     </div>
                 </div>
+            </div>
+            <div id="contentPost" class="col-lg-8" style="display:none">
             </div>
         </div>
     </div>
@@ -30,12 +36,73 @@
 @section Scripts {
     <script>
         $(function () {
-            $("#contentPost").load("/Blogs/_Publicaciones?page=1");
+
+            function loadPosts(url) {
+                $(".fa-spinner").show();
+                setTimeout(function () {
+                    $("#contentPost").load(url, function () {
+                        $(this).show();
+                        $(".fa-spinner").hide();
+                        truncateContent();
+                    });
+                }, 2000);
+            }
+
+            $(document).on("click", ".page-btn", function () {
+                $("#contentPost").hide();
+                var page = $(this).data("page");
+                loadPosts("/Blogs/_Publicaciones?page=" + page);
+            });
 
             $(document).on("click", ".btn-detail", function () {
                 var idpost = $(this).data("idpost");
-                $("#contentPost").load("/Blogs/_SingleBlog?idpost=" + idpost);
+                $("#contentPost").hide();
+                loadPosts("/Blogs/_SingleBlog?idpost=" + idpost);
             });
+
+            loadPosts("/Blogs/_Publicaciones?page=1");
+
+            $(document).on("change", ".tag", function () {
+
+                var tags = [];
+                $(".tag:checked").each(function () {
+                    tags.push($(this).val());
+                });
+
+                var currentPage = $("#currentPage").val();
+
+                $.ajax({
+                    url: "/Blogs/_Publicaciones",
+                    method: "POST",
+                    data: { tags: tags, page: currentPage },
+                    beforeSend: function () {
+                        $(".fa-spinner").show();
+                    },
+                    success: function (data) {
+                        $("#contentPost").html(data);
+                        $(".fa-spinner").hide();
+                        truncateContent();
+                    },
+                    error: function () {
+                        $(".fa-spinner").hide();
+                    }
+                });
+
+
+            });
+
+            function truncateContent() {
+                var elements = $(".truncate-content");
+                elements.each(function (index, element) {
+                    var maxLength = 100;
+                    var content = element.textContent;
+                    if (content.length > maxLength) {
+                        var truncatedContent = content.substring(0, maxLength) + '...';
+                        element.textContent = truncatedContent;
+                    }
+                });
+            }
+
         });
 
         $(document).ready(function () {

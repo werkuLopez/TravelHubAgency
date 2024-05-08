@@ -201,10 +201,11 @@
 
                     setTimeout(function () {
                         messageHtml.remove();
+                        $("#form-auth-container").removeClass("right-panel-active");
                     }, 3000);
                 },
                 error: function (error) {
-                    console.log(error);
+                    $("#form-auth-container").removeClass("right-panel-active");
                 }
             });
         }

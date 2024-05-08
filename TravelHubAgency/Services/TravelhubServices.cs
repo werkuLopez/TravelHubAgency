@@ -1702,6 +1702,19 @@ this.context.HttpContext.User.FindFirst(x => x.Type == "TOKEN").Value;
                 await this.CallApiAsync<List<Etiqueta>>(request);
             return etiquetas;
         }
+
+        public async Task<List<Post>> GetPostsByTagsAsync(List<string> tags, int page)
+        {
+            List<Post> posts = await GetAllPublicacionesAsync(page);
+            if (tags.Count != 0)
+            {
+                List<Post> filtered = posts.Where(x => tags.Any(z => x.Contenido.Contains(z))).ToList();
+
+                return filtered;
+            }
+            return posts;
+        }
+
         #endregion
     }
 }

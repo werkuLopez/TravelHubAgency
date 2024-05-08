@@ -1,5 +1,8 @@
 ﻿﻿﻿@using Microsoft.Extensions.Caching.Memory
 @using TravelHubAgency
 @using TravelHubAgency.Models
+@using Azure.Security.KeyVault.Secrets
 @inject IMemoryCache cache
+@inject IConfiguration config
+@inject SecretClient client
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers

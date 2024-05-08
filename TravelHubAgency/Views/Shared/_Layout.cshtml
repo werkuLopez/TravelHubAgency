@@ -1,7 +1,9 @@
 ﻿@{
     List<Continente> continentes = cache.Get<List<Continente>>("continentes");
     List<Pais> paises = cache.Get<List<Pais>>("paises");
-    string key = cache.Get<string>("APIKEY");
+
+    KeyVaultSecret secret = client.GetSecret("apikey");
+    string key = secret.Value;
 }
 
 <!DOCTYPE html>

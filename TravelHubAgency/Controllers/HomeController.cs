@@ -11,19 +11,12 @@ namespace TravelHubAgency.Controllers
     {
         private TravelhubServices service;
         private IMemoryCache cache;
-        private SecretClient secretClient;
-        private string apikey;
 
         public HomeController(TravelhubServices service,
-            IMemoryCache cache,
-            SecretClient secretClient)
+            IMemoryCache cache)
         {
             this.service = service;
             this.cache = cache;
-
-            this.secretClient = secretClient;
-            KeyVaultSecret secret = this.secretClient.GetSecret("apiKey");
-            this.apikey = secret.Value;
         }
 
         public async Task<IActionResult> Index()
@@ -59,8 +52,6 @@ namespace TravelHubAgency.Controllers
             ViewData["vuelos"] = await this.service.GetAllVuelosAsync();
             ViewData["hoteles"] = await this.service.GetAllHotelesAsync();
             ViewData["usuarios"] = await this.service.GetAllUsuariosAsync();
-
-            this.cache.Set("APIKEY", this.apikey);
 
             return View();
         }

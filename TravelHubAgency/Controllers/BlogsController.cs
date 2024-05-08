@@ -26,7 +26,24 @@ namespace TravelHubAgency.Controllers
             List<Etiqueta> etiquetas = await this.service.GetAllEtiquetasAsync();
             return View(etiquetas);
         }
+        [HttpPost]
+        public async Task<IActionResult> _Publicaciones(List<string>? tags, int page)
+        {
+            if (page == 0)
+            {
+                page = 1;
+            }
 
+            List<Post> posts =
+                await this.service.GetPostsByTagsAsync(tags, page);
+
+            ViewData["numRegistros"] = posts.Count;
+            ViewData["actualPage"] = page;
+            ViewData["usuarios"] = await this.service.GetAllUsuariosAsync();
+            return PartialView("_Publicaciones", posts);
+        }
+
+        [HttpGet]
         public async Task<IActionResult> _Publicaciones(int? page)
         {
             if (page == null || page == 0)
