@@ -5,12 +5,15 @@
 
 @if (Model != null && Model.Count != 0)
 {
-    <div class="container-xxl py-5 wow fadeInUp" data-wow-delay="0.1s">
-        <div class="d-flex justify-content-between mb-2 mx-auto">
-            <a asp-controller="Blogs" asp-action="PublicarPost" class="btn btn-outline-primary">publicar post</a>
+    <div class="container-xxl wow fadeInUp" data-wow-delay="0.1s">
+        <div class="text-center mt-5">
+            <span class="fas fa-spinner spin"></span>
         </div>
-        <div class="container py-5">
-            <div class="row pb-3">
+        <div class="container py-5" id="userposts" style="display:none;">
+            <div class="d-flex justify-content-between mb-3 mx-auto">
+                <a asp-controller="Blogs" asp-action="PublicarPost" class="btn btn-outline-primary">publicar post</a>
+            </div>
+            <div class="row pb-3 g-4 justify-content-center">
                 @foreach (Post post in Model)
                 {
                     var usuario = usuarios.FirstOrDefault(x => x.IdUsuario == post.IdUsuario);
@@ -35,6 +38,14 @@
                                 <a class="h5 m-0 text-decoration-none btn-detail"
                                    data-idpost="@post.IdPublicacion">@post.Contenido</a>
                             </div>
+                            <div class="py-5 d-flex justify-content-end gx-2 mx-2">
+                                <a class="btn btn-outline-dark modpos-tbtn" asp-controller="Usuarios" asp-action="UpdatePost" asp-route-idpost="@post.IdPublicacion">
+                                    modificar
+                                </a>
+                                <button class="btn btn-outline-primary deletebtn" data-idpost="@post.IdPublicacion">
+                                    eliminar post
+                                </button>
+                            </div>
                         </div>
                     </div>
                 }
@@ -54,4 +65,29 @@ else
             </a>
         </div>
     </div>
+}
+
+@section Scripts {
+    <script>
+        $(function () {
+            $.get('@Url.Action("Publicaciones", "Usuarios")', function (data) {
+                $(".fa-spinner").show();
+                setTimeout(function () {
+                    $("#userposts").html(data.response);
+                    $("#userposts").show();
+                    $(".fa-spinner").hide();
+                }, 3000);
+            });
+
+            $(document).on("click", ".deletebtn", function () {
+                var idpost = $(this).data("idpost");
+                $.get('@Url.Action("EliminarPost", "Usuarios")', { idpost: idpost }, function (data) {
+                    $(".fa-spinner").show();
+                    setTimeout(function () {
+                        $(".fa-spinner").hide();
+                    }, 3000);
+                });
+            })
+        });
+    </script>
 }

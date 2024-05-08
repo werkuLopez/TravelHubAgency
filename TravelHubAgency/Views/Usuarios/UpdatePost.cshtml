@@ -1,0 +1,53 @@
+﻿@model Post
+
+<div class="container py-3" id="postform">
+    <div class="p-3">
+        <form method="post" enctype="multipart/form-data">
+            <input name="IdPublicacion" id="idpost" value="@Model.IdPublicacion" hidden />
+            <input name="IdUsuario" id="idsuario" value="@Model.IdUsuario" hidden />
+            <input name="imagen" id="imagen" value="@Model.Imagen" hidden />
+            @Html.AntiForgeryToken()
+            <h1 class="text-black mb-4">Modificar post</h1>
+            <div class="row g-5 align-items-center">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <div class="form-floating mt-3">
+                            <input class="form-control" id="titulo" name="titulo" value="@Model.Titulo" />
+                            <label class="form-label" for="titulo">
+                                Titulo:
+                            </label>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-floating mt-3">
+                            <textarea class="form-control h-50" id="contenido"
+                                      name="contenido" cols="4" rows="10" style="resize:inherit;">@Model.Contenido</textarea>
+                            <label class="form-label" for="contenido">
+                                Contenido:
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 text-white">
+                    <div class="col-12 position-relative">
+                        <img src="@Model.Imagen" class="img-fluid w-100" />
+                        <div class="position-absolute" style="top:0; left:0; bottom:0; right:0; background:rgba(0,0,0,0.5);">
+                            <span style="color: white; text-align:center;"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="form-floating mt-3">
+                            <input type="file" class="form-control w-100" name="file" />
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <div class="row gap-2">
+                        <a asp-controller="Usuarios" asp-action="Publicaciones" class="btn btn-outline-primary w-25 py-3 btn-cancelar"> Cancelar</a>
+                        <button class="btn btn-outline-dark py-3 w-25"> Guardar cambios</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

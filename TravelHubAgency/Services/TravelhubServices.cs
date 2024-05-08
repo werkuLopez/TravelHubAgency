@@ -1,6 +1,10 @@
-﻿using Microsoft.Extensions.Hosting;
+﻿using Azure.Security.KeyVault.Secrets;
+using Azure.Storage.Blobs;
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Drawing;
 using System.Net.Http.Headers;
 using System.Text;
 using TravelHubAgency.Data;
@@ -19,13 +23,19 @@ namespace TravelHubAgency.Repositories
         private MediaTypeWithQualityHeaderValue header;
         private IHttpContextAccessor context;
         private ServiceStorageBlobs blobs;
+        private string UrlBlobContainer;
 
-        public TravelhubServices(IConfiguration config, IHttpContextAccessor context, ServiceStorageBlobs blobs)
+        public TravelhubServices(IConfiguration config,
+            IHttpContextAccessor context,
+            ServiceStorageBlobs blobs)
         {
             this.ApiUrl = config.GetValue<string>("ApiUrls:ApiTravelHub");
             this.header = new MediaTypeWithQualityHeaderValue("application/json");
             this.context = context;
             this.blobs = blobs;
+            this.UrlBlobContainer = config.GetValue<string>("UrlBlobs:UrlContainer");
+
+
         }
 
 
@@ -187,7 +197,7 @@ namespace TravelHubAgency.Repositories
 
             foreach (Destino destino in destinos)
             {
-                destino.Imagen = await this.blobs.GetUrlImageBlob(destino.Imagen);
+                destino.Imagen = this.UrlBlobContainer + "/" + destino.Imagen;
                 news.Add(destino);
             }
             return news;
@@ -200,7 +210,7 @@ namespace TravelHubAgency.Repositories
 
             foreach (Destino destino in destinos)
             {
-                destino.Imagen = await this.blobs.GetUrlImageBlob(destino.Imagen);
+                destino.Imagen = this.UrlBlobContainer + "/" + destino.Imagen;
                 news.Add(destino);
             }
             return news;
@@ -214,7 +224,7 @@ namespace TravelHubAgency.Repositories
 
             foreach (Destino destino in destinos)
             {
-                destino.Imagen = await this.blobs.GetUrlImageBlob(destino.Imagen);
+                destino.Imagen = this.UrlBlobContainer + "/" + destino.Imagen;
                 news.Add(destino);
             }
             return news;
@@ -228,7 +238,7 @@ namespace TravelHubAgency.Repositories
 
             foreach (Destino destino in destinos)
             {
-                destino.Imagen = await this.blobs.GetUrlImageBlob(destino.Imagen);
+                destino.Imagen = this.UrlBlobContainer + "/" + destino.Imagen;
                 news.Add(destino);
             }
             return news;
@@ -238,7 +248,7 @@ namespace TravelHubAgency.Repositories
         {
             string request = "api/destinos/finddestino/" + iddestino;
             Destino destinos = await this.CallApiAsync<Destino>(request);
-            destinos.Imagen = await this.blobs.GetUrlImageBlob(destinos.Imagen);
+            destinos.Imagen = this.UrlBlobContainer + "/" + destinos.Imagen;
             return destinos;
         }
 
@@ -273,6 +283,7 @@ namespace TravelHubAgency.Repositories
                     Imagen = imagen,
                     Precio = precio
                 };
+                model.Imagen = "destino" + model.IdDestino + ".jpg";
 
                 string jsonData =
                     JsonConvert.SerializeObject(model);
@@ -289,11 +300,11 @@ namespace TravelHubAgency.Repositories
 
                     if (file != null)
                     {
-                        string blobName = "destino" + data.Imagen + ".png";
+                        string blobName = "destino" + data.IdDestino + ".jpg";
                         await this.blobs.UploadBlobAsync(file, blobName);
                     }
 
-                    data.Imagen = await this.blobs.GetUrlImageBlob(data.Imagen);
+                    data.Imagen = this.UrlBlobContainer + "/" + data.Imagen;
 
                     return data;
                 }
@@ -333,7 +344,7 @@ namespace TravelHubAgency.Repositories
                 destino.Descripcion = descripcion;
                 destino.Longitud = longitud;
                 destino.Latitud = latitud;
-                destino.Imagen = imagen;
+                destino.Imagen = destino.Imagen;
                 destino.Precio = precio;
 
                 string jsonData =
@@ -348,11 +359,11 @@ namespace TravelHubAgency.Repositories
                 {
                     Destino data =
                         await response.Content.ReadAsAsync<Destino>();
-                    string blobName = "destino" + data.Imagen + ".png";
+                    string blobName = "destino" + data.IdDestino + ".jpg";
                     await this.blobs.UploadBlobAsync(file, blobName);
 
 
-                    data.Imagen = await this.blobs.GetUrlImageBlob(blobName);
+                    data.Imagen = this.UrlBlobContainer + "/" + blobName;
                     return data;
                 }
                 else
@@ -370,7 +381,12 @@ namespace TravelHubAgency.Repositories
             using (HttpClient client = new HttpClient())
             {
                 string blobName = "destino" + iddestion + ".jpg";
-                await this.blobs.DeleteBlobAsync(blobName);
+
+                BlobClient blob = await this.blobs.FindBlobAsync(blobName);
+                if (blob != null)
+                {
+                    await this.blobs.DeleteBlobAsync(blobName);
+                }
 
                 string request = "api/destinos/deletedestino/" + iddestion;
                 int result = await this.CallApiAsync<int>(request, token);
@@ -388,7 +404,7 @@ namespace TravelHubAgency.Repositories
 
             foreach (Package package in packs)
             {
-                package.Imagen = await this.blobs.GetUrlImageBlob(package.Imagen);
+                package.Imagen = this.UrlBlobContainer + "/" + package.Imagen;
                 news.Add(package);
             }
             return news;
@@ -402,7 +418,7 @@ namespace TravelHubAgency.Repositories
 
             foreach (Package package in packages)
             {
-                package.Imagen = await this.blobs.GetUrlImageBlob(package.Imagen);
+                package.Imagen = this.UrlBlobContainer + "/" + package.Imagen;
                 news.Add(package);
             }
             return news;
@@ -414,7 +430,7 @@ namespace TravelHubAgency.Repositories
             Package package =
                 await this.CallApiAsync<Package>(request);
 
-            package.Imagen = await this.blobs.GetUrlImageBlob(package.Imagen);
+            package.Imagen = this.UrlBlobContainer + "/" + package.Imagen;
 
             return package;
         }
@@ -461,10 +477,10 @@ namespace TravelHubAgency.Repositories
                     Package data =
                     await response.Content.ReadAsAsync<Package>();
 
-                    string blobName = "package" + data.Imagen + ".png";
+                    string blobName = "package" + data.IdPack + ".jpg";
                     await this.blobs.UploadBlobAsync(file, blobName);
 
-                    data.Imagen = await this.blobs.GetUrlImageBlob(data.Imagen);
+                    data.Imagen = this.UrlBlobContainer + "/" + blobName;
                     return data;
                 }
                 else
@@ -516,10 +532,10 @@ namespace TravelHubAgency.Repositories
                     Package data =
                         await response.Content.ReadAsAsync<Package>();
 
-                    string blobName = "package" + data.Imagen + ".png";
+                    string blobName = "package" + data.IdPack + ".jpg";
                     await this.blobs.UploadBlobAsync(file, blobName);
 
-                    data.Imagen = await this.blobs.GetUrlImageBlob(blobName);
+                    data.Imagen = this.UrlBlobContainer + "/" + blobName;
                     return data;
                 }
                 else
@@ -539,7 +555,12 @@ namespace TravelHubAgency.Repositories
                 string request = "api/packages/eliminar/" + idPack;
 
                 string blobName = "package" + idPack + ".jpg";
-                await this.blobs.DeleteBlobAsync(blobName);
+
+                BlobClient blob = await this.blobs.FindBlobAsync(blobName);
+                if (blob != null)
+                {
+                    await this.blobs.DeleteBlobAsync(blobName);
+                }
 
                 int result = await this.CallApiAsync<int>(request, token);
             }
@@ -559,7 +580,7 @@ namespace TravelHubAgency.Repositories
 
             foreach (Usuario usuario in usuarios)
             {
-                usuario.Imagen = await this.blobs.GetUrlImageBlob(usuario.Imagen);
+                usuario.Imagen = this.UrlBlobContainer + "/" + usuario.Imagen;
                 news.Add(usuario);
             }
             return news;
@@ -574,7 +595,7 @@ namespace TravelHubAgency.Repositories
 
             Usuario usuario =
                 await this.CallApiAsync<Usuario>(request, token);
-            usuario.Imagen = await this.blobs.GetUrlImageBlob(usuario.Imagen);
+            usuario.Imagen = this.UrlBlobContainer + "/" + usuario.Imagen;
             return usuario;
         }
 
@@ -621,8 +642,6 @@ namespace TravelHubAgency.Repositories
                     List<Usuario> usuarios = await GetAllUsuariosAsync();
 
                     Usuario updated = usuarios.Where(x => x.Email == model.Email).FirstOrDefault();
-                    
-                    //updated.Imagen = await this.blobs.GetUrlImageBlob(updated.Imagen);
                     return updated;
                 }
                 else
@@ -637,7 +656,7 @@ namespace TravelHubAgency.Repositories
             List<Usuario> usuarios = await GetAllUsuariosAsync();
 
             Usuario user = usuarios.FirstOrDefault(x => x.IdUsuario == id);
-            user.Imagen = await this.blobs.GetUrlImageBlob(user.Imagen);
+            user.Imagen = this.UrlBlobContainer + "/" + user.Imagen;
             return user;
         }
 
@@ -646,7 +665,7 @@ namespace TravelHubAgency.Repositories
             List<Usuario> usuarios = await this.GetAllUsuariosAsync();
 
             Usuario user = usuarios.FirstOrDefault(x => x.Email == username);
-            user.Imagen = await this.blobs.GetUrlImageBlob(user.Imagen);
+            user.Imagen = this.UrlBlobContainer + "/" + user.Imagen;
             return user;
         }
 
@@ -673,10 +692,10 @@ namespace TravelHubAgency.Repositories
                     Usuario usuario =
                         await response.Content.ReadAsAsync<Usuario>();
 
-                    string blobName = usuario.Nombre + usuario.IdUsuario + ".png";
+                    string blobName = "usuario" + usuario.IdUsuario + ".jpg";
                     await this.blobs.UploadBlobAsync(file, blobName);
 
-                    usuario.Imagen = await this.blobs.GetUrlImageBlob(blobName);
+                    usuario.Imagen = this.UrlBlobContainer + "/" + blobName;
                     return usuario;
                 }
                 else
@@ -1146,7 +1165,7 @@ namespace TravelHubAgency.Repositories
 
             foreach (Post post in posts)
             {
-                post.Imagen = await this.blobs.GetUrlImageBlob(post.Imagen);
+                post.Imagen = this.UrlBlobContainer + "/" + post.Imagen;
                 news.Add(post);
             }
             return news;
@@ -1163,7 +1182,7 @@ namespace TravelHubAgency.Repositories
 
             foreach (Post post in postsUsuario)
             {
-                post.Imagen = await this.blobs.GetUrlImageBlob(post.Imagen);
+                post.Imagen = this.UrlBlobContainer + "/" + post.Imagen;
                 news.Add(post);
             }
             return news;
@@ -1171,10 +1190,10 @@ namespace TravelHubAgency.Repositories
 
         public async Task<Post> GetPostByIdAsync(int id)
         {
-            string request = "api/publicaciones/post/" + id;
+            string request = "api/publicaciones/" + id;
             Post post =
                 await this.CallApiAsync<Post>(request);
-            post.Imagen = await this.blobs.GetUrlImageBlob(post.Imagen);
+            post.Imagen = this.UrlBlobContainer + "/" + post.Imagen;
             return post;
         }
 
@@ -1185,7 +1204,7 @@ namespace TravelHubAgency.Repositories
 
             using (HttpClient client = new HttpClient())
             {
-                string request = "api/publicaciones/crearpost";
+                string request = "api/publicaciones";
                 client.BaseAddress = new Uri(this.ApiUrl);
                 client.DefaultRequestHeaders.Clear();
                 client.DefaultRequestHeaders.Accept.Add(this.header);
@@ -1217,10 +1236,10 @@ namespace TravelHubAgency.Repositories
                     Post postUloaded =
                         await response.Content.ReadAsAsync<Post>();
 
-                    string blobName = "post" + postUloaded.IdPublicacion + ".png";
+                    string blobName = "post" + postUloaded.IdPublicacion + ".jpg";
                     await this.blobs.UploadBlobAsync(file, blobName);
 
-                    postUloaded.Imagen = await this.blobs.GetUrlImageBlob(blobName);
+                    postUloaded.Imagen = this.UrlBlobContainer + "/" + blobName;
                     return postUloaded;
                 }
                 else
@@ -1232,14 +1251,83 @@ namespace TravelHubAgency.Repositories
 
         }
 
+        public async Task<Post> UpdatePostAsync(Post post, IFormFile file)
+        {
+            string token =
+            this.context.HttpContext.User.FindFirst(x => x.Type == "TOKEN").Value;
+
+            using (HttpClient client = new HttpClient())
+            {
+                string request = "api/publicaciones";
+                client.BaseAddress = new Uri(this.ApiUrl);
+                client.DefaultRequestHeaders.Clear();
+                client.DefaultRequestHeaders.Accept.Add(this.header);
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+                Post newPost = new Post
+                {
+                    IdPublicacion = post.IdPublicacion,
+                    Contenido = post.Contenido,
+                    FechaPublicacion = DateTime.Now,
+                    Imagen = post.Imagen,
+                    Titulo = post.Titulo,
+                    IdUsuario = post.IdUsuario,
+                };
+
+                string jsonData =
+                    JsonConvert.SerializeObject(newPost);
+                StringContent content =
+                    new StringContent(jsonData, Encoding.UTF8, "application/json");
+
+                HttpResponseMessage response =
+                   await client.PutAsync(request, content);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    Post postUloaded =
+                        await response.Content.ReadAsAsync<Post>();
+
+                    if (file != null)
+                    {
+                        string blobName = "post" + postUloaded.IdPublicacion + ".jpg";
+                        await this.blobs.UploadBlobAsync(file, blobName);
+                    }
+
+                    postUloaded.Imagen = this.UrlBlobContainer + "/" + postUloaded.Imagen;
+                    return postUloaded;
+                }
+                else
+                {
+                    return null;
+                }
+
+            }
+        }
+
         public async Task EliminarPostAsync(int id)
         {
-            string request = "api/publicaciones/EliminarPost/" + id;
+            string token =
+                this.context.HttpContext.User.FindFirst(x => x.Type == "TOKEN").Value;
 
-            string blobName = "post" + id + ".jpg";
-            await this.blobs.DeleteBlobAsync(blobName);
+            using (HttpClient client = new HttpClient())
+            {
+                string request = "/api/publicaciones/" + id;
+                client.BaseAddress = new Uri(this.ApiUrl);
+                client.DefaultRequestHeaders.Clear();
+                client.DefaultRequestHeaders.Accept.Add(this.header);
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-            int reult = await this.CallApiAsync<int>(request);
+                HttpResponseMessage response =
+                    await client.DeleteAsync(request);
+
+                string blobName = "post" + id + ".jpg";
+
+                BlobClient blob = await this.blobs.FindBlobAsync(blobName);
+                if (blob != null)
+                {
+                    await this.blobs.DeleteBlobAsync(blobName);
+                }
+            }
         }
 
         public async Task<List<Post>> GetPublicacionesUsuario()
@@ -1255,7 +1343,7 @@ namespace TravelHubAgency.Repositories
 
             foreach (Post post in posts)
             {
-                post.Imagen = await this.blobs.GetUrlImageBlob(post.Imagen);
+                post.Imagen = this.UrlBlobContainer + "/" + post.Imagen;
                 news.Add(post);
             }
             return news;
@@ -1452,7 +1540,7 @@ this.context.HttpContext.User.FindFirst(x => x.Type == "TOKEN").Value;
 
             foreach (Hotel hotel in hoteles)
             {
-                hotel.Imagen = await this.blobs.GetUrlImageBlob(hotel.Imagen);
+                hotel.Imagen = this.UrlBlobContainer + "/" + hotel.Imagen;
                 news.Add(hotel);
             }
             return news;
@@ -1463,7 +1551,7 @@ this.context.HttpContext.User.FindFirst(x => x.Type == "TOKEN").Value;
             string request = "api/hoteles/" + id;
             Hotel hotel =
                 await this.CallApiAsync<Hotel>(request);
-            hotel.Imagen = await this.blobs.GetUrlImageBlob(hotel.Imagen);
+            hotel.Imagen = this.UrlBlobContainer + "/" + hotel.Imagen;
             return hotel;
         }
 
@@ -1503,10 +1591,10 @@ this.context.HttpContext.User.FindFirst(x => x.Type == "TOKEN").Value;
                     Hotel h =
                         await response.Content.ReadAsAsync<Hotel>();
 
-                    string blobName = "hotel" + h.IdHotel + ".png";
+                    string blobName = "hotel" + h.IdHotel + ".jpg";
                     await this.blobs.UploadBlobAsync(file, blobName);
 
-                    h.Imagen = await this.blobs.GetUrlImageBlob(blobName);
+                    h.Imagen = this.UrlBlobContainer + "/" + blobName;
                     return h;
                 }
                 else
@@ -1553,10 +1641,10 @@ this.context.HttpContext.User.FindFirst(x => x.Type == "TOKEN").Value;
                     Hotel h =
                         await response.Content.ReadAsAsync<Hotel>();
 
-                    string blobName = "hotel" + h.IdHotel + ".png";
+                    string blobName = "hotel" + h.IdHotel + ".jpg";
                     await this.blobs.UploadBlobAsync(file, blobName);
 
-                    h.Imagen = await this.blobs.GetUrlImageBlob(blobName);
+                    h.Imagen = this.UrlBlobContainer + "/" + h.Imagen;
                     return h;
                 }
                 else
@@ -1577,7 +1665,12 @@ this.context.HttpContext.User.FindFirst(x => x.Type == "TOKEN").Value;
                 string request = "api/hoteles/" + id;
 
                 string blobName = "hotel" + id + ".jpg";
-                await this.blobs.DeleteBlobAsync(blobName);
+
+                BlobClient blob = await this.blobs.FindBlobAsync(blobName);
+                if (blob != null)
+                {
+                    await this.blobs.DeleteBlobAsync(blobName);
+                }
 
                 int result = await this.CallApiAsyncDelete<int>(request, token);
             }

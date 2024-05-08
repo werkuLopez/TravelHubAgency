@@ -8,10 +8,10 @@ namespace TravelHubAgency.Services
         private BlobServiceClient client;
         private string UrlImages;
 
-        public ServiceStorageBlobs(BlobServiceClient client, IConfiguration config)
+        public ServiceStorageBlobs(BlobServiceClient client)
         {
             this.client = client;
-            UrlImages = config.GetValue<string>("UrlBlobs:UrlContainer");
+          // this.UrlImages = config.GetValue<string>("UrlBlobs:UrlContainer");
         }
 
         //METODO PARA SUBIR UN BLOB A UN CONTAINER 
@@ -33,9 +33,9 @@ namespace TravelHubAgency.Services
             await containerClient.DeleteBlobAsync(blobName);
         }
 
-        public async Task<BlobClient> FindBlobAsync(string containerName, string blobName)
+        public async Task<BlobClient> FindBlobAsync(string blobName)
         {
-            BlobContainerClient containerClient = this.client.GetBlobContainerClient(containerName);
+            BlobContainerClient containerClient = this.client.GetBlobContainerClient("imagestravelhub");
             BlobClient blobClient = containerClient.GetBlobClient(blobName);
 
             if (await blobClient.ExistsAsync())
@@ -55,10 +55,10 @@ namespace TravelHubAgency.Services
         }
 
         // ASIGNAMOS LA URL 
-        public async Task<string> GetUrlImageBlob(string imagen)
-        {
-            string url =this.UrlImages+ "/" + imagen;
-            return url;
-        }
+        //public async Task<string> GetUrlImageBlob(string imagen)
+        //{
+        //    string url = this.UrlImages + "/" + imagen;
+        //    return url;
+        //}
     }
 }

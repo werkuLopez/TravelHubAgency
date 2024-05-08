@@ -56,7 +56,6 @@ namespace TravelHubAgency.Controllers
 
         }
         [AuthorizeUsuario]
-        [HttpGet]
         public async Task<IActionResult> _UpdateVuelo(int idvuelo)
         {
             Vuelo vuelo = await this.service.GetVueloByIdAsync(idvuelo);

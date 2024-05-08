@@ -36,7 +36,6 @@ namespace TravelHubAgency.Controllers
 
             List<Post> publicaciones =
                 await this.service.GetAllPublicacionesAsync(page.Value);
-
             int numRegistros = publicaciones.Count;
 
             ViewData["numRegistros"] = numRegistros;
@@ -86,8 +85,8 @@ namespace TravelHubAgency.Controllers
 
             if (file != null)
             {
-                await this.uploadFiles.UploadFileAsync(file, Foldders.Images);
-                await this.service.PublicarPostAsync(post, file.FileName,file);
+                //await this.uploadFiles.UploadFileAsync(file, Foldders.Images);
+                await this.service.PublicarPostAsync(post, file.FileName, file);
 
                 return RedirectToAction("Index");
             }

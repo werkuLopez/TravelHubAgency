@@ -1,6 +1,7 @@
 ﻿@{
     List<Continente> continentes = cache.Get<List<Continente>>("continentes");
     List<Pais> paises = cache.Get<List<Pais>>("paises");
+    string key = cache.Get<string>("APIKEY");
 }
 
 <!DOCTYPE html>
@@ -16,10 +17,10 @@
     <link rel="stylesheet" href="~/css/multistepsform.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/TravelHubAgency.styles.css" asp-append-version="true" />
-    <script src="https://maps.googleapis.com/maps/api/js?libraries=places&key=AIzaSyB_sNNhR1rCinzXXrVxI6VhQlYUTbQbAyo&callback=initAutocomplete"
-        defer>
+    <script src="https://maps.googleapis.com/maps/api/js?libraries=places&key=@key&callback=initAutocomplete"
+            defer>
     </script>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB_sNNhR1rCinzXXrVxI6VhQlYUTbQbAyo&callback=initMap"
+    <script src="https://maps.googleapis.com/maps/api/js?key=@key&callback=initMap"
             async defer></script>
 
 </head>

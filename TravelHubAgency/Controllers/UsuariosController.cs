@@ -21,7 +21,7 @@ namespace TravelHubAgency.Controllers
             string claimId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
             int idusuario = int.Parse(claimId);
 
-            Usuario usuario= await this.service.GetPerfilUsuarioAsync();
+            Usuario usuario = await this.service.GetPerfilUsuarioAsync();
             if (usuario != null)
             {
                 return View(usuario);
@@ -57,6 +57,31 @@ namespace TravelHubAgency.Controllers
             ViewData["usuarios"] = await this.service.GetAllUsuariosAsync();
 
             return View(misPublicaciones);
+        }
+
+        [AuthorizeUsuario]
+        public async Task<IActionResult> UpdatePost(int idpost)
+        {
+            Post post = await this.service.GetPostByIdAsync(idpost);
+            return View(post);
+        }
+
+        [AuthorizeUsuario]
+        [HttpPost]
+        public async Task<IActionResult> UpdatePost(Post post, IFormFile file)
+        {
+            Post updated = await this.service.UpdatePostAsync(post, file);
+
+            return RedirectToAction("Publicaciones");
+        }
+
+        [AuthorizeUsuario]
+        [HttpGet]
+        public async Task<IActionResult> EliminarPost(int idpost)
+        {
+            await this.service.EliminarPostAsync(idpost);
+
+            return RedirectToAction("Publicaciones");
         }
     }
 }

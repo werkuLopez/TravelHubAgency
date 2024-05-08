@@ -1,8 +1,8 @@
 ﻿
-<div id="hotelesContent" class="mt-4">
-    <div class="text-center">
-        <span class="fas fa-spinner spin" style="display: none;"></span>
-    </div>
+<div class="text-center">
+    <span class="fas fa-spinner spin" style="display: none;"></span>
+</div>
+<div id="hotelesContent" class="mt-4" style="display:none;">
 </div>
 
 
@@ -15,15 +15,21 @@
 
             function loadHoteles() {
                 $(".fa-spinner").show();
-                $("#hotelesContent").load("/Hoteles/_Hoteles");
-                $(".fa-spinner").hide();
+                setTimeout(function () {
+                    $("#hotelesContent").load("/Hoteles/_Hoteles");
+                    $("#hotelesContent").show();
+                    $(".fa-spinner").hide();
+                }, 2000);
             }
 
             $(document).on("click", ".btn", function () {
                 var id = parseInt($(this).data("id"));
                 $(".fa-spinner").show();
-                $("#hotelesContent").load("/Hoteles/_SingleHotel?id=" + id);
-                $(".fa-spinner").hide();
+                setTimeout(function () {
+                    $("#hotelesContent").load("/Hoteles/_SingleHotel?id=" + id);
+                    $("#hotelesContent").show();
+                    $(".fa-spinner").hide();
+                }, 2000);
             });
 
 
@@ -35,24 +41,4 @@
             });
         });
     </script>
-}
-
-@section Styles {
-    <style>
-
-        @@keyframes spin {
-            0% {
-                transform: rotate(0deg);
-            }
-
-            100% {
-                transform: rotate(360deg);
-            }
-        }
-
-        .spin {
-            font-size: 22px;
-            animation: spin 1s infinite linear;
-        }
-    </style>
 }

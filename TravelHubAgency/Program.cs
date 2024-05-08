@@ -50,6 +50,7 @@ builder.Services.AddAzureClients(factory =>
 SecretClient secretClient = builder.Services.BuildServiceProvider().GetService<SecretClient>();
 KeyVaultSecret secret = await secretClient.GetSecretAsync("StorageAccount");
 string azureKeys = secret.Value;
+
 BlobServiceClient blobServiceClient = new BlobServiceClient(azureKeys);
 builder.Services.AddTransient<BlobServiceClient>(x => blobServiceClient);
 builder.Services.AddTransient<ServiceStorageBlobs>();

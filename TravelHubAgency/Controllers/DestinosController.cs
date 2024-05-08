@@ -155,7 +155,7 @@ namespace TravelHubAgency.Controllers
                     destino.Region, destino.Descripcion, file.FileName, destino.Latitud,
                     destino.Longitud, destino.Precio, file);
 
-                return RedirectToAction("Destinos");
+                return RedirectToAction("Index");
             }
             else
             {
